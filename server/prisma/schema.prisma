@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum HiveType {
+  DADANT
+  LANGSTROTH
+  WARRE
+  KENYAN
+  VOIRNOT
+}
+
+enum FrameCount {
+  FRAME_8
+  FRAME_10
+  FRAME_12
+  FRAME_14
+}
+
+enum TranshumanceReason {
+  HONEY_FLOW     // Miellée
+  WINTERING      // Hivernage  
+  POLLINATION    // Pollinisation
+  TREATMENT      // Traitement
+  MAINTENANCE    // Maintenance
+  OTHER          // Autre
+}
+
+enum HiveStatus {
+  ACTIVE      // Ruche en production normale
+  INACTIVE    // Ruche temporairement inactive
+  EMPTY       // Ruche vide (pas de colonie)
+  WINTERING   // Ruche en hivernage
+  SWARMED     // Ruche qui a essaimé
+  DEAD        // Colonie morte
+  QUARANTINE  // Quarantaine (maladie, traitement)
+  MAINTENANCE // En réparation/maintenance
+}
+
+
+//Table users
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  roleId    Int
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt 
+
+  //Relation
+  apiaries  Apiary[]
+
+  role  Role  @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  
+  //Nom de la table
+  @@map("users")
+}
+
+//Table apiaries
+model Apiary{
+  id        Int       @id @default(autoincrement())
+  name      String
+  address   String
+  city      String
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt
+  userId    Int
+
+  //Relation
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiary_hives  ApiaryHive[]
+
+  @@map("apiaries")
+}
+
+
+//Table hive
+model Hive {
+  id          Int         @id @default(autoincrement())
+  name        String
+  type        HiveType    @default(DADANT)
+  framecount  FrameCount  @default(FRAME_10)
+  color       String
+  status      HiveStatus  @default(ACTIVE)
+  yearBuilt   DateTime
+  createdAt   DateTime    @default(now())
+  updateAt    DateTime    @updatedAt
+
+  //Relation
+  apiary_hives  ApiaryHive[]
+
+  @@map("hives")
+
+}
+
+//Table de jointure apiary_hives
+model ApiaryHive {
+  id        Int       @id @default(autoincrement())
+  apiaryId  Int
+  hiveId    Int
+  reason    TranshumanceReason
+  note      String?
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+
+  //Relation
+  apiary    Apiary  @relation(fields: [apiaryId], references: [id], onDelete: Restrict)
+  hive    Hive  @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+
+  @@map("apiary_hives")
+}
+
+model Role {
+  id  Int @id @default(autoincrement())
+  name  String  @unique
+
+  users User[]
+
+  @@map("roles")
+}
