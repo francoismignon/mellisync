@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import testRoutes from './src/routes/test';
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
+app.use('/api', testRoutes);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{
