@@ -1,6 +1,4 @@
-import { PrismaClient } from "../generated/prisma/";
-
-const prisma = new PrismaClient();
+import prisma from "../src/lib/prisma";
 
 async function main() {
   console.log("🌱 Démarrage du seeding...");
@@ -21,7 +19,16 @@ async function main() {
     },
   });
 
-  console.log("✅ Rôles créés");
+  await prisma.user.upsert({
+    where: {email: "admin@mellisync.com"},
+    update:{},
+    create: {
+      name: "Admin",
+      email: "admin@mellisync.com",
+      password: "admin",
+      roleId: 1
+    }
+  });
 }
 
 main()

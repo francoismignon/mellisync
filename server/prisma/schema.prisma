@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -58,7 +57,7 @@ model User {
   password  String
   roleId    Int
   createdAt DateTime  @default(now())
-  updateAt  DateTime  @updatedAt 
+  updatedAt  DateTime  @updatedAt 
 
   //Relation
   apiaries  Apiary[]
@@ -76,7 +75,7 @@ model Apiary{
   address   String
   city      String
   createdAt DateTime  @default(now())
-  updateAt  DateTime  @updatedAt
+  updatedAt  DateTime  @updatedAt
   userId    Int
 
   //Relation
@@ -97,7 +96,7 @@ model Hive {
   status      HiveStatus  @default(ACTIVE)
   yearBuilt   DateTime
   createdAt   DateTime    @default(now())
-  updateAt    DateTime    @updatedAt
+  updatedAt    DateTime    @updatedAt
 
   //Relation
   apiary_hives  ApiaryHive[]

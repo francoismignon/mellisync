@@ -8,6 +8,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import axios from "axios";
 
 function AddApiaryDialog() {
   const [open, setOpen] = React.useState(false);
@@ -20,13 +21,27 @@ function AddApiaryDialog() {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries(formData.entries());
-    const email = formJson.email;
-    console.log(email);
-    handleClose();
+    const formData = new FormData(event.currentTarget); //recupere tout le formulaire
+    const formJson = Object.fromEntries(formData.entries()); // convertis le formulaire en objet
+    const name = formJson.name;
+    const address = formJson.address;
+    const city = formJson.city;
+
+    const apiaryData = {
+      name: name,
+      address: address,
+      city: city,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/apiaries", apiaryData);
+      console.log("Rucher crée avec succes", response.data);
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -88,7 +103,7 @@ function AddApiaryDialog() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Annuler</Button>
-          <Button type="submit" form="subscription-form">
+          <Button type="submit" form="apiary-form">
             Créer le rucher
           </Button>
         </DialogActions>
