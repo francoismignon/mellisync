@@ -24,7 +24,7 @@ export default function VirtualizedList() {
   const [apiaries, setApiaries] = useState([]);
 
   useEffect(()=>{
-    axios.get("http://localhost:3000/api/apiaries")
+    axios.get("https://localhost:3000/api/apiaries")
           .then(response => setApiaries(response.data));
   }, []);
 
