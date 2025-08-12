@@ -129,9 +129,9 @@
           script: |
             cd /home/docker/mellisync
             echo "🔄 Pulling latest images..."
-            docker-compose -f docker-compose.prod.yml --env-file .env.prod pull
+            docker compose -f docker-compose.prod.yml --env-file .env.prod pull
             echo "🚀 Restarting services..."
-            docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d
+            docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
             echo "🧹 Cleaning up old images..."
             docker system prune -f
             echo "✅ Deployment completed!"
