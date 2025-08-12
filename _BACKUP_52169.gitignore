@@ -47,10 +47,12 @@ prisma/migrations/
 
 # Claude AI files
 CLAUDE.md
+<<<<<<< HEAD
 
 # Documentation
 documentation/
 
 NAMING_CONVENTIONS.md
-
+=======
 NAMING_CONVENTIONS.md
+>>>>>>> feature/frontend-routing
