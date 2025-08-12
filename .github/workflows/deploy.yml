@@ -27,12 +27,12 @@
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: mellisync_test
             # Configuration de la DB de test
+          # Vérifie que PostgreSQL est prêt avant de continuer
           options: >-
             --health-cmd pg_isready
             --health-interval 10s
             --health-timeout 5s
             --health-retries 5
-            # Vérifie que PostgreSQL est prêt avant de continuer
           ports:
             - 5432:5432
             # Expose PostgreSQL sur localhost:5432
