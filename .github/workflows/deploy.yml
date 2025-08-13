@@ -80,6 +80,21 @@
       - uses: actions/checkout@v4
         # Récupère le code source
 
+      - name: Setup Node.js for TypeScript build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+        # Configure Node.js pour la compilation TypeScript
+
+      - name: Build TypeScript backend
+        run: |
+          cd server
+          npm ci
+          npm run build
+        # Compile TypeScript en JavaScript pour production
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
