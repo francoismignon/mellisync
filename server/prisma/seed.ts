@@ -29,6 +29,7 @@ async function main() {
       roleId: 1
     }
   });
+  console.log("🌱 Seeding terminé");
 }
 
 main()
