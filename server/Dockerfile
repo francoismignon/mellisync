@@ -1,29 +1,23 @@
-# Use Node.js 22 Alpine
-FROM node:22-alpine
+# syntax=docker/dockerfile:1
+  FROM node:22-alpine
 
-# Set working directory
-WORKDIR /app
+  WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+  # Copier les fichiers de package en premier (pour le cache Docker)
+  COPY package*.json ./
 
-# Install ALL dependencies (dev needed for build)
-RUN npm ci
+  # Installer SEULEMENT les dépendances de production
+  RUN npm ci --omit=dev
 
-# Copy source code
-COPY . .
+  # Copier le JavaScript compilé + Prisma
+  COPY dist/ ./dist/
+  COPY prisma/ ./prisma/
 
-# Generate Prisma client
-RUN npx prisma generate
+  # Générer le client Prisma
+  RUN npx prisma generate
 
-# Build TypeScript
-RUN npm run build
+  # Exposer le port
+  EXPOSE 3000
 
-# Cleanup dev dependencies after build
-RUN npm prune --production
-
-# Expose port
-EXPOSE 3000
-
-# Start application
-CMD ["npm", "start"]
+  # Démarrer l'application
+  CMD ["npm", "start"]
