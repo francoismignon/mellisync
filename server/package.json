@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
+  
   "scripts": {
     "test": "echo \"Pas encore de test TODO :(remettre exit 1)\" && exit 0",
     "start": "node dist/index.js",
