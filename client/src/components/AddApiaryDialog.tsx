@@ -36,7 +36,7 @@ function AddApiaryDialog() {
     };
 
     try {
-      const response = await axios.post("https://localhost:3000/api/apiaries", apiaryData);
+      const response = await axios.post("http://localhost:3000/api/apiaries", apiaryData);
       console.log("Rucher crée avec succes", response.data);
       handleClose();
     } catch (error) {
