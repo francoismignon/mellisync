@@ -36,7 +36,10 @@ function AddApiaryDialog() {
     };
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/apiaries`, apiaryData);
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/apiaries`;
+      console.log("🚀 URL utilisée:", url);
+      console.log("📋 Data envoyée:", apiaryData);
+      const response = await axios.post(url, apiaryData);
       console.log("Rucher crée avec succes", response.data);
       handleClose();
     } catch (error) {
