@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 function renderRow(props: ListChildComponentProps, apiaries: any[]) {
   const { index, style } = props;
-  const apiary = apiaries[index]
+  const apiary = apiaries[index];
   
   return (
     <ListItem style={style} key={index} component="div" disablePadding>
@@ -24,7 +24,7 @@ export default function VirtualizedList() {
   const [apiaries, setApiaries] = useState([]);
 
   useEffect(()=>{
-    axios.get("http://localhost:3000/api/apiaries")
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/apiaries`)
           .then(response => setApiaries(response.data));
   }, []);
 
