@@ -29,6 +29,7 @@ enum FrameCount {
 }
 
 enum TranshumanceReason {
+  ACQUISITION    // Achat/Acquisition initiale
   HONEY_FLOW     // Miellée
   WINTERING      // Hivernage  
   POLLINATION    // Pollinisation
@@ -110,7 +111,7 @@ model ApiaryHive {
   id        Int       @id @default(autoincrement())
   apiaryId  Int
   hiveId    Int
-  reason    TranshumanceReason
+  reason    TranshumanceReason @default(ACQUISITION)
   note      String?
   startDate DateTime  @default(now())
   endDate   DateTime?

@@ -17,5 +17,11 @@ class ApiaryService{
         return await prisma.apiary.findMany();
     }
 
+    static async delete(id: number){
+        return await prisma.apiary.delete({
+            where: {id}
+        });
+    }
+
 }
 export default ApiaryService;

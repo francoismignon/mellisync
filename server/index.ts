@@ -21,6 +21,8 @@ app.use(express.json());
 //Routes Rucher
 app.post("/api/apiaries", apiaryController.create);
 app.get("/api/apiaries", apiaryController.findAll);
+app.delete("/api/apiaries/:apiary-id", apiaryController.delete);
+app.get("/api/apiaries/:apiary-id/hives", apiaryController.findAll);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{
