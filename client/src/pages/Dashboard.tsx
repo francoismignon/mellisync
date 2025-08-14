@@ -1,4 +1,9 @@
-function Dashboard() {
-  return <div>Page Dashboard - Vue d'ensemble ruchers</div>;
+function Dashboard(){
+    return(
+        <div>
+            <h1>Tableau de bord</h1>
+        </div>
+    )
+
 }
 export default Dashboard;

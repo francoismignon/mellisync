@@ -1,31 +1,22 @@
-import './App.css'
-import { BrowserRouter, Route } from 'react-router'
-import { Routes } from 'react-router'
-import Dashboard from './pages/Dashboard'
-import Login from './pages/Login'
-import Apiaries from './pages/Apiaries'
-import ApiaryDetail from './pages/ApiaryDetail'
-import HiveDetail from './pages/HiveDetail'
-import NewInspection from './pages/NewInspection'
-import Navigation from './components/Navigation'
+import { BrowserRouter, Routes, Route } from "react-router";
+import Dashboard from "./pages/Dashboard";
+import NavBar from "./components/NavBar";
+import Apiaries from "./pages/Apiaries";
+import NewApiary from "./pages/NewApiary";
+import Apiary from "./pages/Apiary";
 
 function App() {
   return (
     <BrowserRouter>
-      <Navigation />
-      <div className="app" style={{ marginTop: "64px" }}>
-        {" "}
-        {/* Hauteur AppBar */}
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/apiaries" element={<Apiaries />} />
-          <Route path="/apiaries/:id" element={<ApiaryDetail />} />
-          <Route path="/hives/:id" element={<HiveDetail />} />
-          <Route path="/inspections/new" element={<NewInspection />} />
-        </Routes>
-      </div>
+      {/*NavBar utilise react routeur (Link) donc dois être à l'intérieur de BrowserRouter */}
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/ruchers" element={<Apiaries />} />
+        <Route path="/ruchers/nouveau" element={<NewApiary />} />
+        <Route path="/ruchers/:apiary-id" element={<Apiary />} />
+      </Routes>
     </BrowserRouter>
   );
 }
-export default App
+export default App;
