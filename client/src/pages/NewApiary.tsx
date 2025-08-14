@@ -10,7 +10,7 @@ function NewApiary() {
   });
   const navigate = useNavigate();
   
-  async function handleSubmit(event) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
       const response = await axios.post(
@@ -24,7 +24,7 @@ function NewApiary() {
     }
   }
 
-  function handleChange(event) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setFormData((prevFormData) => {
