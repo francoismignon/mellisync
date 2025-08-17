@@ -35,34 +35,49 @@ function NewApiary() {
     });
   }
   return (
-    <div>
-      <h1>Formulaire de creation de rucher</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          className="border"
-          name="name"
-          placeholder="ex:Rucher des Lilas"
-          onChange={handleChange}
-          value={formData.name}
-        />
-        <input
-          className="border"
-          type="text"
-          name="address"
-          placeholder="ex: Rue de Melli"
-          onChange={handleChange}
-          value={formData.address}
-        />
-        <input
-          className="border"
-          type="text"
-          name="city"
-          placeholder="ex: boussu"
-          onChange={handleChange}
-          value={formData.city}
-        />
-        <input type="submit" value="Ajouter rucher" className="border" />
-      </form>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Formulaire de création de rucher</h1>
+      <div className="bg-white rounded-lg shadow-sm border p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nom du rucher</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              name="name"
+              placeholder="ex: Rucher des Lilas"
+              onChange={handleChange}
+              value={formData.name}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="text"
+              name="address"
+              placeholder="ex: Rue de Melli"
+              onChange={handleChange}
+              value={formData.address}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="text"
+              name="city"
+              placeholder="ex: Boussu"
+              onChange={handleChange}
+              value={formData.city}
+            />
+          </div>
+          <input 
+            type="submit" 
+            value="Ajouter rucher" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 cursor-pointer font-medium"
+          />
+        </form>
+      </div>
     </div>
   );
 }

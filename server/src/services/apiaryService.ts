@@ -19,7 +19,7 @@ class ApiaryService{
 
     static async delete(id: number){
         return await prisma.apiary.delete({
-            where: {id}
+            where: {id: id}
         });
     }
 

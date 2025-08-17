@@ -30,28 +30,42 @@ function Apiaries() {
 
   
   return (
-    <div>
-      <h2>Liste des Ruchers</h2>
-      <ul>
+    <div className="max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-bold text-gray-900">Liste des Ruchers</h2>
+        <Link to="/ruchers/nouveau">
+          <input 
+            type="button" 
+            value="Ajouter un rucher" 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 cursor-pointer"
+          />
+        </Link>
+      </div>
+      
+      <div className="grid gap-4">
         {apiaries.map(apiary => (
-          <li 
+          <div 
             key={apiary.id}
+            className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
             onClick={()=> navigate(`/ruchers/${apiary.id}`)}>
-            {apiary.name} {apiary.address} {apiary.city}
-            {
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{apiary.name}</h3>
+                <p className="text-gray-600">{apiary.address}, {apiary.city}</p>
+              </div>
               <input
                 type="button"
                 value="supprimer"
-                className="border"
-                onClick={() => handleClick(apiary.id)}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick(apiary.id);
+                }}
               />
-            }
-          </li>
+            </div>
+          </div>
         ))}
-      </ul>
-      <Link to="/ruchers/nouveau">
-        <input type="button" value="Ajouter un rucher" className="border" />
-      </Link>
+      </div>
     </div>
   );
 }

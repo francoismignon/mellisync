@@ -8,14 +8,18 @@ import Apiary from "./pages/Apiary";
 function App() {
   return (
     <BrowserRouter>
-      {/*NavBar utilise react routeur (Link) donc dois être à l'intérieur de BrowserRouter */}
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/ruchers" element={<Apiaries />} />
-        <Route path="/ruchers/nouveau" element={<NewApiary />} />
-        <Route path="/ruchers/:apiary-id" element={<Apiary />} />
-      </Routes>
+      <div className="min-h-screen bg-gray-50">
+        {/*NavBar utilise react routeur (Link) donc dois être à l'intérieur de BrowserRouter */}
+        <NavBar />
+        <main className="container mx-auto px-4 py-8">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/ruchers" element={<Apiaries />} />
+            <Route path="/ruchers/nouveau" element={<NewApiary />} />
+            <Route path="/ruchers/:apiary-id" element={<Apiary />} />
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   );
 }

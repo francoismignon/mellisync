@@ -4,12 +4,17 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import ApiaryController from './src/controllers/apiaryController';
+import HiveController from './src/controllers/hiveConroller';
+
+console.log("=== DEBUG ===");
+console.log("ApiaryController:", ApiaryController);
+console.log("ApiaryController.delete:", ApiaryController.delete);
+console.log("typeof ApiaryController.delete:", typeof ApiaryController.delete);
 
 dotenv.config()
 
 const app = express();
 const PORT = process.env.PORT;
-const apiaryController = new ApiaryController();
 
 //middleware
 app.use(helmet());
@@ -19,10 +24,11 @@ app.use(express.json());
 
 
 //Routes Rucher
-app.post("/api/apiaries", apiaryController.create);
-app.get("/api/apiaries", apiaryController.findAll);
-app.delete("/api/apiaries/:apiary-id", apiaryController.delete);
-app.get("/api/apiaries/:apiary-id/hives", apiaryController.findAll);
+app.post("/api/apiaries", ApiaryController.create);
+app.get("/api/apiaries", ApiaryController.findAll);
+app.delete("/api/apiaries/:id", ApiaryController.delete);
+//Routes Ruche
+app.get("/api/hives", HiveController.findAllByUser);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{
