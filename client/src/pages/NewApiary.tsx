@@ -27,10 +27,10 @@ function NewApiary() {
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
-    setFormData((prevFormData) => {
+    setFormData(prevFormData => {
       return {
         ...prevFormData,
-        [name]: value,
+        [name]: value
       };
     });
   }

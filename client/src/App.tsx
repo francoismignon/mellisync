@@ -4,6 +4,8 @@ import NavBar from "./components/NavBar";
 import Apiaries from "./pages/Apiaries";
 import NewApiary from "./pages/NewApiary";
 import Apiary from "./pages/Apiary";
+import NewHive from "./pages/NewHive";
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/ruchers" element={<Apiaries />} />
             <Route path="/ruchers/nouveau" element={<NewApiary />} />
+            <Route path="/ruchers/:apiary-id/ruche/nouvelle" element={<NewHive />} />
             <Route path="/ruchers/:apiary-id" element={<Apiary />} />
           </Routes>
         </main>
