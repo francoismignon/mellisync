@@ -15,6 +15,9 @@ class HiveController {
 
       // Vérification RBAC
       const apiary = await ApiaryService.findById(apiaryId);
+      if (!apiary) {
+        return res.status(404).json({ error: "Rucher non trouvé" });
+      }
       if (apiary.userId !== userId) {
         return res.status(403).json({ error: "Accès interdit" });
       }
