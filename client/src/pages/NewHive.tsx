@@ -40,7 +40,9 @@ const HIVE_STATUS = [
     name: "",
     type: "DADANT",//valeur par defaut pareille que pour les enum dans mon schéma prisma
     framecount: "FRAME_10",
-    status: "ACTIVE"
+    status: "ACTIVE",
+    color: "",
+    yearBuilt: ""
   });
 
 
@@ -54,7 +56,8 @@ const HIVE_STATUS = [
             apiaryId: apiaryId
         }
       );
-      navigate(`/rucher/${apiaryId}/ruche/${response.data.hive.id}`);
+      navigate(`/ruchers/${apiaryId}/ruches/${response.data.hive.id}`);//navigue uniquement si rponse coté back car await
+      alert(`Ruche ${response.data.hive.name} crée avec succes`);
     } catch (error) {
         console.log(error);
     }
@@ -138,6 +141,28 @@ const HIVE_STATUS = [
                         </option>
                     ))}
                     </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Couleur</label>
+                    <input 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        type="text"
+                        name="color"
+                        value={formData.color}
+                        placeholder="ex: Bleue, Rouge, Naturelle"
+                        onChange={handleChange} 
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Année de fabrication</label>
+                    <input 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        type="text"
+                        name="yearBuilt"
+                        value={formData.yearBuilt}
+                        placeholder="ex: 2024"
+                        onChange={handleChange} 
+                    />
                 </div>
                 <input 
                     type="submit" 

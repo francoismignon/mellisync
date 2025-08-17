@@ -95,7 +95,7 @@ model Hive {
   framecount  FrameCount  @default(FRAME_10)
   color       String
   status      HiveStatus  @default(ACTIVE)
-  yearBuilt   DateTime
+  yearBuilt   String
   createdAt   DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 

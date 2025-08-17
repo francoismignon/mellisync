@@ -22,7 +22,7 @@ function Apiary() {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Page Rucher</h1>
-      <Link to={`/ruchers/${apiaryId}/ruche/nouvelle`}>
+      <Link to={`/ruchers/${apiaryId}/ruches/nouvelle`}>
         <input
           type="button"
           value="Ajouter une ruche"

@@ -28,7 +28,8 @@ class HiveController {
 
   static async create(req: Request, res: Response) {
     try {
-      const { apiaryId, name, type, framecount, status } = req.body;
+      const { name, type, framecount, status, color, yearBuilt } = req.body;
+      const apiaryId = parseInt(req.body.apiaryId);
       // TODO: const userId = req.user.id; // depuis JWT token
       const userId = 1; //TODO: temporaire a effecer apres RBAC
 
@@ -43,6 +44,8 @@ class HiveController {
         type,
         framecount,
         status,
+        color,
+        yearBuilt
       });
       res.status(201).json({ hive });
     } catch (error) {
