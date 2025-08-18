@@ -13,6 +13,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../docs/erd.svg"
+  theme    = "neutral"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+  output   = "../docs"
+  outputName = "mld.dbml"
+}
+
 enum HiveType {
   DADANT
   LANGSTROTH
@@ -101,6 +113,7 @@ model Hive {
 
   //Relation
   apiary_hives  ApiaryHive[]
+  visits        Visit[]
 
   @@map("hives")
 
@@ -130,4 +143,34 @@ model Role {
   users User[]
 
   @@map("roles")
+}
+
+model Visit {
+  id          Int       @id @default(autoincrement())
+  hiveId      Int       // FK vers Hive
+  date        DateTime  @default(now())
+  temperature Float?    // Température °C
+  weather     String?   // "Ensoleillé", "Pluie", etc.
+  notes       String?   // Notes générales apiculteur
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  //Relation
+  hive    Hive  @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+  visitActions VisitAction[]
+
+  @@map("visits")
+}
+
+model VisitAction {
+  id       Int     @id @default(autoincrement())
+  visitId  Int     // FK vers Visit
+  type     String  // "presence-reine", "couvain-frais", "reserves", etc.
+  value    String  // JSON: {"result": "Oui"} ou {"weight": "15.5", "unit": "kg"}
+  notes    String? // Notes spécifiques action
+
+  //Relation
+  visit    Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade) //si on supprime une visite, on supprime aussi l'action
+
+  @@map("visitActions")
 }

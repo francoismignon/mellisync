@@ -30,6 +30,7 @@ app.delete("/api/apiaries/:id", ApiaryController.delete);
 //Routes Ruche
 app.get("/api/hives", HiveController.findAllByApiary);
 app.post("/api/hives", HiveController.create);
+app.get("/api/hives/:id", HiveController.findById)
 
 //route test
 app.get("/", (req: Request, res: Response)=>{

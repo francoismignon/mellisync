@@ -1,6 +1,14 @@
 import prisma from "../lib/prisma";
 
 class HiveService {
+
+  static async findById(id: number){
+    return await prisma.hive.findUnique({
+      where: {id:id}
+    });
+  }
+
+
   static async findAllByApiary(apiaryId: number) {
     return await prisma.hive.findMany({
       where: {

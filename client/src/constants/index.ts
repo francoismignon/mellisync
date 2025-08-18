@@ -1,0 +1,25 @@
+export const HIVE_TYPES = [
+  { value: "DADANT", label: "Dadant" },
+  { value: "LANGSTROTH", label: "Langstroth" },
+  { value: "WARRE", label: "Warré" },
+  { value: "KENYAN", label: "Kenyane" },
+  { value: "VOIRNOT", label: "Voirnot" },
+];
+
+export const FRAME_COUNTS = [
+  { value: "FRAME_8", label: "8 cadres" },
+  { value: "FRAME_10", label: "10 cadres" },
+  { value: "FRAME_12", label: "12 cadres" },
+  { value: "FRAME_14", label: "14 cadres" },
+];
+
+export const HIVE_STATUS = [
+  { value: "ACTIVE", label: "Active" },
+  { value: "INACTIVE", label: "Inactive" },
+  { value: "EMPTY", label: "Vide" },
+  { value: "WINTERING", label: "Hivernage" },
+  { value: "SWARMED", label: "Essaimée" },
+  { value: "DEAD", label: "Morte" },
+  { value: "QUARANTINE", label: "Quarantaine" },
+  { value: "MAINTENANCE", label: "Maintenance" },
+];

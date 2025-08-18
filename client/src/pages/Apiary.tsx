@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 function Apiary() {
   const [hives, setHives] = useState<any[]>([]);
   const params = useParams();
   const apiaryId = params['apiary-id'];
+
+  const navigate = useNavigate();
 
   async function fetchHives() {
     // TODO: Configurer axios.defaults.withCredentials = true pour httpOnly cookies
@@ -35,7 +37,10 @@ function Apiary() {
         {hives.length > 0 ? (
           <div className="grid gap-3">
             {hives.map((hive) => (
-              <div key={hive.id} className="bg-gray-50 rounded-lg p-4 border">
+              <div 
+                key={hive.id} 
+                className="bg-gray-50 rounded-lg p-4 border cursor-pointer"
+                onClick={()=> navigate(`/ruchers/${apiaryId}/ruches/${hive.id}`)}>
                 <h3 className="font-medium text-gray-900">{hive.name}</h3>
               </div>
             ))}

@@ -3,6 +3,18 @@ import HiveService from "../services/hiveService";
 import { Request, Response } from "express";
 
 class HiveController {
+
+  static async findById(req: Request, res: Response){
+    try {
+      const hiveId = parseInt(req.params.id);
+      const hive = await HiveService.findById(hiveId);
+      res.status(201).json(hive);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
   static async findAllByApiary(req: Request, res: Response) {
     try {
       // TODO: const userId = req.user.id;

@@ -1,49 +1,21 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
 
 function NewHive() {
+    
     const navigate = useNavigate();
     const params = useParams();
-
     const apiaryId = params['apiary-id'];
-
-    const HIVE_TYPES = [
-    { value: "DADANT", label: "Dadant" },
-    { value: "LANGSTROTH", label: "Langstroth" },
-    { value: "WARRE", label: "Warré" },
-    { value: "KENYAN", label: "Kenyane" },
-    { value: "VOIRNOT", label: "Voirnot" }
-  ];
-
-const FRAME_COUNTS = [
-  { value: "FRAME_8", label: "8 cadres" },
-  { value: "FRAME_10", label: "10 cadres" },
-  { value: "FRAME_12", label: "12 cadres" },
-  { value: "FRAME_14", label: "14 cadres" },
-];
-
-
-const HIVE_STATUS = [
-  { value: "ACTIVE", label: "Active" },
-  { value: "INACTIVE", label: "Inactive" },
-  { value: "EMPTY", label: "Vide" },
-  { value: "WINTERING", label: "Hivernage" },
-  { value: "SWARMED", label: "Essaimée" },
-  { value: "DEAD", label: "Morte" },
-  { value: "QUARANTINE", label: "Quarantaine" },
-  { value: "MAINTENANCE", label: "Maintenance" },
-];
-
-
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "DADANT",//valeur par defaut pareille que pour les enum dans mon schéma prisma
-    framecount: "FRAME_10",
-    status: "ACTIVE",
-    color: "",
-    yearBuilt: ""
-  });
+    const [formData, setFormData] = useState({
+      name: "",
+      type: "DADANT", //valeur par defaut pareille que pour les enum dans mon schéma prisma
+      framecount: "FRAME_10",
+      status: "ACTIVE",
+      color: "",
+      yearBuilt: "",
+    });
 
 
   async function handleSubmit(event: React.FormEvent){
