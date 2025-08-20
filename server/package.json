@@ -8,8 +8,12 @@
     "dev": "tsx --watch index.ts",
     "build": "tsc",
     "seed": "tsx prisma/seed.ts",
-    "migrate": "npx prisma migrate deploy",
-    "db:reset": "npx prisma migrate reset"
+    "prisma:generate": "prisma generate --schema=prisma/schema.runtime.prisma",
+    "prisma:dev:generate": "prisma generate --schema=prisma/schema.prisma",
+    "prisma:erd": "prisma generate --schema=prisma/schema.prisma",
+    "migrate": "prisma migrate deploy --schema=prisma/schema.runtime.prisma",
+    "db:reset": "prisma migrate reset --schema=prisma/schema.prisma",
+    "postinstall": "prisma generate --schema=prisma/schema.runtime.prisma"
   },
   "prisma": {
     "seed": "node dist/prisma/seed.js"

@@ -5,14 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = __importDefault(require("../lib/prisma"));
 class ApiaryService {
+    static async findById(id) {
+        return await prisma_1.default.apiary.findUnique({
+            where: { id: id },
+        });
+    }
     static async create(name, address, city, userId) {
         return await prisma_1.default.apiary.create({
             data: {
                 name,
                 address,
                 city,
-                userId
-            }
+                userId,
+            },
         });
     }
     //TODO: adapter lors d' l'authentification
@@ -21,7 +26,7 @@ class ApiaryService {
     }
     static async delete(id) {
         return await prisma_1.default.apiary.delete({
-            where: { id }
+            where: { id: id },
         });
     }
 }

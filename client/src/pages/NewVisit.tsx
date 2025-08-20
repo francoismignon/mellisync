@@ -3,100 +3,71 @@ import { useEffect, useState } from "react";
 
 function NewVisit() {
   const [actions, setActions] = useState([]);
-  const [actionStates, setActionStates] = useState({});
+  const [buttonLabel, setButtonLabel] = useState("");
+  const [buttonValue, setButtonValue] = useState("");
+  const [index, setIndex] = useState(0);
 
-  // Fetch actions depuis la nouvelle API
   async function fetchActions() {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/actions`
-      );
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/actions`);
       setActions(response.data);
-      console.log("Actions chargées:", response.data);
+      console.log("Fetched actions:", response.data);
     } catch (error) {
-      console.error("Erreur lors du chargement des actions:", error);
+      console.error("Error fetching actions:", error);
+      // Handle error appropriately, e.g., show a notification or alert
     }
   }
-
+  
   useEffect(() => {
     fetchActions();
   }, []);
+  
+  useEffect(() => {
+    if (actions.length > 0) {
+      setButtonLabel(actions[0].label);
+      setButtonValue(actions[0].action_options[index].option.label || "Default Option Label");
+    }
+  }, [actions]);
 
-  // Filtrer pour avoir seulement les 2 actions de test
-  const testActions = actions.filter(action => 
-    action.id === 1 || action.id === 6 // Présence reine (toggle) et Réserves (weight)
-  );
-
-  // Récupérer l'état actuel d'une action
-  function getActionState(actionId) {
-    return actionStates[actionId] || 0; // 0 = état par défaut
+  function handleClick() {
+    if (actions[0].actionType === "CYCLE") {
+      // Supposons : ["Non", "Oui", "Peut-être"] (length = 3)
+      // currentIndex = 0 → "Non"
+      // nextIndex = (0 + 1) % 3 = 1 % 3 = 1 → "Oui"
+      // currentIndex = 1 → "Oui"
+      // nextIndex = (1 + 1) % 3 = 2 % 3 = 2 → "Peut-être"
+      // currentIndex = 2 → "Peut-être"
+      // nextIndex = (2 + 1) % 3 = 3 % 3 = 0 → "Non" ← BOUCLE !
+      const nextIndex = (index + 1) % actions[0].action_options.length;
+      setIndex(nextIndex);
+      setButtonValue(actions[0].action_options[nextIndex].option.label || "Default Option Label");
+    }
+    //else if (actionType === "INCREMENT") {
   }
 
-  // Afficher la valeur selon le type d'action
-  function getActionDisplay(action) {
-    const state = getActionState(action.id);
-    
-    if (action.actionType === 'toggle') {
-      // Pour l'action 1 (reine), les options sont "Non" (0) et "Oui" (1)
-      const options = action.action_options?.map(ao => ao.option.label) || ["Non", "Oui"];
-      return options[state] || "Non";
-    }
-    
-    if (action.actionType === 'weight') {
-      return `${state.toFixed(1)} kg`;
-    }
-    
-    return state;
-  }
-
-  function handleActionClick(action) {
-    if (action.actionType === 'toggle') {
-      // Alterner entre 0 et 1 pour toggle
-      setActionStates(prev => ({
-        ...prev,
-        [action.id]: prev[action.id] === 1 ? 0 : 1
-      }));
-    }
-  }
 
   return (
+
     <div>
-      <h1>Test Page NewVisit</h1>
-      
-      <p>Nombre d'actions chargées: {actions.length}</p>
-      <p>Actions de test affichées: {testActions.length}</p>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
-        {testActions.map((action) => (
-          <button 
-            key={action.id}
-            onClick={() => handleActionClick(action)}
-            style={{
-              padding: '15px',
-              border: '2px solid #ccc',
-              borderRadius: '8px',
-              backgroundColor: '#f9f9f9',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              fontSize: '14px'
-            }}
-          >
-            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-              {action.label}
-            </div>
-            <div style={{ color: '#0066cc', fontSize: '16px' }}>
-              {getActionDisplay(action)}
-            </div>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '3px' }}>
-              ({action.actionType})
-            </div>
-          </button>
-        ))}
-      </div>
+        <button 
+          className="border-2 border-gray-300 rounded-md p-2 mb-4 flex flex-col items-center"
+          onClick={handleClick}
+        >
+          <div className="font-bold mb-2">{buttonLabel}</div>
+          <div className="text-sm text-blue-500">{buttonValue}</div>
+        </button>
     </div>
+    // <div>
+    //   <h1>New Visit</h1>
+    //   {actions.map(action => 
+    //     <li>{action.label} {action.actionType} 
+    //     {
+    //       action.action_options.map(option =>
+    //         <li>{option.option.label}</li>
+    //       )
+    //     }</li>
+    //   )}
+    // </div>
   );
 }
-
 export default NewVisit;

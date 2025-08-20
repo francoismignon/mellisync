@@ -121,26 +121,29 @@ async function main() {
   }
   console.log(`✅ ${weatherRestrictions.length} restrictions météo seedées`);
 
-  // Seeding des actions avec la nouvelle architecture
+  // Seeding des actions avec actionType et incrementStep finaux
   const actions = [
-    { id: 1, label: "Confirmer présence de la reine", actionType: "toggle" },
-    { id: 2, label: "Observer couvain frais", actionType: "toggle" },
-    { id: 3, label: "Évaluer vitalité de la reine", actionType: "cycle" },
-    { id: 4, label: "Estimer force de la ruche", actionType: "cycle" },
-    { id: 5, label: "Surface & compacité du couvain", actionType: "cycle" },
-    { id: 6, label: "Contrôler réserves (soupesée)", actionType: "weight" },
-    { id: 7, label: "Placer pain de candi", actionType: "weight" },
-    { id: 8, label: "Nourrissement 50/50", actionType: "weight" },
-    { id: 9, label: "Nourrissement lourd (2/3–1/3)", actionType: "weight" },
-    { id: 10, label: "Contrôle mortalité extérieure", actionType: "counter" },
-    { id: 11, label: "Observer chute naturelle varroa", actionType: "counter" },
-    { id: 12, label: "Compter varroas (languette graissée)", actionType: "counter" },
-    { id: 13, label: "Poser traitement varroa", actionType: "cycle" },
-    { id: 14, label: "Traitement acide oxalique hivernal", actionType: "toggle" },
-    { id: 15, label: "Surveiller maladies", actionType: "cycle" },
-    { id: 16, label: "Nettoyer plateau de fond", actionType: "toggle" },
-    { id: 17, label: "Contrôle moisissures", actionType: "cycle" },
-    { id: 18, label: "Contrôle visuel réserves (cadres)", actionType: "cycle" },
+    // CYCLE actions (incrementStep undefined = NULL en DB)
+    { id: 1, label: "Confirmer présence de la reine", actionType: "CYCLE" },
+    { id: 2, label: "Observer couvain frais", actionType: "CYCLE" },
+    { id: 3, label: "Évaluer vitalité de la reine", actionType: "CYCLE" },
+    { id: 4, label: "Estimer force de la ruche", actionType: "CYCLE" },
+    { id: 5, label: "Surface & compacité du couvain", actionType: "CYCLE" },
+    { id: 13, label: "Poser traitement varroa", actionType: "CYCLE" },
+    { id: 14, label: "Traitement acide oxalique hivernal", actionType: "CYCLE" },
+    { id: 15, label: "Surveiller maladies", actionType: "CYCLE" },
+    { id: 16, label: "Nettoyer plateau de fond", actionType: "CYCLE" },
+    { id: 17, label: "Contrôle moisissures", actionType: "CYCLE" },
+    { id: 18, label: "Contrôle visuel réserves (cadres)", actionType: "CYCLE" },
+    
+    // INCREMENT actions avec coefficients optimisés
+    { id: 6, label: "Contrôler réserves (soupesée)", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg
+    { id: 7, label: "Placer pain de candi", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg
+    { id: 8, label: "Nourrissement 50/50", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5L
+    { id: 9, label: "Nourrissement lourd (2/3–1/3)", actionType: "INCREMENT", incrementStep: 1 }, // 1L
+    { id: 10, label: "Contrôle mortalité extérieure", actionType: "INCREMENT", incrementStep: 10 }, // 10 abeilles
+    { id: 11, label: "Observer chute naturelle varroa", actionType: "INCREMENT", incrementStep: 5 }, // 5 varroas
+    { id: 12, label: "Compter varroas (languette graissée)", actionType: "INCREMENT", incrementStep: 1 }, // 1 varroa
   ];
 
   for (const action of actions) {
