@@ -3,18 +3,15 @@
 
   WORKDIR /app
 
-  # Copier les fichiers de package en premier (pour le cache Docker)
+  # Copier les fichiers de package et prisma schema en premier (pour le cache Docker)
   COPY package*.json ./
-
-  # Installer SEULEMENT les dépendances de production
-  RUN npm ci --omit=dev
-
-  # Copier le JavaScript compilé + Prisma
-  COPY dist/ ./dist/
   COPY prisma/ ./prisma/
 
-  # Générer le client Prisma
-  RUN npx prisma generate
+  # Installer SEULEMENT les dépendances de production + générer client
+  RUN npm ci --omit=dev
+
+  # Copier le JavaScript compilé
+  COPY dist/ ./dist/
 
   # Exposer le port
   EXPOSE 3000
