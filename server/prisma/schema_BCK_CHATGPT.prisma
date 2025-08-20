@@ -1,0 +1,295 @@
+// Prisma schema (English, normalized names, no JSON)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../../docs/technique/diagrammes/erd.svg"
+  theme    = "neutral" // default | forest | dark | neutral
+  ignoreEnums  = true
+}
+
+generator dbml {
+  provider   = "prisma-dbml-generator"
+  output     = "../../docs/technique/diagrammes/"
+  outputName = "mld.dbml"
+}
+
+/**
+ * =========================
+ * Enums
+ * =========================
+ */
+
+enum HiveType {
+  DADANT
+  LANGSTROTH
+  WARRE
+  KENYAN
+  VOIRNOT
+}
+
+enum FrameCount {
+  FRAME_8
+  FRAME_10
+  FRAME_12
+  FRAME_14
+}
+
+enum AssignmentReason {
+  ACQUISITION
+  HONEY_FLOW
+  WINTERING
+  POLLINATION
+  TREATMENT
+  MAINTENANCE
+  OTHER
+}
+
+enum HiveStatus {
+  ACTIVE
+  INACTIVE
+  EMPTY
+  WINTERING
+  SWARMED
+  DEAD
+  QUARANTINE
+  MAINTENANCE
+}
+
+enum ActionType {
+  TOGGLE
+  CYCLE
+  COUNTER
+  WEIGHT
+}
+
+enum SeasonPeriod {
+  WINTER
+  LATE_WINTER
+  SPRING_FLOW
+  INTER_FLOW
+  PRE_TREATMENT
+  SUMMER_TREATMENT
+  WINTER_PREP
+  WINTER_TREATMENT
+}
+
+enum WeatherCode {
+  SUNNY
+  RAIN
+  WIND
+  COLD
+  OVERCAST
+}
+
+enum WeatherRuleType {
+  REQUIRED
+  FORBIDDEN
+}
+
+/**
+ * =========================
+ * Core Tables
+ * =========================
+ */
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  apiaries Apiary[]
+  role     Role     @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@map("users")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model Apiary {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String
+  city      String
+  ownerId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner       User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  assignments ApiaryAssignment[]
+
+  @@map("apiaries")
+}
+
+model Hive {
+  id         Int        @id @default(autoincrement())
+  name       String
+  type       HiveType   @default(DADANT)
+  frameCount FrameCount @default(FRAME_10)
+  color      String
+  status     HiveStatus @default(ACTIVE)
+  buildYear  String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Relations
+  assignments ApiaryAssignment[]
+  visits      Visit[]
+
+  @@map("hives")
+}
+
+model ApiaryAssignment {
+  id       Int              @id @default(autoincrement())
+  apiaryId Int
+  hiveId   Int
+  reason   AssignmentReason @default(ACQUISITION)
+  note     String?
+  startAt  DateTime         @default(now())
+  endAt    DateTime?
+
+  // Relations
+  apiary Apiary @relation(fields: [apiaryId], references: [id], onDelete: Restrict)
+  hive   Hive   @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+
+  @@map("apiary_assignments")
+}
+
+model Visit {
+  id          Int      @id @default(autoincrement())
+  hiveId      Int
+  date        DateTime @default(now())
+  temperature Float?
+  weather     String? // switch to WeatherCode if you want strict values
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  hive         Hive          @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+  visitActions VisitAction[]
+
+  @@index([hiveId, date])
+  @@map("visits")
+}
+
+/**
+ * =========================
+ * Action Definitions (normalized)
+ * =========================
+ */
+
+model ActionDefinition {
+  id         Int        @id @default(autoincrement())
+  label      String
+  actionType ActionType
+
+  // Normalized rules (no JSON)
+  options  ActionOption[] // for CYCLE
+  periods  ActionAllowedPeriod[] // allowed seasonal periods
+  tempRule ActionTempRule? // optional min/max °C
+  weather  ActionWeatherRule[] // required/forbidden weather codes
+
+  visitActions VisitAction[]
+
+  @@map("action_definitions")
+}
+
+model ActionOption {
+  id                 Int    @id @default(autoincrement())
+  actionDefinitionId Int
+  label              String
+  order              Int
+
+  // Relations
+  actionDefinition ActionDefinition @relation(fields: [actionDefinitionId], references: [id], onDelete: Cascade)
+
+  // Inverse side of VisitAction.cycleOption
+  visitActions VisitAction[] @relation("VisitAction_cycleOption")
+
+  @@unique([actionDefinitionId, order])
+  @@map("action_options")
+}
+
+model ActionAllowedPeriod {
+  actionDefinitionId Int
+  period             SeasonPeriod
+
+  actionDefinition ActionDefinition @relation(fields: [actionDefinitionId], references: [id], onDelete: Cascade)
+
+  @@id([actionDefinitionId, period])
+  @@map("action_allowed_periods")
+}
+
+model ActionTempRule {
+  id                 Int    @id @default(autoincrement())
+  actionDefinitionId Int    @unique
+  minC               Float
+  maxC               Float?
+
+  actionDefinition ActionDefinition @relation(fields: [actionDefinitionId], references: [id], onDelete: Cascade)
+
+  @@map("action_temp_rules")
+}
+
+model ActionWeatherRule {
+  id                 Int             @id @default(autoincrement())
+  actionDefinitionId Int
+  ruleType           WeatherRuleType
+  weather            WeatherCode
+
+  actionDefinition ActionDefinition @relation(fields: [actionDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([actionDefinitionId, ruleType, weather])
+  @@map("action_weather_rules")
+}
+
+/**
+ * =========================
+ * Observed Values (typed; no JSON)
+ * =========================
+ */
+
+model VisitAction {
+  id                 Int @id @default(autoincrement())
+  visitId            Int
+  actionDefinitionId Int
+
+  // Only one of these should be set depending on actionType
+  boolValue     Boolean? // TOGGLE
+  cycleOptionId Int? // CYCLE -> FK to ActionOption
+  countValue    Int? // COUNTER
+  weightKg      Decimal? @db.Decimal(5, 1) // WEIGHT
+
+  notes String?
+
+  // Relations
+  visit            Visit            @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  actionDefinition ActionDefinition @relation(fields: [actionDefinitionId], references: [id], onDelete: Cascade)
+
+  // Named relation to match ActionOption.visitActions
+  cycleOption ActionOption? @relation("VisitAction_cycleOption", fields: [cycleOptionId], references: [id], onDelete: Restrict)
+
+  @@index([actionDefinitionId, visitId])
+  @@map("visit_actions")
+}

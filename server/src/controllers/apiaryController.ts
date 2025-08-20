@@ -21,7 +21,7 @@ class ApiaryController {
 
   static async delete(req: Request, res: Response) {
     try {
-      console.log("DELETE appelé");
+      //console.log("DELETE appelé");
       const id: number = parseInt(req.params.id);//bracket notation pour garder les bonne protique du guide zalando
       const apiaryDeleted = await ApiaryService.delete(id);
       res.json(apiaryDeleted);

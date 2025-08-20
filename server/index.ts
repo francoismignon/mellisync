@@ -5,11 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import ApiaryController from './src/controllers/apiaryController';
 import HiveController from './src/controllers/hiveConroller';
-
-console.log("=== DEBUG ===");
-console.log("ApiaryController:", ApiaryController);
-console.log("ApiaryController.delete:", ApiaryController.delete);
-console.log("typeof ApiaryController.delete:", typeof ApiaryController.delete);
+import ActionController from './src/controllers/actionController';
 
 dotenv.config()
 
@@ -31,6 +27,8 @@ app.delete("/api/apiaries/:id", ApiaryController.delete);
 app.get("/api/hives", HiveController.findAllByApiary);
 app.post("/api/hives", HiveController.create);
 app.get("/api/hives/:id", HiveController.findById)
+//Routes pour la définition des actions
+app.get("/api/actions", ActionController.findAll);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{

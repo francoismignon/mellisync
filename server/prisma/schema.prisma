@@ -15,13 +15,13 @@ datasource db {
 
 generator erd {
   provider = "prisma-erd-generator"
-  output   = "../docs/erd.svg"
+  output   = "../../docs/technique/diagrammes/erd.svg"
   theme    = "neutral"
 }
 
 generator dbml {
-  provider = "prisma-dbml-generator"
-  output   = "../docs"
+  provider   = "prisma-dbml-generator"
+  output     = "../../docs/technique/diagrammes/"
   outputName = "mld.dbml"
 }
 
@@ -41,104 +41,101 @@ enum FrameCount {
 }
 
 enum TranshumanceReason {
-  ACQUISITION    // Achat/Acquisition initiale
-  HONEY_FLOW     // Miellée
-  WINTERING      // Hivernage  
-  POLLINATION    // Pollinisation
-  TREATMENT      // Traitement
-  MAINTENANCE    // Maintenance
-  OTHER          // Autre
+  ACQUISITION // Achat/Acquisition initiale
+  HONEY_FLOW // Miellée
+  WINTERING // Hivernage  
+  POLLINATION // Pollinisation
+  TREATMENT // Traitement
+  MAINTENANCE // Maintenance
+  OTHER // Autre
 }
 
 enum HiveStatus {
-  ACTIVE      // Ruche en production normale
-  INACTIVE    // Ruche temporairement inactive
-  EMPTY       // Ruche vide (pas de colonie)
-  WINTERING   // Ruche en hivernage
-  SWARMED     // Ruche qui a essaimé
-  DEAD        // Colonie morte
-  QUARANTINE  // Quarantaine (maladie, traitement)
+  ACTIVE // Ruche en production normale
+  INACTIVE // Ruche temporairement inactive
+  EMPTY // Ruche vide (pas de colonie)
+  WINTERING // Ruche en hivernage
+  SWARMED // Ruche qui a essaimé
+  DEAD // Colonie morte
+  QUARANTINE // Quarantaine (maladie, traitement)
   MAINTENANCE // En réparation/maintenance
 }
 
-
 //Table users
 model User {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
-  email     String    @unique
+  email     String   @unique
   password  String
   roleId    Int
-  createdAt DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   //Relation
-  apiaries  Apiary[]
+  apiaries Apiary[]
 
-  role  Role  @relation(fields: [roleId], references: [id], onDelete: Restrict)
-  
+  role Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
   //Nom de la table
   @@map("users")
 }
 
 //Table apiaries
-model Apiary{
-  id        Int       @id @default(autoincrement())
+model Apiary {
+  id        Int      @id @default(autoincrement())
   name      String
   address   String
   city      String
-  createdAt DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   userId    Int
 
   //Relation
-  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  apiary_hives  ApiaryHive[]
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiary_hives ApiaryHive[]
 
   @@map("apiaries")
 }
 
-
 //Table hive
 model Hive {
-  id          Int         @id @default(autoincrement())
-  name        String
-  type        HiveType    @default(DADANT)
-  framecount  FrameCount  @default(FRAME_10)
-  color       String
-  status      HiveStatus  @default(ACTIVE)
-  yearBuilt   String
-  createdAt   DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id         Int        @id @default(autoincrement())
+  name       String
+  type       HiveType   @default(DADANT)
+  framecount FrameCount @default(FRAME_10)
+  color      String
+  status     HiveStatus @default(ACTIVE)
+  yearBuilt  String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   //Relation
-  apiary_hives  ApiaryHive[]
-  visits        Visit[]
+  apiary_hives ApiaryHive[]
+  visits       Visit[]
 
   @@map("hives")
-
 }
 
 //Table de jointure apiary_hives
 model ApiaryHive {
-  id        Int       @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   apiaryId  Int
   hiveId    Int
   reason    TranshumanceReason @default(ACQUISITION)
   note      String?
-  startDate DateTime  @default(now())
+  startDate DateTime           @default(now())
   endDate   DateTime?
 
   //Relation
-  apiary    Apiary  @relation(fields: [apiaryId], references: [id], onDelete: Restrict)
-  hive    Hive  @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+  apiary Apiary @relation(fields: [apiaryId], references: [id], onDelete: Restrict)
+  hive   Hive   @relation(fields: [hiveId], references: [id], onDelete: Restrict)
 
   @@map("apiary_hives")
 }
 
 model Role {
-  id  Int @id @default(autoincrement())
-  name  String  @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
   users User[]
 
@@ -146,31 +143,107 @@ model Role {
 }
 
 model Visit {
-  id          Int       @id @default(autoincrement())
-  hiveId      Int       // FK vers Hive
-  date        DateTime  @default(now())
-  temperature Float?    // Température °C
-  weather     String?   // "Ensoleillé", "Pluie", etc.
-  notes       String?   // Notes générales apiculteur
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id      Int      @id @default(autoincrement())
+  hiveId  Int      // FK vers Hive
+  date    DateTime @default(now())
 
   //Relation
-  hive    Hive  @relation(fields: [hiveId], references: [id], onDelete: Restrict)
+  hive         Hive          @relation(fields: [hiveId], references: [id], onDelete: Restrict)
   visitActions VisitAction[]
 
   @@map("visits")
 }
 
 model VisitAction {
-  id       Int     @id @default(autoincrement())
-  visitId  Int     // FK vers Visit
-  type     String  // "presence-reine", "couvain-frais", "reserves", etc.
-  value    String  // JSON: {"result": "Oui"} ou {"weight": "15.5", "unit": "kg"}
-  notes    String? // Notes spécifiques action
+  id       Int    @id @default(autoincrement())
+  visitId  Int    // FK vers Visit
+  actionId Int    // FK vers Action
+  value    String // Valeur de l'action : "Oui", "15.5", etc.
 
   //Relation
-  visit    Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade) //si on supprime une visite, on supprime aussi l'action
+  visit  Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  action Action @relation(fields: [actionId], references: [id], onDelete: Cascade)
 
-  @@map("visitActions")
+  @@map("visit_action")
+}
+
+model Action {
+  id         Int    @id @default(autoincrement())
+  label      String // "Confirmer présence de la reine"
+  actionType String // "toggle", "cycle", "counter", "weight"
+
+  // Relations
+  visitActions                VisitAction[]
+  action_options              ActionOption[]
+  action_periodes             ActionPeriode[]
+  action_weather_restrictions ActionWeatherRestriction[]
+
+  @@map("actions")
+}
+
+model Option {
+  id    Int    @id @default(autoincrement())
+  label String
+
+  // Relations
+  action_options ActionOption[]
+
+  @@map("options")
+}
+
+model Periode {
+  id    Int    @id @default(autoincrement())
+  label String
+
+  // Relations
+  action_periodes ActionPeriode[]
+
+  @@map("periodes")
+}
+
+model WeatherRestriction {
+  id    Int    @id @default(autoincrement())
+  label String
+
+  // Relations
+  action_weather_restrictions ActionWeatherRestriction[]
+
+  @@map("weather_restrictions")
+}
+
+// Tables de jointure many-to-many
+model ActionOption {
+  actionId Int
+  optionId Int
+
+  // Relations
+  action Action @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@id([actionId, optionId])
+  @@map("action_option")
+}
+
+model ActionPeriode {
+  actionId  Int
+  periodeId Int
+
+  // Relations
+  action  Action  @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  periode Periode @relation(fields: [periodeId], references: [id], onDelete: Cascade)
+
+  @@id([actionId, periodeId])
+  @@map("action_periode")
+}
+
+model ActionWeatherRestriction {
+  actionId             Int
+  weatherRestrictionId Int
+
+  // Relations
+  action             Action             @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  weatherRestriction WeatherRestriction @relation(fields: [weatherRestrictionId], references: [id], onDelete: Cascade)
+
+  @@id([actionId, weatherRestrictionId])
+  @@map("action_weather_restriction")
 }

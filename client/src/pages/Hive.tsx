@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
 import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
+import { useNavigate, useParams } from "react-router";
 
 function Hive(){
     const [hive, setHive] = useState({});
     const params = useParams();
+    const navigate = useNavigate();
 
     async function fetchHive(){
         try {
@@ -39,6 +40,14 @@ function Hive(){
             </h1>
             {/* On utilise .find() pour récupérer l’objet correspondant, et ?. (optional chaining) pour afficher son label uniquement s’il existe. */}
             <h1>{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</h1>
+            <h1>{HIVE_STATUS.find(status => status.value === hive.status)?.label}</h1>
+            <input 
+                type="button" 
+                value="Ajouter une visite"
+                className="border"
+                onClick={()=> {
+                    navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
+                }} />
         </div>
     );
 }

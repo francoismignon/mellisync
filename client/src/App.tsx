@@ -6,6 +6,7 @@ import NewApiary from "./pages/NewApiary";
 import Apiary from "./pages/Apiary";
 import NewHive from "./pages/NewHive";
 import Hive from "./pages/Hive";
+import NewVisit from "./pages/NewVisit";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
             <Route path="/ruchers/:apiary-id" element={<Apiary />} />
             <Route path="/ruchers/:apiary-id/ruches/nouvelle" element={<NewHive />} />
             <Route path="/ruchers/:apiary-id/ruches/:hive-id" element={<Hive />} />
+            <Route path="/ruchers/:apiary-id/ruches/:hive-id/visites/nouvelle" element={<NewVisit />} />
           </Routes>
         </main>
       </div>
