@@ -4,7 +4,7 @@ import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
 import { useNavigate, useParams } from "react-router";
 
 function Hive(){
-    const [hive, setHive] = useState({});
+    const [hive, setHive] = useState<any>({});
     const params = useParams();
     const navigate = useNavigate();
 

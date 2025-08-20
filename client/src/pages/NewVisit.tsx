@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 function NewVisit() {
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState<any[]>([]);
   const [buttonLabel, setButtonLabel] = useState("");
   const [buttonValue, setButtonValue] = useState("");
   const [index, setIndex] = useState(0);
