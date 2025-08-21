@@ -7,18 +7,56 @@ interface ActionButtonProps {
     label: string;
     actionType: 'CYCLE' | 'INCREMENT';
     incrementStep?: number;
+    temperatureMin?: number;
+    temperatureMax?: number;
     action_options: Array<{
       option: {
         label: string;
       }
     }>;
+    action_periode: Array<{
+      periode: {
+        name: string;
+      }
+    }>;
   };
+  currentTemperature: number;
+  currentWeather: string;
+  expertMode: boolean;
   onValueChange: (value: string | number) => void;
 }
 
 function ActionButton(props: ActionButtonProps) {
   const [currentIndex, setCurrentIndex] = useState(0); // État pour CYCLE (index option)
   const [currentValue, setCurrentValue] = useState(0); // État pour INCREMENT (valeur numérique)
+
+  // Fonction pour vérifier si l'action doit être affichée
+  function shouldDisplay(): boolean {
+    if (props.expertMode) return true; // Mode expert : tout afficher
+    
+    // Vérification température minimum
+    if (props.action.temperatureMin && props.currentTemperature < props.action.temperatureMin) {
+      return false;
+    }
+    
+    // Vérification température maximum
+    if (props.action.temperatureMax && props.currentTemperature > props.action.temperatureMax) {
+      return false;
+    }
+    
+    // Vérification météo (actions nécessitant ouverture ruche ≥15°C interdites par mauvais temps)
+    const badWeathers = ["Pluie", "Averses", "Orage", "Vent fort"];
+    if (props.action.temperatureMin && props.action.temperatureMin >= 15 && badWeathers.includes(props.currentWeather)) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Early return si l'action ne doit pas être affichée
+  if (!shouldDisplay()) {
+    return null;
+  }
 
   // Calcul valeur affichage selon type action
   function getCurrentValue() {
