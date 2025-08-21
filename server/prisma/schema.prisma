@@ -172,6 +172,8 @@ model Action {
   label         String  // "Confirmer présence de la reine"
   actionType    String  // "CYCLE", "INCREMENT"
   incrementStep Decimal? // Coefficient multiplicateur pour INCREMENT (NULL pour CYCLE)
+  temperatureMin Int?    // Température minimum requise (°C)
+  temperatureMax Int?    // Température maximum autorisée (°C)
 
   // Relations
   visitActions                VisitAction[]

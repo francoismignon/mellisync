@@ -121,29 +121,29 @@ async function main() {
   }
   console.log(`✅ ${weatherRestrictions.length} restrictions météo seedées`);
 
-  // Seeding des actions avec actionType et incrementStep finaux
+  // Seeding des actions avec actionType, incrementStep et restrictions température selon REGLES_METIER_APICOLES.md
   const actions = [
-    // CYCLE actions (incrementStep undefined = NULL en DB)
-    { id: 1, label: "Confirmer présence de la reine", actionType: "CYCLE" },
-    { id: 2, label: "Observer couvain frais", actionType: "CYCLE" },
-    { id: 3, label: "Évaluer vitalité de la reine", actionType: "CYCLE" },
-    { id: 4, label: "Estimer force de la ruche", actionType: "CYCLE" },
-    { id: 5, label: "Surface & compacité du couvain", actionType: "CYCLE" },
-    { id: 13, label: "Poser traitement varroa", actionType: "CYCLE" },
-    { id: 14, label: "Traitement acide oxalique hivernal", actionType: "CYCLE" },
-    { id: 15, label: "Surveiller maladies", actionType: "CYCLE" },
-    { id: 16, label: "Nettoyer plateau de fond", actionType: "CYCLE" },
-    { id: 17, label: "Contrôle moisissures", actionType: "CYCLE" },
-    { id: 18, label: "Contrôle visuel réserves (cadres)", actionType: "CYCLE" },
+    // CYCLE actions avec restrictions température (ouverture ruche nécessaire)
+    { id: 1, label: "Confirmer présence de la reine", actionType: "CYCLE", temperatureMin: 15 },
+    { id: 2, label: "Observer couvain frais", actionType: "CYCLE", temperatureMin: 15 },
+    { id: 3, label: "Évaluer vitalité de la reine", actionType: "CYCLE", temperatureMin: 15 },
+    { id: 4, label: "Estimer force de la ruche", actionType: "CYCLE" }, // Observation externe, pas de restriction
+    { id: 5, label: "Surface & compacité du couvain", actionType: "CYCLE", temperatureMin: 15 },
+    { id: 13, label: "Poser traitement varroa", actionType: "CYCLE" }, // Pas de restriction température
+    { id: 14, label: "Traitement acide oxalique hivernal", actionType: "CYCLE", temperatureMin: 3, temperatureMax: 8 }, // Conditions spécifiques hiver
+    { id: 15, label: "Surveiller maladies", actionType: "CYCLE" }, // Pas de restriction température
+    { id: 16, label: "Nettoyer plateau de fond", actionType: "CYCLE" }, // Intervention rapide
+    { id: 17, label: "Contrôle moisissures", actionType: "CYCLE" }, // Pas de restriction température
+    { id: 18, label: "Contrôle visuel réserves (cadres)", actionType: "CYCLE", temperatureMin: 15 }, // Ouverture ruche
     
-    // INCREMENT actions avec coefficients optimisés
-    { id: 6, label: "Contrôler réserves (soupesée)", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg
-    { id: 7, label: "Placer pain de candi", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg
-    { id: 8, label: "Nourrissement 50/50", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5L
-    { id: 9, label: "Nourrissement lourd (2/3–1/3)", actionType: "INCREMENT", incrementStep: 1 }, // 1L
-    { id: 10, label: "Contrôle mortalité extérieure", actionType: "INCREMENT", incrementStep: 10 }, // 10 abeilles
-    { id: 11, label: "Observer chute naturelle varroa", actionType: "INCREMENT", incrementStep: 5 }, // 5 varroas
-    { id: 12, label: "Compter varroas (languette graissée)", actionType: "INCREMENT", incrementStep: 1 }, // 1 varroa
+    // INCREMENT actions (pas de restriction température - interventions externes ou rapides)
+    { id: 6, label: "Contrôler réserves (soupesée)", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg - soupesée externe
+    { id: 7, label: "Placer pain de candi", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5kg - intervention rapide
+    { id: 8, label: "Nourrissement 50/50", actionType: "INCREMENT", incrementStep: 0.5 }, // 0.5L - intervention rapide
+    { id: 9, label: "Nourrissement lourd (2/3–1/3)", actionType: "INCREMENT", incrementStep: 1 }, // 1L - intervention rapide
+    { id: 10, label: "Contrôle mortalité extérieure", actionType: "INCREMENT", incrementStep: 10 }, // 10 abeilles - observation externe
+    { id: 11, label: "Observer chute naturelle varroa", actionType: "INCREMENT", incrementStep: 5 }, // 5 varroas - plateau de fond
+    { id: 12, label: "Compter varroas (languette graissée)", actionType: "INCREMENT", incrementStep: 1 }, // 1 varroa - contrôle plateau
   ];
 
   for (const action of actions) {
@@ -229,6 +229,166 @@ async function main() {
     });
   }
   console.log(`✅ ${actionOptions.length} relations action-options créées`);
+
+  // Seeding des relations ActionPeriode selon REGLES_METIER_APICOLES.md
+  const actionPeriodes = [
+    // Action 1: Confirmer présence reine (périodes actives)
+    { actionId: 1, periodeId: 3 }, // miellée_printemps
+    { actionId: 1, periodeId: 4 }, // inter_miellée
+    { actionId: 1, periodeId: 5 }, // pré_traitement
+    { actionId: 1, periodeId: 6 }, // traitement_été
+    { actionId: 1, periodeId: 7 }, // préparation_hiver
+    
+    // Action 2: Observer couvain frais (mêmes périodes que présence reine)
+    { actionId: 2, periodeId: 3 }, // miellée_printemps
+    { actionId: 2, periodeId: 4 }, // inter_miellée
+    { actionId: 2, periodeId: 5 }, // pré_traitement
+    { actionId: 2, periodeId: 6 }, // traitement_été
+    { actionId: 2, periodeId: 7 }, // préparation_hiver
+    
+    // Action 3: Évaluer vitalité reine (mêmes périodes)
+    { actionId: 3, periodeId: 3 }, // miellée_printemps
+    { actionId: 3, periodeId: 4 }, // inter_miellée
+    { actionId: 3, periodeId: 5 }, // pré_traitement
+    { actionId: 3, periodeId: 6 }, // traitement_été
+    { actionId: 3, periodeId: 7 }, // préparation_hiver
+    
+    // Action 4: Force colonie (toutes périodes sauf hiver strict)
+    { actionId: 4, periodeId: 2 }, // fin_hiver
+    { actionId: 4, periodeId: 3 }, // miellée_printemps
+    { actionId: 4, periodeId: 4 }, // inter_miellée
+    { actionId: 4, periodeId: 5 }, // pré_traitement
+    { actionId: 4, periodeId: 6 }, // traitement_été
+    { actionId: 4, periodeId: 7 }, // préparation_hiver
+    
+    // Action 5: Surface couvain (mêmes que présence reine)
+    { actionId: 5, periodeId: 3 }, // miellée_printemps
+    { actionId: 5, periodeId: 4 }, // inter_miellée
+    { actionId: 5, periodeId: 5 }, // pré_traitement
+    { actionId: 5, periodeId: 6 }, // traitement_été
+    { actionId: 5, periodeId: 7 }, // préparation_hiver
+    
+    // Action 6: Contrôler réserves (toute l'année)
+    { actionId: 6, periodeId: 1 }, // hiver
+    { actionId: 6, periodeId: 2 }, // fin_hiver
+    { actionId: 6, periodeId: 3 }, // miellée_printemps
+    { actionId: 6, periodeId: 4 }, // inter_miellée
+    { actionId: 6, periodeId: 5 }, // pré_traitement
+    { actionId: 6, periodeId: 6 }, // traitement_été
+    { actionId: 6, periodeId: 7 }, // préparation_hiver
+    { actionId: 6, periodeId: 8 }, // traitement_hiver
+    
+    // Action 7: Placer pain candi (hiver et fin hiver)
+    { actionId: 7, periodeId: 1 }, // hiver
+    { actionId: 7, periodeId: 2 }, // fin_hiver
+    { actionId: 7, periodeId: 7 }, // préparation_hiver
+    { actionId: 7, periodeId: 8 }, // traitement_hiver
+    
+    // Action 8: Nourrissement 50/50 (stimulation)
+    { actionId: 8, periodeId: 2 }, // fin_hiver
+    { actionId: 8, periodeId: 7 }, // préparation_hiver
+    
+    // Action 9: Nourrissement lourd (constitution réserves)
+    { actionId: 9, periodeId: 1 }, // hiver
+    { actionId: 9, periodeId: 2 }, // fin_hiver
+    { actionId: 9, periodeId: 7 }, // préparation_hiver
+    { actionId: 9, periodeId: 8 }, // traitement_hiver
+    
+    // Action 10: Mortalité extérieure (toutes sauf hiver strict)
+    { actionId: 10, periodeId: 2 }, // fin_hiver
+    { actionId: 10, periodeId: 3 }, // miellée_printemps
+    { actionId: 10, periodeId: 4 }, // inter_miellée
+    { actionId: 10, periodeId: 5 }, // pré_traitement
+    { actionId: 10, periodeId: 6 }, // traitement_été
+    { actionId: 10, periodeId: 7 }, // préparation_hiver
+    
+    // Action 11: Chute varroa (contrôle période varroa)
+    { actionId: 11, periodeId: 4 }, // inter_miellée
+    { actionId: 11, periodeId: 5 }, // pré_traitement
+    { actionId: 11, periodeId: 6 }, // traitement_été
+    { actionId: 11, periodeId: 7 }, // préparation_hiver
+    { actionId: 11, periodeId: 8 }, // traitement_hiver
+    { actionId: 11, periodeId: 1 }, // hiver
+    
+    // Action 12: Compter varroas (mêmes périodes)
+    { actionId: 12, periodeId: 4 }, // inter_miellée
+    { actionId: 12, periodeId: 5 }, // pré_traitement
+    { actionId: 12, periodeId: 6 }, // traitement_été
+    { actionId: 12, periodeId: 7 }, // préparation_hiver
+    
+    // Action 18: Contrôle visuel réserves (mêmes que présence reine)
+    { actionId: 18, periodeId: 3 }, // miellée_printemps
+    { actionId: 18, periodeId: 4 }, // inter_miellée
+    { actionId: 18, periodeId: 5 }, // pré_traitement
+    { actionId: 18, periodeId: 6 }, // traitement_été
+    { actionId: 18, periodeId: 7 }, // préparation_hiver
+  ];
+
+  for (const actionPeriode of actionPeriodes) {
+    await prisma.actionPeriode.upsert({
+      where: { 
+        actionId_periodeId: { 
+          actionId: actionPeriode.actionId, 
+          periodeId: actionPeriode.periodeId 
+        } 
+      },
+      update: {},
+      create: actionPeriode,
+    });
+  }
+  console.log(`✅ ${actionPeriodes.length} relations action-périodes créées`);
+
+  // Seeding des relations ActionWeatherRestriction selon REGLES_METIER_APICOLES.md
+  const actionWeatherRestrictions = [
+    // Actions nécessitant ouverture ruche = interdites par mauvais temps
+    // Restrictions: Pluie (3), Averses (4), Orage (5), Vent fort (6)
+    
+    // Action 1: Confirmer présence reine (ouverture ruche)
+    { actionId: 1, weatherRestrictionId: 3 }, // Pluie
+    { actionId: 1, weatherRestrictionId: 4 }, // Averses
+    { actionId: 1, weatherRestrictionId: 5 }, // Orage
+    { actionId: 1, weatherRestrictionId: 6 }, // Vent fort
+    
+    // Action 2: Observer couvain (ouverture prolongée)
+    { actionId: 2, weatherRestrictionId: 3 }, // Pluie
+    { actionId: 2, weatherRestrictionId: 4 }, // Averses
+    { actionId: 2, weatherRestrictionId: 5 }, // Orage
+    { actionId: 2, weatherRestrictionId: 6 }, // Vent fort
+    
+    // Action 3: Évaluer vitalité reine (ouverture ruche)
+    { actionId: 3, weatherRestrictionId: 3 }, // Pluie
+    { actionId: 3, weatherRestrictionId: 4 }, // Averses
+    { actionId: 3, weatherRestrictionId: 5 }, // Orage
+    { actionId: 3, weatherRestrictionId: 6 }, // Vent fort
+    
+    // Action 5: Surface couvain (inspection cadres)
+    { actionId: 5, weatherRestrictionId: 3 }, // Pluie
+    { actionId: 5, weatherRestrictionId: 4 }, // Averses
+    { actionId: 5, weatherRestrictionId: 5 }, // Orage
+    { actionId: 5, weatherRestrictionId: 6 }, // Vent fort
+    
+    // Action 18: Contrôle visuel réserves (ouverture ruche)
+    { actionId: 18, weatherRestrictionId: 3 }, // Pluie
+    { actionId: 18, weatherRestrictionId: 4 }, // Averses
+    { actionId: 18, weatherRestrictionId: 5 }, // Orage
+    { actionId: 18, weatherRestrictionId: 6 }, // Vent fort
+    
+    // Note: Actions 4,6,7,8,9,10,11,12,13,14,15,16,17 = interventions externes/rapides = pas de restrictions météo
+  ];
+
+  for (const actionWeatherRestriction of actionWeatherRestrictions) {
+    await prisma.actionWeatherRestriction.upsert({
+      where: { 
+        actionId_weatherRestrictionId: { 
+          actionId: actionWeatherRestriction.actionId, 
+          weatherRestrictionId: actionWeatherRestriction.weatherRestrictionId 
+        } 
+      },
+      update: {},
+      create: actionWeatherRestriction,
+    });
+  }
+  console.log(`✅ ${actionWeatherRestrictions.length} relations action-météo créées`);
   console.log("🌱 Seeding terminé");
 }
 
