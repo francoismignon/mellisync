@@ -36,6 +36,11 @@ function NewVisit() {
             }));
           }} />
       )}
+      <input 
+        type="button" 
+        value="Enregistrer"
+        className="border"
+        onClick={()=> console.log(visitActions)} />
     </div>
   );
 }
