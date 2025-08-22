@@ -82,6 +82,18 @@ class VisitService {
       }
     });
   }
+
+  static async findAllByHive(hiveId: number) {
+    return await prisma.visit.findMany({
+      where: { hiveId },
+      include: {
+        visitActions: {
+          include: { action: true }
+        }
+      },
+      orderBy: { date: 'desc' }  // Plus récentes en premier
+    });
+  }
 }
 
 export default VisitService;

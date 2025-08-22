@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 
 function Hive(){
     const [hive, setHive] = useState<any>({});
+    const [visits, setVisits] = useState<any[]>([]);
     const params = useParams();
     const navigate = useNavigate();
 
@@ -19,8 +20,20 @@ function Hive(){
         }
     }
 
+    // 📋 Fonction pour récupérer les visites de cette ruche
+    async function fetchVisits(){
+        try {
+            const hiveId = params['hive-id'];
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/hives/${hiveId}/visits`);
+            setVisits(response.data);
+        } catch (error) {
+            console.log("Erreur récupération visites:", error);
+        }
+    }
+
     useEffect(()=>{
         fetchHive();
+        fetchVisits();
     }, []);
 
     return(
@@ -48,6 +61,54 @@ function Hive(){
                 onClick={()=> {
                     navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
                 }} />
+
+            {/* 📋 Section Historique des visites */}
+            <div className="mt-8">
+                <h2 className="text-xl font-bold mb-4">Historique des visites</h2>
+                
+                {visits.length === 0 ? (
+                    <p className="text-gray-500 italic">Aucune visite enregistrée pour cette ruche</p>
+                ) : (
+                    <div className="space-y-2">
+                        {visits.map(visit => {
+                            // 📅 Fonction pour formater la date
+                            const formatDate = (dateString: string) => {
+                                const date = new Date(dateString);
+                                return date.toLocaleDateString('fr-FR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                            };
+
+                            return (
+                                <div 
+                                    key={visit.id}
+                                    onClick={() => {
+                                        // TODO: Navigation vers détail visite + génération PDF fiche officielle imprimable
+                                        console.log('Visite cliquée:', visit.id);
+                                    }}
+                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <p className="font-semibold text-gray-800">📅 {formatDate(visit.date)}</p>
+                                            <p className="text-sm text-gray-600">
+                                                {visit.visitActions?.length || 0} action(s) effectuée(s)
+                                            </p>
+                                        </div>
+                                        <div className="text-gray-400">
+                                            →
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

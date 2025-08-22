@@ -28,6 +28,7 @@ app.delete("/api/apiaries/:id", ApiaryController.delete);
 app.get("/api/hives", HiveController.findAllByApiary);
 app.post("/api/hives", HiveController.create);
 app.get("/api/hives/:id", HiveController.findById)
+app.get("/api/hives/:id/visits", VisitController.findAllByHive);
 //Routes pour la définition des actions
 // Route unique qui gère 2 cas :
 // - GET /api/actions → Toutes les actions (mode expert)  
