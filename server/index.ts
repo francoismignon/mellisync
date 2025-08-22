@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import ApiaryController from './src/controllers/apiaryController';
 import HiveController from './src/controllers/hiveConroller';
 import ActionController from './src/controllers/actionController';
+import VisitController from './src/controllers/visitController';
 
 dotenv.config()
 
@@ -28,7 +29,12 @@ app.get("/api/hives", HiveController.findAllByApiary);
 app.post("/api/hives", HiveController.create);
 app.get("/api/hives/:id", HiveController.findById)
 //Routes pour la définition des actions
+// Route unique qui gère 2 cas :
+// - GET /api/actions → Toutes les actions (mode expert)  
+// - GET /api/actions?filter=current → Actions filtrées selon période/météo/température (mode normal)
 app.get("/api/actions", ActionController.findAll);
+//Routes pour les visites
+app.post("/api/visits", VisitController.create);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{

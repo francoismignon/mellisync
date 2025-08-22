@@ -1,28 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-// Interface TypeScript pour les props
+// 🎯 Interface TypeScript simplifiée - Backend filtre tout !
 interface ActionButtonProps {
   action: {
     id: number;
     label: string;
     actionType: 'CYCLE' | 'INCREMENT';
     incrementStep?: number;
-    temperatureMin?: number;
-    temperatureMax?: number;
+    // ⚠️ Props supprimées : Plus nécessaires car backend filtre
+    // temperatureMin, temperatureMax, restrictions météo gérées côté serveur
     action_options: Array<{
       option: {
         label: string;
       }
     }>;
-    action_periode: Array<{
-      periode: {
-        name: string;
-      }
-    }>;
   };
-  currentTemperature: number;
-  currentWeather: string;
-  expertMode: boolean;
+  // 🔥 Props supprimées : Plus de props météo/température/expertMode
+  // Le backend envoie seulement les actions autorisées !
   onValueChange: (value: string | number) => void;
 }
 
@@ -30,35 +24,21 @@ function ActionButton(props: ActionButtonProps) {
   const [currentIndex, setCurrentIndex] = useState(0); // État pour CYCLE (index option)
   const [currentValue, setCurrentValue] = useState(0); // État pour INCREMENT (valeur numérique)
 
-  // Fonction pour vérifier si l'action doit être affichée
-  function shouldDisplay(): boolean {
-    if (props.expertMode) return true; // Mode expert : tout afficher
-    
-    // Vérification température minimum
-    if (props.action.temperatureMin && props.currentTemperature < props.action.temperatureMin) {
-      return false;
+  useEffect(() => {
+    // Envoyer valeur par défaut au parent automatiquement
+    if (props.action.actionType === "CYCLE") {
+      const defaultValue = props.action.action_options[0]?.option.label;
+      props.onValueChange(defaultValue);
+    } else {
+      props.onValueChange(0);
     }
-    
-    // Vérification température maximum
-    if (props.action.temperatureMax && props.currentTemperature > props.action.temperatureMax) {
-      return false;
-    }
-    
-    // Vérification météo (actions nécessitant ouverture ruche ≥15°C interdites par mauvais temps)
-    const badWeathers = ["Pluie", "Averses", "Orage", "Vent fort"];
-    if (props.action.temperatureMin && props.action.temperatureMin >= 15 && badWeathers.includes(props.currentWeather)) {
-      return false;
-    }
-    
-    return true;
-  }
+  }, []); // Au mount du composant
 
-  // Early return si l'action ne doit pas être affichée
-  if (!shouldDisplay()) {
-    return null;
-  }
+  // 🗑️ LOGIQUE SUPPRIMÉE : Plus de shouldDisplay() !
+  // Le backend envoie seulement les actions autorisées maintenant.
+  // Si ActionButton est rendu = action autorisée par définition !
 
-  // Calcul valeur affichage selon type action
+  // 📊 Calcul valeur affichée selon type action (logique inchangée)
   function getCurrentValue() {
     if (props.action.actionType === "CYCLE") {
       return props.action.action_options[currentIndex]?.option.label || "Default Option Label";
@@ -68,24 +48,27 @@ function ActionButton(props: ActionButtonProps) {
     return "Type d'action inconnu";
   }
 
-  // Gestion clic : cycle options (CYCLE) ou incrémente valeur (INCREMENT)
+  // 🎮 Gestion clic : cycle options (CYCLE) ou incrémente valeur (INCREMENT) 
   function handleClick() {
     if (props.action.actionType === "CYCLE") {
+      // Cycle parmi les options disponibles (Oui/Non, Faible/Moyen/Fort, etc.)
       const nextIndex = (currentIndex + 1) % props.action.action_options.length;
       setCurrentIndex(nextIndex);
       
       const nextValue = props.action.action_options[nextIndex]?.option.label;
-      props.onValueChange(nextValue); // Remonte nouvelle valeur au parent
+      props.onValueChange(nextValue); // Remonte nouvelle valeur au parent (NewVisit)
     } else if (props.action.actionType === "INCREMENT") {
+      // Incrémente par pas défini (0.5kg, 1L, 5 varroas, etc.)
       const newValue = currentValue + Number(props.action.incrementStep || 1);
       setCurrentValue(newValue);
-      props.onValueChange(newValue); // Remonte nouvelle valeur au parent
+      props.onValueChange(newValue); // Remonte nouvelle valeur au parent (NewVisit)
     }
   }
 
+  // 🎨 Rendu : Bouton toujours affiché (actions pré-filtrées par backend)
   return (
     <button 
-        className="border-2 border-gray-300 rounded-md p-2 mb-4 flex flex-col items-center"
+        className="border-2 border-gray-300 rounded-md p-2 mb-4 flex flex-col items-center hover:bg-gray-50"
         onClick={handleClick}
     >
       <div className="font-bold mb-2">{props.action.label}</div>
