@@ -18,14 +18,15 @@ function NewVisit() {
   // 📤 États pour gestion sauvegarde
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+
   // 🚀 Fonction adaptée pour les 2 modes avec backend intelligent
   async function fetchActions() {
     try {
-      // Mode normal : Actions pré-filtrées par backend avec contexte
+      // Mode normal : Actions pré-filtrées par backend avec contexte + météo spécifique au rucher
       // Mode expert : Toutes les actions sans filtre
       const endpoint = expertMode 
-        ? `${import.meta.env.VITE_API_BASE_URL}/api/actions`                    // Toutes actions
-        : `${import.meta.env.VITE_API_BASE_URL}/api/actions?filter=current`;   // Actions filtrées
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/actions`                                      // Toutes actions
+        : `${import.meta.env.VITE_API_BASE_URL}/api/actions?filter=current&apiaryId=${apiaryId}`;  // Actions filtrées + météo du rucher
       
       const response = await axios.get(endpoint);
       
@@ -83,10 +84,10 @@ function NewVisit() {
     }
   }
 
-  // ⚡ Re-fetch quand l'utilisateur change de mode
+  // ⚡ Re-fetch quand l'utilisateur change de mode ou de rucher
   useEffect(() => {
     fetchActions();
-  }, [expertMode]); // Dépendance ajoutée !
+  }, [expertMode, apiaryId]); // Dépendances : mode + rucher spécifique
 
 
   return (
@@ -97,7 +98,7 @@ function NewVisit() {
         {/* 📊 Affichage contexte apicole en mode normal */}
         {!expertMode && currentPeriod && (
           <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
-            📅 {currentPeriod} • 🌡️ {currentTemperature}°C • ☀️ {currentWeather}
+            {currentPeriod} • {currentTemperature}°C • {currentWeather}
           </div>
         )}
         

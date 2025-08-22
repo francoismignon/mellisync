@@ -132,7 +132,7 @@ async function main() {
     { id: 13, label: "Poser traitement varroa", actionType: "CYCLE" }, // Pas de restriction température
     { id: 14, label: "Traitement acide oxalique hivernal", actionType: "CYCLE", temperatureMin: 3, temperatureMax: 8 }, // Conditions spécifiques hiver
     { id: 15, label: "Surveiller maladies", actionType: "CYCLE" }, // Pas de restriction température
-    { id: 16, label: "Nettoyer plateau de fond", actionType: "CYCLE", temperatureMin: 12 }, // Manipulation nécessite ouverture
+    { id: 16, label: "Nettoyer plateau de fond", actionType: "CYCLE" }, // pas de restriction
     { id: 17, label: "Contrôle moisissures", actionType: "CYCLE" }, // Pas de restriction température
     { id: 18, label: "Contrôle visuel réserves (cadres)", actionType: "CYCLE", temperatureMin: 15 }, // Ouverture ruche
     

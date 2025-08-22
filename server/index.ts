@@ -23,7 +23,7 @@ app.use(express.json());
 //Routes Rucher
 app.post("/api/apiaries", ApiaryController.create);
 app.get("/api/apiaries", ApiaryController.findAll);
-app.delete("/api/apiaries/:id", ApiaryController.delete);
+
 //Routes Ruche
 app.get("/api/hives", HiveController.findAllByApiary);
 app.post("/api/hives", HiveController.create);
@@ -36,6 +36,7 @@ app.get("/api/hives/:id/visits", VisitController.findAllByHive);
 app.get("/api/actions", ActionController.findAll);
 //Routes pour les visites
 app.post("/api/visits", VisitController.create);
+app.get("/api/visits/:id/pdf", VisitController.generatePDF);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{

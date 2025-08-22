@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma";
+import WeatherService from "./weatherService";
 
 // 📋 Types TypeScript pour la structure des données
 interface WeatherData {
@@ -37,7 +38,7 @@ class ActionService {
   }
 
   // 🧠 SERVICE INTELLIGENT : Filtrage selon règles métier apicoles
-  static async findForVisit(): Promise<FilteredActionsResponse> {
+  static async findForVisit(apiaryId?: number): Promise<FilteredActionsResponse> {
     
     // 1️⃣ ÉTAPE DATA : Réutiliser findAll() pour éviter duplication code
     // ✅ DRY Principle : Don't Repeat Yourself
@@ -45,7 +46,7 @@ class ActionService {
 
     // 2️⃣ ÉTAPE CONTEXTE : Calculer situation actuelle apicole
     const currentPeriod = this.getCurrentPeriod();    // Période selon date (hiver, printemps...)
-    const weatherData = await this.getCurrentWeather(); // Température + météo actuelles
+    const weatherData = await this.getCurrentWeather(apiaryId); // Température + météo spécifiques au rucher
 
     // 3️⃣ ÉTAPE FILTRAGE : Appliquer règles métier pour chaque action
     const filteredActions = this.filterActionsByRules(
@@ -63,7 +64,7 @@ class ActionService {
     };
   }
 
-  // 📅 MÉTHODE 1: Calcul période apicole selon date actuelle
+  // 📅 MÉTHODE 1: Calcul période apicole selon date actuelle (retourne label utilisateur)
   static getCurrentPeriod(): string {
     const now = new Date();
     const month = now.getMonth() + 1; // JavaScript months: 0-indexed → +1 pour mois réel
@@ -77,48 +78,52 @@ class ActionService {
       return "fin_hiver";               // 16 fév - Mars : Préparation réveil, premiers contrôles  
     }
     if (month >= 4 && month <= 6) {
-      return "miellée_printemps";       // Avr-Juin : Période productive, surveillance reine/couvain
+      return "miellée_primptemps";         // Avr-Juin : Période productive, surveillance reine/couvain
     }
     if (month === 7) {
-      return "inter_miellée";           // Juillet : Entre 2 miellées, récolte miel
+      return "inter_miellée";                // Juillet : Entre 2 miellées, récolte miel
     }
     if ((month === 8 && day <= 15)) {
-      return "pré_traitement";          // 1-15 août : Préparation traitements varroa
+      return "pré_traitement";               // 1-15 août : Préparation traitements varroa
     }
     if ((month === 8 && day > 15) || month === 9) {
-      return "traitement_été";          // 16 août-Sept : Traitement varroa obligatoire
+      return "traitement_été";             // 16 août-Sept : Traitement varroa obligatoire
     }
     if (month >= 10 && month <= 11) {
-      return "préparation_hiver";       // Oct-Nov : Préparation hivernage, nourrissement
+      return "préparation_hiver";        // Oct-Nov : Préparation hivernage, nourrissement
     }
     if (month === 12) {
-      return "traitement_hiver";        // Décembre : Traitement hiver (acide oxalique)
+      return "traitement_hiver";          // Décembre : Traitement hiver (acide oxalique)
     }
     
     return "hiver"; // Fallback sécurité
   }
 
-  // 🌤️ MÉTHODE 2: Récupération météo actuelle (MVP avec simulation)
-  static async getCurrentWeather(): Promise<WeatherData> {
-    // 🔧 MVP: Valeurs simulées pour développement/test
-    // Permet de tester la logique sans dépendre d'API externe
-    return {
-      temperature: 25,        // °C - Température simulée (été belge)
-      condition: "Ensoleillé" // Condition simulée favorable aux actions
-    };
-
-    // 🚀 TODO PRODUCTION: Implémentation vraie API météo
-    // Décommenter et ajouter clé API pour production :
-    //
-    // const API_KEY = process.env.OPENWEATHER_API_KEY;
-    // const response = await fetch(
-    //   `https://api.openweathermap.org/data/2.5/weather?q=Brussels&appid=${API_KEY}&units=metric`
-    // );
-    // const data = await response.json();
-    // return {
-    //   temperature: Math.round(data.main.temp),                    // Température arrondie
-    //   condition: this.mapWeatherCondition(data.weather[0].main)   // Condition mappée en français
-    // };
+  // 🌤️ MÉTHODE 2: Récupération météo actuelle avec API Open-Meteo
+  static async getCurrentWeather(apiaryId?: number): Promise<WeatherData> {
+    // Si aucun apiaryId fourni, utiliser coordonnées par défaut (Bruxelles)
+    let latitude = 50.8503; // Bruxelles par défaut
+    let longitude = 4.3517;
+    
+    // 📍 Si apiaryId fourni, récupérer les coordonnées du rucher
+    if (apiaryId) {
+      try {
+        const apiary = await prisma.apiary.findUnique({
+          where: { id: apiaryId },
+          select: { latitude: true, longitude: true }
+        });
+        
+        if (apiary?.latitude && apiary?.longitude) {
+          latitude = parseFloat(apiary.latitude.toString());
+          longitude = parseFloat(apiary.longitude.toString());
+        }
+      } catch (error) {
+        console.warn(`Erreur récupération coordonnées rucher ${apiaryId}:`, error);
+      }
+    }
+    
+    // 🌤️ Appel API météo avec coordonnées
+    return await WeatherService.getCurrentWeather(latitude, longitude);
   }
 
   // 🎯 MÉTHODE 3: Filtrage actions selon 4 règles métier apicoles
@@ -156,22 +161,6 @@ class ActionService {
 
       return true; // ✅ Action autorisée ! Toutes les conditions respectées
     });
-  }
-
-  // 🗺️ MÉTHODE UTILITAIRE: Conversion conditions météo API → termes métier français
-  static mapWeatherCondition(apiCondition: string): string {
-    // Mapping OpenWeatherMap conditions → termes stockés en DB (table weather_restrictions)
-    const mapping: { [key: string]: string } = {
-      'Clear': 'Ensoleillé',      // Beau temps → Autorise la plupart des actions
-      'Clouds': 'Nuageux',        // Nuageux → Généralement OK pour actions
-      'Rain': 'Pluie',            // Pluie → Interdit ouverture ruches (action_weather_restrictions)
-      'Drizzle': 'Averses',       // Bruine → Interdit certaines actions
-      'Thunderstorm': 'Orage',    // Orage → Interdit toutes actions extérieures
-      'Snow': 'Neige',            // Neige → Période hivernale, actions limitées
-      'Mist': 'Brouillard'        // Brouillard → Visibilité réduite
-    };
-    
-    return mapping[apiCondition] || 'Inconnu'; // Fallback si condition API inconnue
   }
 }
 export default ActionService;

@@ -87,8 +87,8 @@ function Hive(){
                                 <div 
                                     key={visit.id}
                                     onClick={() => {
-                                        // TODO: Navigation vers détail visite + génération PDF fiche officielle imprimable
-                                        console.log('Visite cliquée:', visit.id);
+                                        // 📄 Téléchargement PDF fiche de visite
+                                        window.open(`${import.meta.env.VITE_API_BASE_URL}/api/visits/${visit.id}/pdf`, '_blank');
                                     }}
                                     className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
                                 >
@@ -99,8 +99,8 @@ function Hive(){
                                                 {visit.visitActions?.length || 0} action(s) effectuée(s)
                                             </p>
                                         </div>
-                                        <div className="text-gray-400">
-                                            →
+                                        <div className="text-blue-500 font-bold">
+                                            📄 PDF
                                         </div>
                                     </div>
                                 </div>

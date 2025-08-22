@@ -616,6 +616,120 @@ Mignon François
 - Sauvegarde 1-tap : "Enregistrer visite" → Transaction backend → Redirection ruche
 - UX mobile-optimized : Workflow complet sans navigation manuelle requise
 
+### Phase 22 : Génération PDF fiches visite officielles (terminée ✅)
+1. **Template React PDF professionnel** : VisitPDFTemplate.tsx avec en-tête, identification, actions, signatures
+2. **Backend Puppeteer intégré** : Route `/api/visits/:id/pdf` avec React SSR → HTML → PDF A4
+3. **Workflow utilisateur bouclé** : Clic "PDF" historique → téléchargement automatique fiche officielle 
+4. **Corrections UX multiples** : Suppression émojis incompatibles, cohérence numéros visite, données rucher/localisation
+5. **Architecture relations Prisma** : Résolution ApiaryHive → Apiary pour données complètes ruchers
+6. **Recherche API météo** : Comparaison Open-Meteo vs OpenWeatherMap vs WeatherAPI pour intégration future
+
+### Décisions techniques phase 22
+- **Puppeteer backend vs jsPDF frontend** : Rendu serveur pour consistance cross-browser + template React réutilisable
+- **Styles inline vs Tailwind** : CSS inline optimal pour PDF (pas de build Tailwind backend requis)
+- **Relations Prisma complexes** : Via ApiaryHive junction table pour récupérer nom/adresse rucher actuel
+- **Numérotation visite par ruche** : Tri chronologique + findIndex() pour position correcte vs ID global
+- **Open-Meteo choix API** : Gratuit 10k calls/jour, pas de clé API, open-source vs alternatives limitées
+- **Template serveur séparé** : src/components côté server vs client pour isolation SSR
+
+### Réalisations détaillées Phase 22
+
+**Système PDF enterprise** :
+- Template VisitPDFTemplate.tsx professionnel : sections identification, conditions, actions, observations, signature
+- Architecture Puppeteer : React.createElement() → renderToStaticMarkup() → page.setContent() → page.pdf()
+- Format A4 avec marges : top 20mm, right/left 15mm, bottom 20mm pour impression optimale
+- Headers HTTP corrects : Content-Type application/pdf + Content-Disposition attachment filename
+
+**Résolution données complètes** :
+- Requête Prisma 3-niveaux : Visit → VisitAction → Action + Hive → ApiaryHive → Apiary
+- Calcul visitNumber par ruche : allVisitsForHive.sort(date).findIndex() pour numérotation 1,2,3...
+- Interface TypeScript cohérente : apiary_hives[0].apiary.{name,address,city} vs anciennes structures
+- Formatage français : toLocaleDateString('fr-FR') avec weekday/month/day/hour/minute complets
+
+**Interface utilisateur finalisée** :
+- Bouton "PDF" historique visites avec window.open() vers route backend API
+- Suppression émojis template : compatibilité polices standard sans caractères spéciaux
+- Cohérence numérotation : visitNumber utilisé header + footer vs visit.id global
+- UX download direct : téléchargement automatique sans preview (workflow optimisé mobile)
+
+**Recherche technique API météo** :
+- Comparaison Open-Meteo (10k free, no API key) vs OpenWeatherMap (60/min limit) vs WeatherAPI
+- Décision Open-Meteo : optimal pour MVP avec 10k calls/jour + données température/conditions complètes
+- Architecture prête : ActionService.getCurrentWeather() déjà structuré pour intégration API réelle
+
+### Phase 23 : Intégration API météo Open-Meteo temps réel (terminée ✅)
+1. **WeatherService complet** : Géocodage automatique adresse → GPS + météo temps réel via API Open-Meteo
+2. **Géocodage transparent** : Création rucher stocke latitude/longitude automatiquement selon ville
+3. **Météo contextualisée par rucher** : Chaque rucher affiche sa propre météo locale au lieu de données par défaut
+4. **Stratégie fallback géocodage** : Si adresse complète échoue, utilise ville seule pour fiabilité
+5. **Sélecteur villes belges** : Dropdown 25 villes principales pour éviter erreurs saisie utilisateur
+6. **Données PDF météo temps réel** : Fiches visite avec vraie température/météo du rucher au moment génération
+
+### Décisions techniques phase 23
+- **Open-Meteo API gratuite** : 10k calls/jour sans clé API vs alternatives limitées/payantes
+- **Géocodage ville uniquement** : Plus fiable que adresse complète, suffisant précision ruchers
+- **Coordonnées GPS stockées** : latitude/longitude en DB pour éviter appels répétés
+- **ActionService getCurrentWeather(apiaryId)** : Utilise coordonnées spécifiques rucher vs défaut Bruxelles
+- **Dropdown contraignant** : Liste villes validées vs champ libre source erreurs
+- **Architecture 3-tier respectée** : APIs externes dans couche service selon Node.js Best Practices
+
+### Réalisations détaillées Phase 23
+
+**WeatherService production** :
+- Méthode geocodeAddress() avec fallback ville si adresse complète échoue
+- getCurrentWeather() avec coordonnées GPS → température + condition météo WMO
+- Gestion erreurs robuste avec fallback données par défaut (18°C, "Non disponible")
+- Migration Prisma latitude/longitude Decimal nullable pour toutes coordonnées mondiales
+
+**Intégration transparente** :
+- ApiaryService.create() appelle géocodage automatiquement lors création rucher
+- ActionService.getCurrentWeather(apiaryId) utilise coordonnées stockées vs Bruxelles par défaut
+- Frontend NewVisit.tsx envoie apiaryId dans URL → météo spécifique rucher affiché
+- VisitController génération PDF utilise vraie météo moment visite vs données hardcodées
+
+**UX amélioration significative** :
+- Formulaire NewApiary avec dropdown 25 villes belges (Bruxelles, Liège, Anvers, Charleroi...)
+- Chaque rucher affiche météo locale correcte : Namur 19°C vs Liège 18°C
+- Suppression bouton supprimer rucher pour éviter contraintes clés étrangères complexes
+- Interface météo temps réel : température + condition (Ensoleillé, Couvert, Pluie...)
+
+**Architecture finale opérationnelle** :
+- Workflow complet : Créer rucher → Géocodage automatique → Création visite → Météo spécifique → PDF avec vraies données
+- Base données enrichie : coordonnées GPS + historique météo contextuel par visite
+- APIs externes intégrées selon standards enterprise avec fallback robustes
+
+### Phase 24 : Optimisation UX labels périodes + émojis météo (terminée ✅)
+1. **Émojis météo contextuels** : Ajout émojis appropriés dans WeatherService (☀️ Soleil, ☁️ Couvert, 🌧️ Pluie, etc.)
+2. **Labels périodes utilisateur** : Conversion "traitement_été" → "Traitement d'été" pour interface élégante
+3. **Centralisation logique backend** : ActionService.getCurrentPeriod() retourne directement labels utilisateur
+4. **Suppression duplication frontend** : Élimination PERIOD_LABELS côté client, une seule source vérité backend
+5. **UX cohérente frontend/PDF** : Labels élégants dans interface + fiches PDF générées
+6. **Architecture DRY appliquée** : Logique conversion centralisée, maintenance simplifiée
+
+### Décisions techniques phase 24
+- **Émojis météo WMO standardisés** : Mapping codes Open-Meteo → émojis contextuels (☀️🌤️⛅☁️🌫️🌦️🌧️❄️⛈️)
+- **Labels backend-first** : getCurrentPeriod() retourne "Traitement d'été" vs "traitement_été" technique
+- **Suppression duplication** : PERIOD_LABELS supprimés frontend + visitController (DRY principle)
+- **TypeScript tsconfig JSX** : Configuration "jsx": "react-jsx" backend pour template PDF React
+- **Architecture centralisée** : Backend génère labels utilisateur → Frontend affiche direct → PDF cohérent
+
+### Réalisations détaillées Phase 24
+
+**Interface météo enrichie** :
+- Conditions avec émojis contextuels : "☁️ Couvert", "☀️ Ciel dégagé", "🌧️ Pluie modérée"
+- Affichage périodes élégant : "📅 Traitement d'été • 🌡️ 19°C • ☁️ Couvert"
+- PDF fiches visite cohérentes avec mêmes labels/émojis que interface
+
+**Refactoring architecture labels** :
+- ActionService.getCurrentPeriod() source unique vérité avec 8 périodes wallonnes
+- Suppression logique duplication frontend/backend (PERIOD_LABELS éliminés)
+- Architecture DRY respectée : modification labels = 1 seul endroit backend
+
+**Configuration TypeScript JSX** :
+- tsconfig.json backend étendu : "jsx": "react-jsx" + include "**/*.tsx"
+- Support React Server-Side Rendering pour génération PDF
+- Template VisitPDFTemplate.tsx fonctionnel avec CSS-in-JS côté serveur
+
 
 ## 🚀 Évolutions futures (post-MVP)
 
@@ -633,3 +747,13 @@ Mignon François
 - **Progression visible** : Compteurs ruche, achievements, déblocage actions
 - **Dopamine design** : Chaque action importante = récompense visuelle immédiate
 - **Librairies** : Framer Motion, react-spring pour animations fluides
+
+### Fonctionnalités V2/V3 planifiées
+
+#### Types visites selon calendrier apicole
+**Concept** : Classification automatique visites selon période
+- **Types** : Visite printemps, été, automne, hivernage
+- **Auto-détection** : Date visite → période → type automatique  
+- **Affichage PDF** : "Type de visite : Visite d'automne" dans fiche
+- **Règles métier** : Chaque type = actions recommandées différentes
+- **Implementation** : Extension ActionService.getCurrentPeriod() → visit type mapping

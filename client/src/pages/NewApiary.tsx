@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { BELGIAN_CITIES } from "../constants/belgianCities";
 
 function NewApiary() {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ function NewApiary() {
     }
   }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target;
 
     setFormData(prevFormData => {
@@ -62,14 +63,20 @@ function NewApiary() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
-            <input
+            <select
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              type="text"
               name="city"
-              placeholder="ex: Boussu"
               onChange={handleChange}
               value={formData.city}
-            />
+              required
+            >
+              <option value="">Sélectionner une ville...</option>
+              {BELGIAN_CITIES.map(city => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
           </div>
           <input 
             type="submit" 

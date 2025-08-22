@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma";
+import WeatherService from "./weatherService";
 
 class ApiaryService {
     
@@ -14,11 +15,16 @@ class ApiaryService {
     city: string,
     userId: number
   ) {
+    // 📍 Géocodage automatique de l'adresse lors de la création
+    const coordinates = await WeatherService.geocodeAddress(address, city);
+    
     return await prisma.apiary.create({
       data: {
         name,
         address,
         city,
+        latitude: coordinates?.latitude || null,
+        longitude: coordinates?.longitude || null,
         userId,
       },
     });
@@ -27,12 +33,6 @@ class ApiaryService {
   //TODO: adapter lors d' l'authentification
   static async findAll() {
     return await prisma.apiary.findMany();
-  }
-
-  static async delete(id: number) {
-    return await prisma.apiary.delete({
-      where: { id: id },
-    });
   }
 }
 export default ApiaryService;

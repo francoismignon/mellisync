@@ -24,6 +24,8 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
@@ -31,7 +33,10 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
-    "prisma": "^6.13.0"
+    "prisma": "^6.13.0",
+    "puppeteer": "^23.11.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^11.9.0",

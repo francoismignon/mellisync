@@ -77,7 +77,16 @@ class VisitService {
           include: { action: true }
         },
         hive: {
-          select: { id: true, name: true }
+          include: {
+            apiary_hives: {
+              where: { endDate: null }, // Rucher actuel
+              include: {
+                apiary: {
+                  select: { id: true, name: true, address: true, city: true }
+                }
+              }
+            }
+          }
         }
       }
     });

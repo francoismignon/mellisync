@@ -6,16 +6,6 @@ function Apiaries() {
   const [apiaries, setApiaries] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  async function handleClick(apiaryId: number) {
-    try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/apiaries/${apiaryId}`
-      );
-      fetchApiaries();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   async function fetchApiaries() {
     const response = await axios.get(
@@ -48,20 +38,9 @@ function Apiaries() {
             key={apiary.id}
             className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
             onClick={()=> navigate(`/ruchers/${apiary.id}`)}>
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{apiary.name}</h3>
-                <p className="text-gray-600">{apiary.address}, {apiary.city}</p>
-              </div>
-              <input
-                type="button"
-                value="supprimer"
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClick(apiary.id);
-                }}
-              />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{apiary.name}</h3>
+              <p className="text-gray-600">{apiary.address}, {apiary.city}</p>
             </div>
           </div>
         ))}
