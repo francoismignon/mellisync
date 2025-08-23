@@ -2,11 +2,13 @@ import express, {Request, Response} from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import ApiaryController from './src/controllers/apiaryController';
 import HiveController from './src/controllers/hiveConroller';
 import ActionController from './src/controllers/actionController';
 import VisitController from './src/controllers/visitController';
+import AuthController from './src/controllers/authController';
 
 dotenv.config()
 
@@ -15,8 +17,12 @@ const PORT = process.env.PORT;
 
 //middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true // Important pour les cookies
+}));
 app.use(morgan('combined'));
+app.use(cookieParser()); // Middleware pour parser les cookies
 app.use(express.json());
 
 
@@ -37,6 +43,11 @@ app.get("/api/actions", ActionController.findAll);
 //Routes pour les visites
 app.post("/api/visits", VisitController.create);
 app.get("/api/visits/:id/pdf", VisitController.generatePDF);
+
+//Routes pour l'authentification
+app.post("/api/auth/register", AuthController.register);
+app.post("/api/auth/login", AuthController.login);
+app.post("/api/auth/logout", AuthController.logout);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{

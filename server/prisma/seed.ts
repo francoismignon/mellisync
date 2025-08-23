@@ -1,4 +1,5 @@
 import prisma from "../src/lib/prisma";
+import AuthService from "../src/services/authService";
 
 async function main() {
   console.log("🌱 Démarrage du seeding...");
@@ -17,18 +18,37 @@ async function main() {
   }
   console.log(`✅ ${roles.length} rôles seedés`);
 
-  // Seeding de l'utilisateur admin
+  // Seeding de l'utilisateur admin avec mot de passe hashé
+  const hashedAdminPassword = await AuthService.hashPassword("admin");
   await prisma.user.upsert({
     where: { email: "admin@mellisync.com" },
-    update: {},
+    update: {
+      password: hashedAdminPassword // Met à jour avec hash si l'utilisateur existe
+    },
     create: {
       name: "Admin",
       email: "admin@mellisync.com",
-      password: "admin",
+      password: hashedAdminPassword,
       roleId: 1,
     },
   });
-  console.log("✅ 1 utilisateur admin seedé");
+  console.log("✅ 1 utilisateur admin seedé (mot de passe hashé)");
+
+  // Seeding de l'utilisateur beekeeper test
+  const hashedBeekeeperPassword = await AuthService.hashPassword("francois");
+  await prisma.user.upsert({
+    where: { email: "francois@mellisync.com" },
+    update: {
+      password: hashedBeekeeperPassword
+    },
+    create: {
+      name: "François",
+      email: "francois@mellisync.com",
+      password: hashedBeekeeperPassword,
+      roleId: 2, // BEEKEEPER role
+    },
+  });
+  console.log("✅ 1 utilisateur beekeeper seedé (François)");
 
   // Seeding des options complètes (basées sur panel.html + user stories MUST HAVE)
   const options = [

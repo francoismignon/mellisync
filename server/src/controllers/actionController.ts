@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import ActionService from '../services/actionService';
 
 class ActionController {
-    // 🎮 CONTROLLER PRINCIPAL : Gère les 2 modes (expert vs normal)
+    // Gère les 2 modes (expert vs normal)
     static async findAll(req: Request, res: Response) {
         try {
-            // 1️⃣ Extraction des paramètres d'URL : ?filter=current&apiaryId=123
+            // 1️ Extraction des paramètres d'URL : ?filter=current&apiaryId=123
             const { filter, apiaryId } = req.query;
             
-            // 2️⃣ MODE NORMAL (débutant) : Actions pré-filtrées par règles métier
+            // 2️ MODE NORMAL (débutant) : Actions pré-filtrées par règles métier
             if (filter === 'current') {
                 // Appelle service avec logique filtrage intelligent + météo spécifique au rucher
                 // Retourne : { currentPeriod, currentTemperature, currentWeather, actions[] }
@@ -17,7 +17,7 @@ class ActionController {
                 return res.json(filteredResult);
             }
             
-            // 3️⃣ MODE EXPERT : Toutes les actions sans filtre
+            // 3️ MODE EXPERT : Toutes les actions sans filtre
             // Retourne : actions[] (format classique)
             const actions = await ActionService.findAll();
             res.json(actions);
