@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { BELGIAN_CITIES } from "../constants/belgianCities";
@@ -14,10 +14,7 @@ function NewApiary() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/apiaries`,
-        formData
-      );
+      const response = await axios.post('/api/apiaries', formData);
       //console.log(response.data);
       navigate(`/ruchers/${response.data.apiary.id}`); // si OK, renvoye vers la pages de liste de ruchers
     } catch (error) {

@@ -792,6 +792,51 @@ Mignon François
 - **Dopamine design** : Chaque action importante = récompense visuelle immédiate
 - **Librairies** : Framer Motion, react-spring pour animations fluides
 
+### Phase 26 : Interface authentification frontend React + Configuration Axios optimisée (terminée ✅)
+1. **Pages authentification Material-UI** : Login/Register avec formulaires simples, validation, gestion erreurs
+2. **Gestion état authentification** : App.tsx avec useEffect auth check, protection routes automatique, loading states
+3. **Configuration Axios globale** : axiosConfig.ts avec baseURL, withCredentials, intercepteurs requête/réponse
+4. **Migration complète Fetch → Axios** : Tous appels API utilisant config centralisée + URLs relatives simplifiées
+5. **Intercepteurs debug** : Logs automatiques requêtes/réponses, gestion centralisée erreurs 401
+6. **Workflow auth complet** : Login → cookies HttpOnly → navigation protégée → logout fonctionnel
+7. **Documentation technique** : SOURCES.md enrichi avec justification Axios vs Fetch (cookies, intercepteurs, DX)
+
+### Décisions techniques phase 26
+- **Axios vs Fetch choix documenté** : Intercepteurs natifs, withCredentials global, gestion erreurs automatique
+- **Pages auth Material-UI** : Card + TextField cohérent avec architecture existante
+- **Protection routes React Router** : Conditional rendering App.tsx selon état authentification
+- **Configuration centralisée** : axiosConfig.ts source unique vérité (baseURL, credentials, logging)
+- **URLs relatives** : `/api/auth/login` vs `http://localhost:3000...` pour maintenabilité
+- **Intercepteurs production-ready** : Logs debug + gestion 401 centralisée (préparation refresh token)
+- **Workflow RESTful** : POST login/register → GET /auth/me verification → POST logout
+
+### Réalisations détaillées Phase 26
+
+**Interface authentification React complete** :
+- Login.tsx avec email/password, validation, error states, loading
+- Register.tsx avec confirmation mot de passe, validation cohérente
+- Navigation inter-pages avec React Router Link (Login ↔ Register)
+- Gestion erreurs backend : affichage error.response.data.error dans Alert Material-UI
+
+**Protection routes automatique** :
+- App.tsx checkAuth() au mount avec axios.get('/api/auth/me')
+- Conditional rendering : routes auth si non connecté, app complète si connecté
+- Loading state pendant vérification authentification initiale
+- NavBar bouton déconnexion avec axios.post('/api/auth/logout')
+
+**Configuration Axios enterprise-grade** :
+- axiosConfig.ts avec axios.defaults globaux (baseURL, withCredentials)
+- Intercepteur requête avec logs debug toutes requêtes
+- Intercepteur réponse avec gestion centralisée erreurs + logs
+- Migration 8+ fichiers : imports axios → axiosConfig + URLs simplifiées
+- Suppression duplication `{ withCredentials: true }` grâce config globale
+
+**Architecture HTTP client optimisée** :
+- Plus d'URLs hardcodées : axios.post('/api/auth/login') vs fetch('http://localhost:3000...')
+- Logs automatiques : `[AXIOS] POST /api/auth/login` + `[AXIOS] 201 /api/auth/login`
+- Gestion erreurs centralisée : detection 401 → log "Token expired" (futur refresh automatique)
+- DX améliorée : debugging réseau facilité + consistency requêtes
+
 ### Fonctionnalités V2/V3 planifiées
 
 #### Types visites selon calendrier apicole
@@ -801,3 +846,5 @@ Mignon François
 - **Affichage PDF** : "Type de visite : Visite d'automne" dans fiche
 - **Règles métier** : Chaque type = actions recommandées différentes
 - **Implementation** : Extension ActionService.getCurrentPeriod() → visit type mapping
+
+*Dernière étape* : **Interface authentification frontend + Axios config optimisée !** Login/Register Material-UI fonctionnels, gestion état auth dans App.tsx, protection routes automatique. Configuration Axios globale avec intercepteurs, baseURL centralisée, withCredentials automatique. Frontend-backend auth workflow complet opérationnel.

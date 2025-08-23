@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
@@ -25,8 +25,8 @@ function NewVisit() {
       // Mode normal : Actions pré-filtrées par backend avec contexte + météo spécifique au rucher
       // Mode expert : Toutes les actions sans filtre
       const endpoint = expertMode 
-        ? `${import.meta.env.VITE_API_BASE_URL}/api/actions`                                      // Toutes actions
-        : `${import.meta.env.VITE_API_BASE_URL}/api/actions?filter=current&apiaryId=${apiaryId}`;  // Actions filtrées + météo du rucher
+        ? `/api/actions`                                      // Toutes actions
+        : `/api/actions?filter=current&apiaryId=${apiaryId}`;  // Actions filtrées + météo du rucher
       
       const response = await axios.get(endpoint);
       
@@ -61,7 +61,7 @@ function NewVisit() {
     try {
       // 📤 Envoi données au backend
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/visits`, 
+        `/api/visits`, 
         {
           hiveId: parseInt(hiveId),  // String URL → Number
           visitActions: visitActions  // Toutes les actions avec leurs valeurs

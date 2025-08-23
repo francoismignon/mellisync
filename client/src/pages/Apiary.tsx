@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -12,7 +12,7 @@ function Apiary() {
   async function fetchHives() {
     // TODO: Configurer axios.defaults.withCredentials = true pour httpOnly cookies
     const response = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/api/hives?apiaryId=${apiaryId}`
+      `/api/hives?apiaryId=${apiaryId}`
     );
     setHives(response.data);
   }

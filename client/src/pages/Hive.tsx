@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
 import { useNavigate, useParams } from "react-router";
@@ -12,7 +12,7 @@ function Hive(){
     async function fetchHive(){
         try {
             const hiveId = params['hive-id'];
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/hives/${hiveId}`);
+            const response = await axios.get(`/api/hives/${hiveId}`);
             setHive(response.data);
 
         } catch (error) {
@@ -24,7 +24,7 @@ function Hive(){
     async function fetchVisits(){
         try {
             const hiveId = params['hive-id'];
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/hives/${hiveId}/visits`);
+            const response = await axios.get(`/api/hives/${hiveId}/visits`);
             setVisits(response.data);
         } catch (error) {
             console.log("Erreur récupération visites:", error);
@@ -88,7 +88,7 @@ function Hive(){
                                     key={visit.id}
                                     onClick={() => {
                                         // 📄 Téléchargement PDF fiche de visite
-                                        window.open(`${import.meta.env.VITE_API_BASE_URL}/api/visits/${visit.id}/pdf`, '_blank');
+                                        window.open(`/api/visits/${visit.id}/pdf`, '_blank');
                                     }}
                                     className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
                                 >

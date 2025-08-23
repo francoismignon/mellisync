@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
@@ -22,7 +22,7 @@ function NewHive() {
     event.preventDefault();
     try {
        const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/hives`,
+        `/api/hives`,
         {
             ...formData,
             apiaryId: apiaryId

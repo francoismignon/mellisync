@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import axios from '../config/axiosConfig';
 import { Button, TextField, Typography, Alert, Card, CardContent } from '@mui/material';
 
 export default function Login() {
@@ -14,21 +15,10 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        window.location.href = '/';
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Erreur de connexion');
-      }
-    } catch (err) {
-      setError('Erreur de connexion');
+      await axios.post('/api/auth/login', { email, password });
+      window.location.href = '/';
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Erreur de connexion');
     } finally {
       setLoading(false);
     }

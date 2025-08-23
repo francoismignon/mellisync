@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../config/axiosConfig";
 import { Link, useNavigate } from "react-router";
 
 function Apiaries() {
@@ -9,7 +9,7 @@ function Apiaries() {
 
   async function fetchApiaries() {
     const response = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/api/apiaries`
+      `/api/apiaries`
     );
     setApiaries(response.data);
   }

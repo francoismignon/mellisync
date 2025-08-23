@@ -1,13 +1,11 @@
 import { Link } from "react-router"
+import axios from "../config/axiosConfig"
 import { Button } from "@mui/material"
 
 function NavBar(){
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:3000/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include',
-            });
+            await axios.post('/api/auth/logout');
             window.location.href = '/';
         } catch (error) {
             console.error('Erreur logout:', error);

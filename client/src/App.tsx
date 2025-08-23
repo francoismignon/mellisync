@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
+import axios from "./config/axiosConfig";
 import Dashboard from "./pages/Dashboard";
 import NavBar from "./components/NavBar";
 import Apiaries from "./pages/Apiaries";
@@ -21,10 +22,8 @@ function App() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/me', {
-        credentials: 'include',
-      });
-      setIsAuthenticated(response.ok);
+      await axios.get('/api/auth/me');
+      setIsAuthenticated(true);
     } catch {
       setIsAuthenticated(false);
     } finally {

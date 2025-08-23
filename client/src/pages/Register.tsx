@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import axios from '../config/axiosConfig';
 import { Button, TextField, Typography, Alert, Card, CardContent } from '@mui/material';
 
 export default function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,21 +23,10 @@ export default function Register() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        window.location.href = '/';
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Erreur d\'inscription');
-      }
-    } catch (err) {
-      setError('Erreur de connexion');
+      await axios.post('/api/auth/register', { name, email, password });
+      window.location.href = '/';
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Erreur d\'inscription');
     } finally {
       setLoading(false);
     }
@@ -52,6 +43,15 @@ export default function Register() {
           {error && <Alert severity="error" className="mb-4">{error}</Alert>}
           
           <form onSubmit={handleRegister} className="space-y-4">
+            <TextField
+              fullWidth
+              label="Nom complet"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            
             <TextField
               fullWidth
               label="Email"
