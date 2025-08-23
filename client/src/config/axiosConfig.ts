@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration globale d'Axios pour l'authentification
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
 // Intercepteur de requête - S'exécute AVANT chaque requête

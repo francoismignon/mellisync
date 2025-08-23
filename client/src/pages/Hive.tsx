@@ -88,7 +88,7 @@ function Hive(){
                                     key={visit.id}
                                     onClick={() => {
                                         //Téléchargement PDF fiche de visite
-                                        window.open(`http://localhost:3000/api/visits/${visit.id}/pdf`, '_blank');
+                                        window.open(`${import.meta.env.VITE_API_BASE_URL}/api/visits/${visit.id}/pdf`, '_blank');
                                     }}
                                     className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
                                 >
