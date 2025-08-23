@@ -154,6 +154,10 @@
             cd /home/docker/mellisync
             echo "🔄 Pulling latest images..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod pull
+            echo "🔧 Running Prisma migrations..."
+            docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm backend npx prisma migrate deploy
+            echo "🌱 Running database seed..."
+            docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm backend npm run seed
             echo "🚀 Restarting services..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
             echo "🧹 Cleaning up old images..."
