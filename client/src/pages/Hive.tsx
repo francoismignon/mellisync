@@ -20,7 +20,7 @@ function Hive(){
         }
     }
 
-    // 📋 Fonction pour récupérer les visites de cette ruche
+    //Fonction pour récupérer les visites de cette ruche
     async function fetchVisits(){
         try {
             const hiveId = params['hive-id'];
@@ -62,7 +62,7 @@ function Hive(){
                     navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
                 }} />
 
-            {/* 📋 Section Historique des visites */}
+            {/*Section Historique des visites */}
             <div className="mt-8">
                 <h2 className="text-xl font-bold mb-4">Historique des visites</h2>
                 
@@ -71,7 +71,7 @@ function Hive(){
                 ) : (
                     <div className="space-y-2">
                         {visits.map(visit => {
-                            // 📅 Fonction pour formater la date
+                            //Fonction pour formater la date
                             const formatDate = (dateString: string) => {
                                 const date = new Date(dateString);
                                 return date.toLocaleDateString('fr-FR', {
@@ -87,20 +87,20 @@ function Hive(){
                                 <div 
                                     key={visit.id}
                                     onClick={() => {
-                                        // 📄 Téléchargement PDF fiche de visite
-                                        window.open(`/api/visits/${visit.id}/pdf`, '_blank');
+                                        //Téléchargement PDF fiche de visite
+                                        window.open(`http://localhost:3000/api/visits/${visit.id}/pdf`, '_blank');
                                     }}
                                     className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
                                 >
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <p className="font-semibold text-gray-800">📅 {formatDate(visit.date)}</p>
+                                            <p className="font-semibold text-gray-800">{formatDate(visit.date)}</p>
                                             <p className="text-sm text-gray-600">
                                                 {visit.visitActions?.length || 0} action(s) effectuée(s)
                                             </p>
                                         </div>
                                         <div className="text-blue-500 font-bold">
-                                            📄 PDF
+                                            PDF
                                         </div>
                                     </div>
                                 </div>

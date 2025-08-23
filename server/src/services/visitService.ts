@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma";
 
-// 📋 Interface TypeScript pour les données de création visite
+//Interface TypeScript pour les données de création visite
 interface CreateVisitData {
   hiveId: number;
   visitActions: {
@@ -9,14 +9,14 @@ interface CreateVisitData {
 }
 
 class VisitService {
-  // 🚀 Méthode principale : Créer visite + toutes ses actions
+  //Méthode principale : Créer visite + toutes ses actions
   static async create(data: CreateVisitData) {
     const { hiveId, visitActions } = data;
 
-    // 🔄 Transaction Prisma : Tout ou rien (atomicité garantie)
+    //Transaction Prisma : Tout ou rien (atomicité garantie)
     return await prisma.$transaction(async (tx) => {
       
-      // 1️⃣ ÉTAPE 1 : Créer la visite
+      //ÉTAPE 1 : Créer la visite
       const visit = await tx.visit.create({
         data: {
           hiveId: hiveId,
@@ -24,19 +24,19 @@ class VisitService {
         },
       });
 
-      // 2️⃣ ÉTAPE 2 : Préparer les actions pour création en lot
+      //ÉTAPE 2 : Préparer les actions pour création en lot
       const visitActionsToCreate = Object.entries(visitActions).map(([actionId, value]) => ({
         visitId: visit.id,           // FK vers visite créée
         actionId: parseInt(actionId), // ID action (string → number)
         value: String(value),        // Valeur action (number|string → string)
       }));
 
-      // 3️⃣ ÉTAPE 3 : Créer toutes les VisitAction en une fois (performance)
+      //ÉTAPE 3 : Créer toutes les VisitAction en une fois (performance)
       await tx.visitAction.createMany({
         data: visitActionsToCreate,
       });
 
-      // 4️⃣ ÉTAPE 4 : Retourner visite complète avec actions pour confirmation
+      //ÉTAPE 4 : Retourner visite complète avec actions pour confirmation
       const visitWithActions = await tx.visit.findUnique({
         where: { id: visit.id },
         include: {
@@ -55,7 +55,7 @@ class VisitService {
     });
   }
 
-  // 📊 Méthode future : Récupérer toutes les visites d'une ruche
+  //Méthode future : Récupérer toutes les visites d'une ruche
   static async findByHiveId(hiveId: number) {
     return await prisma.visit.findMany({
       where: { hiveId },
@@ -68,7 +68,7 @@ class VisitService {
     });
   }
 
-  // 🔍 Méthode future : Récupérer une visite spécifique
+  //Méthode future : Récupérer une visite spécifique
   static async findById(id: number) {
     return await prisma.visit.findUnique({
       where: { id },

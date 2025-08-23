@@ -1,5 +1,5 @@
-// 🇧🇪 Liste des principales villes belges pour géocodage Open-Meteo
-// Testées et validées avec l'API Open-Meteo Geocoding
+//Liste des principales villes belges pour géocodage Open-Meteo
+//Testées et validées avec l'API Open-Meteo Geocoding
 
 export const BELGIAN_CITIES = [
   // Région de Bruxelles-Capitale

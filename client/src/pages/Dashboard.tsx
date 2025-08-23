@@ -30,8 +30,8 @@ function Dashboard(){
             <div className="mb-6">
                 <h2>Alertes</h2>
                 <div className="border p-4">
-                    <p>⚠️ Ruche D1 - Pas de visite depuis 15 jours</p>
-                    <p>🚨 Ruche E2 - Pas de visite depuis 21 jours</p>
+                    <p>Ruche D1 - Pas de visite depuis 15 jours</p>
+                    <p>Ruche E2 - Pas de visite depuis 21 jours</p>
                 </div>
             </div>
 

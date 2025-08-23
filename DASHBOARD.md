@@ -847,4 +847,11 @@ Mignon François
 - **Règles métier** : Chaque type = actions recommandées différentes
 - **Implementation** : Extension ActionService.getCurrentPeriod() → visit type mapping
 
-*Dernière étape* : **Interface authentification frontend + Axios config optimisée !** Login/Register Material-UI fonctionnels, gestion état auth dans App.tsx, protection routes automatique. Configuration Axios globale avec intercepteurs, baseURL centralisée, withCredentials automatique. Frontend-backend auth workflow complet opérationnel.
+### Corrections post-authentification
+**Problème identifié** : Génération PDF cassée après implémentation authentification
+- **Cause** : Routes API protégées + `window.open()` nouvelle fenêtre sans cookies HttpOnly
+- **Solution** : URLs absolues backend `http://localhost:3000/api/visits/1/pdf` contournent React Router
+- **Corrections TypeScript** : Mapping types Prisma → VisitPDFTemplate (Date → string ISO, actionType casting)
+- **Formatage dates amélioré** : `timeZone: 'Europe/Brussels'` pour heure locale correcte PDF
+
+*Dernière étape* : **Interface authentification frontend + Corrections PDF !** Login/Register Material-UI fonctionnels, protection routes automatique, configuration Axios globale avec intercepteurs. Génération PDF authentifiée corrigée avec types TypeScript et formatage dates belge. Workflow complet frontend-backend opérationnel.

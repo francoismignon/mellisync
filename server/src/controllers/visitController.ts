@@ -9,17 +9,17 @@ import VisitPDFTemplate from '../components/VisitPDFTemplate';
 class VisitController{
     static async create(req: Request, res: Response){
         try {
-            // 🔍 Récupération body
+            //Récupération body
             const { hiveId, visitActions } = req.body;
             
-            // ✅ Validation basique
+            //Validation basique
             if (!hiveId || !visitActions || typeof visitActions !== 'object') {
                 return res.status(400).json({ 
                     error: "hiveId et visitActions sont requis" 
                 });
             }
             
-            // 🚀 Appel service avec données validées
+            //Appel service avec données validées
             const visit = await VisitService.create({
                 hiveId,
                 visitActions
@@ -45,33 +45,33 @@ class VisitController{
         }
     }
 
-    // 📄 Génération PDF fiche de visite
+    //Génération PDF fiche de visite
     static async generatePDF(req: Request, res: Response) {
         try {
             const visitId = parseInt(req.params.id);
             
-            // 📋 Récupération données visite complètes
+            //Récupération données visite complètes
             const visit = await VisitService.findById(visitId);
             if (!visit) {
                 return res.status(404).json({ error: "Visite non trouvée" });
             }
 
-            // 📊 Calcul numéro de visite pour cette ruche spécifique
+            //Calcul numéro de visite pour cette ruche spécifique
             const allVisitsForHive = await VisitService.findAllByHive(visit.hiveId);
-            // Trier par date pour avoir la bonne position chronologique
+            //Trier par date pour avoir la bonne position chronologique
             const sortedVisits = allVisitsForHive.sort((a, b) => 
                 new Date(a.date).getTime() - new Date(b.date).getTime()
             );
             const visitNumber = sortedVisits.findIndex(v => v.id === visitId) + 1;
 
-            // 🌤️ Récupération données contexte temps réel
-            // 🔍 Extraction apiaryId depuis la visite
+            //Récupération données contexte temps réel
+            //Extraction apiaryId depuis la visite
             const apiaryId = visit.hive.apiary_hives?.[0]?.apiary?.id;
             
-            // 📅 Calcul période apicole actuelle
+            //Calcul période apicole actuelle
             const currentPeriod = ActionService.getCurrentPeriod();
             
-            // 🌤️ Récupération météo temps réel spécifique au rucher
+            //Récupération météo temps réel spécifique au rucher
             const weatherData = await ActionService.getCurrentWeather(apiaryId);
             
             const contextData = {
@@ -79,16 +79,29 @@ class VisitController{
                 period: currentPeriod  // Déjà converti en label utilisateur par ActionService
             };
 
-            // 🎨 Génération HTML depuis composant React
+            //Génération HTML depuis composant React
             const htmlContent = renderToStaticMarkup(
                 React.createElement(VisitPDFTemplate, {
-                    visit: { ...visit, visitNumber },
+                    visit: { 
+                        ...visit, 
+                        visitNumber,
+                        date: visit.date.toISOString(), // Date complète ISO pour garder l'heure
+                        visitActions: visit.visitActions.map(va => ({
+                            id: va.id,
+                            value: va.value,
+                            action: {
+                                id: va.action.id,
+                                label: va.action.label,
+                                actionType: va.action.actionType as 'CYCLE' | 'INCREMENT'
+                            }
+                        }))
+                    },
                     weather: contextData.weather,
                     period: contextData.period
                 })
             );
 
-            // 🚀 Lancement Puppeteer pour génération PDF
+            //Lancement Puppeteer pour génération PDF
             const browser = await puppeteer.launch({
                 headless: true,
                 args: [
@@ -100,12 +113,12 @@ class VisitController{
 
             const page = await browser.newPage();
             
-            // 📄 Configuration format A4
+            //Configuration format A4
             await page.setContent(`<!DOCTYPE html>${htmlContent}`, {
                 waitUntil: 'networkidle0'
             });
 
-            // 🎯 Génération PDF avec options
+            //Génération PDF avec options
             const pdfBuffer = await page.pdf({
                 format: 'A4',
                 margin: {
@@ -119,7 +132,7 @@ class VisitController{
 
             await browser.close();
 
-            // 📤 Envoi PDF au client
+            //Envoi PDF au client
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename="fiche-visite-${visitId}.pdf"`);
             res.send(pdfBuffer);

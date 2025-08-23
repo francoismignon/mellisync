@@ -15,7 +15,7 @@ class ApiaryService {
     city: string,
     userId: number
   ) {
-    // 📍 Géocodage automatique de l'adresse lors de la création
+    //Géocodage automatique de l'adresse lors de la création
     const coordinates = await WeatherService.geocodeAddress(address, city);
     
     return await prisma.apiary.create({

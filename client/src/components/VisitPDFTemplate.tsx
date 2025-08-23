@@ -29,7 +29,7 @@ interface VisitPDFTemplateProps {
 }
 
 function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
-  // 📅 Formatage date française
+  //Formatage date française
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -50,7 +50,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
       padding: '20px',
       lineHeight: '1.4'
     }}>
-      {/* 📋 En-tête officiel */}
+      {/*En-tête officiel */}
       <div style={{ 
         textAlign: 'center', 
         borderBottom: '2px solid #333', 
@@ -74,7 +74,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         </p>
       </div>
 
-      {/* 🏷️ Informations générales */}
+      {/*Informations générales */}
       <div style={{ 
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
@@ -118,7 +118,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         </div>
       </div>
 
-      {/* ✅ Actions effectuées */}
+      {/*Actions effectuées */}
       <div style={{ marginBottom: '40px' }}>
         <h3 style={{ 
           fontSize: '16px', 
@@ -223,7 +223,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         )}
       </div>
 
-      {/* 📝 Zone observations */}
+      {/*Zone observations */}
       <div style={{ marginBottom: '40px' }}>
         <h3 style={{ 
           fontSize: '16px', 
@@ -251,7 +251,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         </div>
       </div>
 
-      {/* ✍️ Signature */}
+      {/*Signature */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
@@ -286,7 +286,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         </div>
       </div>
 
-      {/* 🔒 Pied de page */}
+      {/*Pied de page */}
       <div style={{
         marginTop: '40px',
         padding: '15px',

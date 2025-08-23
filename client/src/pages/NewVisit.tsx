@@ -4,22 +4,22 @@ import { useParams, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
 
 function NewVisit() {
-  const { "hive-id": hiveId, "apiary-id": apiaryId } = useParams<{ "hive-id": string, "apiary-id": string }>(); // 🔍 Récupération params depuis URL
-  const navigate = useNavigate(); // 🧭 Hook de navigation
+  const { "hive-id": hiveId, "apiary-id": apiaryId } = useParams<{ "hive-id": string, "apiary-id": string }>(); //Récupération params depuis URL
+  const navigate = useNavigate();
   const [actions, setActions] = useState<any[]>([]);
   const [visitActions, setVisitActions] = useState({});
   
-  // 🎯 États pour contexte apicole (maintenant fournis par backend)
+  //États pour contexte apicole (maintenant fournis par backend)
   const [currentPeriod, setCurrentPeriod] = useState<string>("");
   const [currentTemperature, setCurrentTemperature] = useState<number>(0);
   const [currentWeather, setCurrentWeather] = useState<string>("");
   const [expertMode, setExpertMode] = useState<boolean>(false);
   
-  // 📤 États pour gestion sauvegarde
+  //États pour gestion sauvegarde
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
 
-  // 🚀 Fonction adaptée pour les 2 modes avec backend intelligent
+  //Fonction adaptée pour les 2 modes avec backend intelligent
   async function fetchActions() {
     try {
       // Mode normal : Actions pré-filtrées par backend avec contexte + météo spécifique au rucher
@@ -49,7 +49,7 @@ function NewVisit() {
     }
   }
 
-  // 💾 Fonction de sauvegarde visite
+  //Fonction de sauvegarde visite
   async function saveVisit() {
     if (!hiveId) {
       alert("Erreur : ID de ruche manquant");
@@ -59,7 +59,7 @@ function NewVisit() {
     setIsSaving(true);
     
     try {
-      // 📤 Envoi données au backend
+      //Envoi données au backend
       const response = await axios.post(
         `/api/visits`, 
         {
@@ -68,15 +68,15 @@ function NewVisit() {
         }
       );
 
-      // ✅ Succès : Confirmation utilisateur + redirection
+      //Succès : Confirmation utilisateur + redirection
       alert(`Visite enregistrée avec succès ! ID: ${response.data.id}`);
       console.log("Visite sauvée:", response.data);
       
-      // 🧭 Redirection automatique vers la vue de la ruche
+      //Redirection automatique vers la vue de la ruche
       navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`);
       
     } catch (error) {
-      // ❌ Erreur : Affichage message utilisateur
+      //Erreur : Affichage message utilisateur
       console.error("Erreur sauvegarde visite:", error);
       alert("Erreur lors de l'enregistrement de la visite");
     } finally {
@@ -84,7 +84,7 @@ function NewVisit() {
     }
   }
 
-  // ⚡ Re-fetch quand l'utilisateur change de mode ou de rucher
+  //Re-fetch quand l'utilisateur change de mode ou de rucher
   useEffect(() => {
     fetchActions();
   }, [expertMode, apiaryId]); // Dépendances : mode + rucher spécifique
@@ -95,7 +95,7 @@ function NewVisit() {
       <div className="mb-4 flex items-center gap-4">
         <h2 className="text-xl font-bold">Nouvelle visite</h2>
         
-        {/* 📊 Affichage contexte apicole en mode normal */}
+        {/*Affichage contexte apicole en mode normal */}
         {!expertMode && currentPeriod && (
           <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
             {currentPeriod} • {currentTemperature}°C • {currentWeather}
@@ -129,9 +129,6 @@ function NewVisit() {
           <ActionButton
             key={action.id}
             action={action}
-            // ⚠️ Props supprimées : Plus besoin car backend filtre tout !
-            // currentTemperature et currentWeather ne sont plus nécessaires
-            // expertMode non plus car actions déjà pré-filtrées
             onValueChange={(value) =>{
               setVisitActions(prevActions => ({
                 ...prevActions,

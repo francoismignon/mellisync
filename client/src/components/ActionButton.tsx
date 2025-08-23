@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
 
-// 🎯 Interface TypeScript simplifiée - Backend filtre tout !
+//Interface TypeScript simplifiée - Backend filtre tout !
 interface ActionButtonProps {
   action: {
     id: number;
     label: string;
     actionType: 'CYCLE' | 'INCREMENT';
     incrementStep?: number;
-    // ⚠️ Props supprimées : Plus nécessaires car backend filtre
-    // temperatureMin, temperatureMax, restrictions météo gérées côté serveur
     action_options: Array<{
       option: {
         label: string;
       }
     }>;
   };
-  // 🔥 Props supprimées : Plus de props météo/température/expertMode
-  // Le backend envoie seulement les actions autorisées !
   onValueChange: (value: string | number) => void;
 }
 
@@ -34,11 +30,7 @@ function ActionButton(props: ActionButtonProps) {
     }
   }, []); // Au mount du composant
 
-  // 🗑️ LOGIQUE SUPPRIMÉE : Plus de shouldDisplay() !
-  // Le backend envoie seulement les actions autorisées maintenant.
-  // Si ActionButton est rendu = action autorisée par définition !
-
-  // 📊 Calcul valeur affichée selon type action (logique inchangée)
+  //Calcul valeur affichée selon type action (logique inchangée)
   function getCurrentValue() {
     if (props.action.actionType === "CYCLE") {
       return props.action.action_options[currentIndex]?.option.label || "Default Option Label";
@@ -48,7 +40,7 @@ function ActionButton(props: ActionButtonProps) {
     return "Type d'action inconnu";
   }
 
-  // 🎮 Gestion clic : cycle options (CYCLE) ou incrémente valeur (INCREMENT) 
+  //Gestion clic : cycle options (CYCLE) ou incrémente valeur (INCREMENT) 
   function handleClick() {
     if (props.action.actionType === "CYCLE") {
       // Cycle parmi les options disponibles (Oui/Non, Faible/Moyen/Fort, etc.)
@@ -64,8 +56,6 @@ function ActionButton(props: ActionButtonProps) {
       props.onValueChange(newValue); // Remonte nouvelle valeur au parent (NewVisit)
     }
   }
-
-  // 🎨 Rendu : Bouton toujours affiché (actions pré-filtrées par backend)
   return (
     <button 
         className="border-2 border-gray-300 rounded-md p-2 mb-4 flex flex-col items-center hover:bg-gray-50"

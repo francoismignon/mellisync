@@ -36,7 +36,7 @@ interface VisitPDFTemplateProps {
 }
 
 function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
-  // 📅 Formatage date française
+  // 📅 Formatage date française avec fuseau horaire local
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -45,7 +45,8 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'Europe/Brussels' // Fuseau horaire belge
     });
   };
 
