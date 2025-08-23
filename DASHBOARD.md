@@ -730,6 +730,50 @@ Mignon François
 - Support React Server-Side Rendering pour génération PDF
 - Template VisitPDFTemplate.tsx fonctionnel avec CSS-in-JS côté serveur
 
+### Phase 25 : Système authentification sécurisé enterprise-grade (terminée ✅)
+1. **Architecture cookies HttpOnly sécurisée** : JWT stocké dans cookies sécurisés (httpOnly, secure, sameSite strict)
+2. **AuthService production** : Bcrypt 12 rounds + JWT 24h + gestion cookies automatique + variables environnement
+3. **Middleware authentification complet** : Extraction cookies + validation JWT + injection req.user + gestion erreurs
+4. **Controllers RBAC opérationnels** : Remplacement userId hardcodé par req.user.id avec vérifications ownership
+5. **Routes API sécurisées** : Middleware authenticateToken appliqué à toutes routes protégées
+6. **Seed automatisé sécurisé** : Admin + François avec mots de passe hashés + upsert intelligent
+7. **CORS configuré** : credentials: true pour cookies cross-origin + origin configuré environnement
+
+### Décisions techniques phase 25
+- **Cookies HttpOnly vs localStorage** : Protection XSS selon Node.js Best Practices (Trust 9.6)
+- **SameSite strict + Secure** : Protection CSRF + HTTPS obligatoire (défense multicouche)
+- **Architecture stateless JWT** : Token auto-contenu vs sessions serveur pour scalabilité
+- **Middleware pattern Express** : authenticateToken réutilisable + req.user injection standardisée
+- **RBAC + Ownership combinés** : Rôles (ADMIN/BEEKEEPER) + filtrage données utilisateur
+- **Cookie-parser integration** : Middleware Express natif pour parsing cookies sécurisé
+- **Environment-aware CORS** : Frontend URL configurable dev/prod via variables environnement
+
+### Réalisations détaillées Phase 25
+
+**Backend authentification enterprise** :
+- AuthService avec méthodes register/login retournant user (pas token exposé)
+- Cookies sécurisés : mellisync_auth avec options complètes sécurité
+- AuthController adapté : responses sans tokens + cookies automatiques
+- Middleware auth : extraction cookies + validation + user injection + error handling
+
+**Sécurisation routes API complète** :
+- Toutes routes métier protégées : /api/apiaries, /api/hives, /api/actions, /api/visits
+- Controllers mis à jour : userId dynamique req.user.id vs hardcodé
+- ApiaryService étendu : findAllByUser() pour filtrage RBAC automatique
+- Route profil ajoutée : GET /api/auth/me pour données utilisateur courant
+
+**Infrastructure sécurisée opérationnelle** :
+- CORS configuré : origin + credentials pour cookies cross-domain
+- Seed production : hashage automatique mots de passe + upsert mise à jour
+- Utilisateurs test : admin@mellisync.com (ADMIN) + francois@mellisync.com (BEEKEEPER)
+- Architecture prête : frontend peut implémenter login/register + session management
+
+**Standards sécurité respectés** :
+- Node.js Best Practices : cookies HttpOnly + bcrypt + JWT + middleware patterns
+- Architecture multicouche : TLS (transport) + HttpOnly (XSS) + SameSite (CSRF)  
+- RBAC enterprise : rôles + ownership + filtrage automatique
+- Code-first security : sécurité intégrée architecture vs ajout post-développement
+
 
 ## 🚀 Évolutions futures (post-MVP)
 

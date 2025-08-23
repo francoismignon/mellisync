@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Dashboard from "./pages/Dashboard";
 import NavBar from "./components/NavBar";
@@ -7,13 +8,52 @@ import Apiary from "./pages/Apiary";
 import NewHive from "./pages/NewHive";
 import Hive from "./pages/Hive";
 import NewVisit from "./pages/NewVisit";
-
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/me', {
+        credentials: 'include',
+      });
+      setIsAuthenticated(response.ok);
+    } catch {
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <main className="container mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<Login />} />
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    );
+  }
+
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
-        {/*NavBar utilise react routeur (Link) donc dois être à l'intérieur de BrowserRouter */}
         <NavBar />
         <main className="container mx-auto px-4 py-8">
           <Routes>
