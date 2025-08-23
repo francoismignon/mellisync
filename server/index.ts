@@ -19,7 +19,9 @@ const PORT = process.env.PORT;
 //middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.NODE_ENV === 'production' 
+    ? `https://${process.env.WEB_DOMAIN}`
+    : 'http://localhost:5173',
   credentials: true // Important pour les cookies
 }));
 app.use(morgan('combined'));
