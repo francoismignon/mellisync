@@ -17,8 +17,7 @@ class HiveController {
 
   static async findAllByApiary(req: Request, res: Response) {
     try {
-      // TODO: const userId = req.user.id;
-      const userId = 1; // temporaire
+      const userId = req.user!.id; // Garanti par middleware auth
       const apiaryId = parseInt(req.query.apiaryId as string);
 
       if (!apiaryId) {
@@ -45,8 +44,7 @@ class HiveController {
     try {
       const { name, type, framecount, status, color, yearBuilt } = req.body;
       const apiaryId = parseInt(req.body.apiaryId);
-      // TODO: const userId = req.user.id; // depuis JWT token
-      const userId = 1; //TODO: temporaire a effecer apres RBAC
+      const userId = req.user!.id; // Garanti par middleware auth
 
       //Vérification RBAC avant création
       const apiary = await ApiaryService.findById(apiaryId);

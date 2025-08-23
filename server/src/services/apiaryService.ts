@@ -30,9 +30,22 @@ class ApiaryService {
     });
   }
 
-  //TODO: adapter lors d' l'authentification
   static async findAll() {
     return await prisma.apiary.findMany();
+  }
+
+  /**
+   * Récupérer tous les ruchers d'un utilisateur (RBAC)
+   */
+  static async findAllByUser(userId: number) {
+    return await prisma.apiary.findMany({
+      where: {
+        userId: userId
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
   }
 }
 export default ApiaryService;

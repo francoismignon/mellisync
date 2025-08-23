@@ -9,6 +9,7 @@ import HiveController from './src/controllers/hiveConroller';
 import ActionController from './src/controllers/actionController';
 import VisitController from './src/controllers/visitController';
 import AuthController from './src/controllers/authController';
+import { authenticateToken } from './src/middleware/auth';
 
 dotenv.config()
 
@@ -26,28 +27,31 @@ app.use(cookieParser()); // Middleware pour parser les cookies
 app.use(express.json());
 
 
-//Routes Rucher
-app.post("/api/apiaries", ApiaryController.create);
-app.get("/api/apiaries", ApiaryController.findAll);
+//Routes Rucher (protégées)
+app.post("/api/apiaries", authenticateToken, ApiaryController.create);
+app.get("/api/apiaries", authenticateToken, ApiaryController.findAll);
 
-//Routes Ruche
-app.get("/api/hives", HiveController.findAllByApiary);
-app.post("/api/hives", HiveController.create);
-app.get("/api/hives/:id", HiveController.findById)
-app.get("/api/hives/:id/visits", VisitController.findAllByHive);
-//Routes pour la définition des actions
+//Routes Ruche (protégées)
+app.get("/api/hives", authenticateToken, HiveController.findAllByApiary);
+app.post("/api/hives", authenticateToken, HiveController.create);
+app.get("/api/hives/:id", authenticateToken, HiveController.findById)
+app.get("/api/hives/:id/visits", authenticateToken, VisitController.findAllByHive);
+
+//Routes pour la définition des actions (protégées)
 // Route unique qui gère 2 cas :
 // - GET /api/actions → Toutes les actions (mode expert)  
 // - GET /api/actions?filter=current → Actions filtrées selon période/météo/température (mode normal)
-app.get("/api/actions", ActionController.findAll);
-//Routes pour les visites
-app.post("/api/visits", VisitController.create);
-app.get("/api/visits/:id/pdf", VisitController.generatePDF);
+app.get("/api/actions", authenticateToken, ActionController.findAll);
+
+//Routes pour les visites (protégées)
+app.post("/api/visits", authenticateToken, VisitController.create);
+app.get("/api/visits/:id/pdf", authenticateToken, VisitController.generatePDF);
 
 //Routes pour l'authentification
 app.post("/api/auth/register", AuthController.register);
 app.post("/api/auth/login", AuthController.login);
 app.post("/api/auth/logout", AuthController.logout);
+app.get("/api/auth/me", authenticateToken, AuthController.me);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{
