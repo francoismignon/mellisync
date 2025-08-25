@@ -46,12 +46,11 @@ prisma/migrations/
 
 # Claude AI files
 CLAUDE.md
+DASHBOARD.md
+LOGS.md
+BUGS.md
+CORRECTIFS_TFE.md
+SOURCES.md
 
 # Documentation TFE (complète)
 docs/
-
-# Anciens fichiers de doc (nettoyés)
-NAMING_CONVENTIONS.md
-CICD_SETUP.md
-TAILWIND_GUIDE.md
-SOURCES.md
