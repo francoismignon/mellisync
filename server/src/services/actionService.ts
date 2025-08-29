@@ -78,7 +78,7 @@ class ActionService {
       return "fin_hiver";               // 16 fév - Mars : Préparation réveil, premiers contrôles  
     }
     if (month >= 4 && month <= 6) {
-      return "miellée_primptemps";         // Avr-Juin : Période productive, surveillance reine/couvain
+      return "miellée_printemps";         // Avr-Juin : Période productive, surveillance reine/couvain
     }
     if (month === 7) {
       return "inter_miellée";                // Juillet : Entre 2 miellées, récolte miel
