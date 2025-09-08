@@ -82,7 +82,7 @@ function Hive(){
         setIsMoving(true);
         try {
             const hiveId = params['hive-id'];
-            const response = await axios.post(`/api/hives/${hiveId}/move`, {
+            await axios.post(`/api/hives/${hiveId}/move`, {
                 newApiaryId: parseInt(selectedApiaryId),
                 reason: reason,
                 note: note || undefined
@@ -117,7 +117,7 @@ function Hive(){
         setIsUpdatingStatus(true);
         try {
             const hiveId = params['hive-id'];
-            const response = await axios.put(`/api/hives/${hiveId}/status`, {
+            await axios.put(`/api/hives/${hiveId}/status`, {
                 newStatus: selectedStatus,
                 note: statusNote || undefined
             });

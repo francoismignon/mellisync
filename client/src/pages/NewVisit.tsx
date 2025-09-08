@@ -9,7 +9,7 @@ function NewVisit() {
   const navigate = useNavigate();
   const [actions, setActions] = useState<any[]>([]);
   const [visitActions, setVisitActions] = useState({});
-  const [toast, setToast] = useState({ message: "", type: "", isVisible: false });
+  const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
   
   //États pour contexte apicole (maintenant fournis par backend)
   const [currentPeriod, setCurrentPeriod] = useState<string>("");
