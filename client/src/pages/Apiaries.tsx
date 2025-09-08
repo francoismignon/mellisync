@@ -23,7 +23,7 @@ function Apiaries() {
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Liste des Ruchers</h2>
-        <Link to="/ruchers/nouveau">
+        <Link to="/ruchers/nouveau" className="hidden sm:block">
           <input 
             type="button" 
             value="Ajouter un rucher" 
@@ -44,6 +44,18 @@ function Apiaries() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* FAB Mobile uniquement */}
+      <div className="sm:hidden fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => navigate('/ruchers/nouveau')}
+          className="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </button>
       </div>
     </div>
   );

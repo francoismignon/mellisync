@@ -20,6 +20,7 @@ function Hive(){
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [showQRModal, setShowQRModal] = useState(false);
     const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+    const [showFABMenu, setShowFABMenu] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const params = useParams();
     const navigate = useNavigate();
@@ -235,7 +236,7 @@ function Hive(){
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="hidden sm:flex sm:flex-row gap-3 mb-6">
                 <input 
                     type="button" 
                     value="Ajouter une visite"
@@ -592,6 +593,96 @@ function Hive(){
                     </div>
                 </div>
             )}
+
+            {/* FAB Mobile uniquement */}
+            <div className="sm:hidden fixed bottom-6 right-6 z-50">
+                {/* Menu FAB (affiché si ouvert) */}
+                {showFABMenu && (
+                    <div className="absolute bottom-16 right-0 flex flex-col gap-3 mb-2">
+                        {/* Bouton Ajouter visite */}
+                        <div className="flex items-center gap-3">
+                            <span className="bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded whitespace-nowrap">
+                                Ajouter visite
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setShowFABMenu(false);
+                                    navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
+                                }}
+                                className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Bouton Déplacer */}
+                        <div className="flex items-center gap-3">
+                            <span className="bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded whitespace-nowrap">
+                                Déplacer ruche
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setShowFABMenu(false);
+                                    setShowMoveModal(true);
+                                }}
+                                className="w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Bouton Modifier statut */}
+                        <div className="flex items-center gap-3">
+                            <span className="bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded whitespace-nowrap">
+                                Modifier statut
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setShowFABMenu(false);
+                                    setShowStatusModal(true);
+                                }}
+                                className="w-12 h-12 bg-purple-500 hover:bg-purple-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Bouton QR Code */}
+                        <div className="flex items-center gap-3">
+                            <span className="bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded whitespace-nowrap">
+                                QR Code
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setShowFABMenu(false);
+                                    setShowQRModal(true);
+                                }}
+                                className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Bouton FAB principal */}
+                <button
+                    onClick={() => setShowFABMenu(!showFABMenu)}
+                    className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center ${showFABMenu ? 'rotate-45' : ''}`}
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </button>
+            </div>
         </div>
     );
 }
