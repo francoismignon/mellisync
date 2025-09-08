@@ -133,9 +133,11 @@ model Role {
 }
 
 model Visit {
-  id      Int      @id @default(autoincrement())
-  hiveId  Int      // FK vers Hive
-  date    DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  hiveId      Int      // FK vers Hive
+  date        DateTime @default(now())
+  temperature Float?   // Température en °C au moment de la visite
+  weather     String?  // Condition météo au moment de la visite
 
   //Relation
   hive         Hive          @relation(fields: [hiveId], references: [id], onDelete: Restrict)

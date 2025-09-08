@@ -6,21 +6,25 @@ interface CreateVisitData {
   visitActions: {
     [actionId: string]: string | number;  // Clé = ID action, Valeur = résultat
   };
+  temperature?: number;  // Température au moment de la visite
+  weather?: string;      // Condition météo au moment de la visite
 }
 
 class VisitService {
   //Méthode principale : Créer visite + toutes ses actions
   static async create(data: CreateVisitData) {
-    const { hiveId, visitActions } = data;
+    const { hiveId, visitActions, temperature, weather } = data;
 
     //Transaction Prisma : Tout ou rien (atomicité garantie)
     return await prisma.$transaction(async (tx) => {
       
-      //ÉTAPE 1 : Créer la visite
+      //ÉTAPE 1 : Créer la visite avec données météo
       const visit = await tx.visit.create({
         data: {
           hiveId: hiveId,
           date: new Date(),  // Date/heure actuelle automatique
+          temperature: temperature || null,  // Température au moment de la visite
+          weather: weather || null,          // Condition météo au moment de la visite
         },
       });
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import VisitService from "../services/visitService";
 import ActionService from "../services/actionService";
+import HiveService from "../services/hiveService";
 import puppeteer from 'puppeteer';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -19,10 +20,25 @@ class VisitController{
                 });
             }
             
-            //Appel service avec données validées
+            //Récupération du rucher pour la météo
+            const hive = await HiveService.findById(hiveId);
+            if (!hive || !hive.apiary_hives?.[0]?.apiary) {
+                return res.status(404).json({ 
+                    error: "Ruche ou rucher non trouvé" 
+                });
+            }
+            
+            const apiaryId = hive.apiary_hives[0].apiary.id;
+            
+            //Récupération météo temps réel au moment de la visite
+            const weatherData = await ActionService.getCurrentWeather(apiaryId);
+            
+            //Appel service avec données validées + météo
             const visit = await VisitService.create({
                 hiveId,
-                visitActions
+                visitActions,
+                temperature: weatherData.temperature,
+                weather: weatherData.condition
             });
             
             res.status(201).json(visit);
@@ -64,19 +80,13 @@ class VisitController{
             );
             const visitNumber = sortedVisits.findIndex(v => v.id === visitId) + 1;
 
-            //Récupération données contexte temps réel
-            //Extraction apiaryId depuis la visite
-            const apiaryId = visit.hive.apiary_hives?.[0]?.apiary?.id;
-            
-            //Calcul période apicole actuelle
-            const currentPeriod = ActionService.getCurrentPeriod();
-            
-            //Récupération météo temps réel spécifique au rucher
-            const weatherData = await ActionService.getCurrentWeather(apiaryId);
-            
+            //Utilisation météo historique stockée dans la visite
             const contextData = {
-                weather: weatherData,
-                period: currentPeriod  // Déjà converti en label utilisateur par ActionService
+                weather: {
+                    temperature: visit.temperature || 0,
+                    condition: visit.weather || "Non disponible"
+                },
+                period: ActionService.getCurrentPeriod()  // Période selon date visite
             };
 
             //Génération HTML depuis composant React

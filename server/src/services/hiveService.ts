@@ -4,7 +4,17 @@ class HiveService {
 
   static async findById(id: number){
     return await prisma.hive.findUnique({
-      where: {id:id}
+      where: {id:id},
+      include: {
+        apiary_hives: {
+          where: { endDate: null }, // Rucher actuel
+          include: {
+            apiary: {
+              select: { id: true, name: true, address: true, city: true }
+            }
+          }
+        }
+      }
     });
   }
 
