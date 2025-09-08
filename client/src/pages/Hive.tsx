@@ -14,6 +14,10 @@ function Hive(){
     const [reason, setReason] = useState<string>("");
     const [note, setNote] = useState<string>("");
     const [isMoving, setIsMoving] = useState(false);
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<string>("");
+    const [statusNote, setStatusNote] = useState<string>("");
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const params = useParams();
     const navigate = useNavigate();
@@ -103,6 +107,39 @@ function Hive(){
         }
     }
 
+    // Fonction pour modifier le statut de la ruche
+    async function updateHiveStatus() {
+        if (!selectedStatus) {
+            setToast({ message: "Veuillez sélectionner un statut", type: "error", isVisible: true });
+            return;
+        }
+
+        setIsUpdatingStatus(true);
+        try {
+            const hiveId = params['hive-id'];
+            const response = await axios.put(`/api/hives/${hiveId}/status`, {
+                newStatus: selectedStatus,
+                note: statusNote || undefined
+            });
+
+            setToast({ message: "Statut modifié avec succès", type: "success", isVisible: true });
+            
+            // Fermer le modal et reset les états
+            setShowStatusModal(false);
+            setSelectedStatus("");
+            setStatusNote("");
+            
+            // Recharger les données de la ruche
+            fetchHive();
+            
+        } catch (error: any) {
+            console.error("Erreur modification statut:", error);
+            setToast({ message: "Erreur lors de la modification", type: "error", isVisible: true });
+        } finally {
+            setIsUpdatingStatus(false);
+        }
+    }
+
     return(
         <div>
             <Toast 
@@ -141,6 +178,13 @@ function Hive(){
                     value="Déplacer ruche"
                     className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
                     onClick={() => setShowMoveModal(true)} 
+                />
+
+                <input 
+                    type="button" 
+                    value="Modifier statut"
+                    className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                    onClick={() => setShowStatusModal(true)} 
                 />
             </div>
 
@@ -338,6 +382,73 @@ function Hive(){
                                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                                 )}
                                 {isMoving ? 'Déplacement...' : 'Déplacer'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal modification statut */}
+            {showStatusModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-md w-full p-6">
+                        <h3 className="text-lg font-bold mb-4">Modifier le statut de la ruche</h3>
+                        
+                        {/* Sélection du nouveau statut */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Nouveau statut
+                            </label>
+                            <select 
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                                <option value="">Sélectionner un statut...</option>
+                                {HIVE_STATUS.map(status => (
+                                    <option key={status.value} value={status.value}>
+                                        {status.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Note optionnelle */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Note (optionnelle)
+                            </label>
+                            <textarea
+                                value={statusNote}
+                                onChange={(e) => setStatusNote(e.target.value)}
+                                placeholder="Raison du changement de statut..."
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                rows={3}
+                            />
+                        </div>
+
+                        {/* Boutons */}
+                        <div className="flex gap-3 justify-end">
+                            <button 
+                                onClick={() => {
+                                    setShowStatusModal(false);
+                                    setSelectedStatus("");
+                                    setStatusNote("");
+                                }}
+                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                disabled={isUpdatingStatus}
+                            >
+                                Annuler
+                            </button>
+                            <button 
+                                onClick={updateHiveStatus}
+                                disabled={isUpdatingStatus || !selectedStatus}
+                                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:bg-gray-400 transition-colors flex items-center gap-2"
+                            >
+                                {isUpdatingStatus && (
+                                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                )}
+                                {isUpdatingStatus ? 'Modification...' : 'Modifier'}
                             </button>
                         </div>
                     </div>

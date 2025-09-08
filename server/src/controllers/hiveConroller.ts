@@ -154,5 +154,47 @@ class HiveController {
       res.status(500).json({ error: "Erreur serveur" });
     }
   }
+
+  // Modifier le statut d'une ruche
+  static async updateStatus(req: Request, res: Response) {
+    try {
+      const hiveId = parseInt(req.params.id);
+      const { newStatus, note } = req.body;
+      const userId = req.user!.id;
+
+      // Validation des données
+      if (!newStatus) {
+        return res.status(400).json({ 
+          error: "newStatus est requis" 
+        });
+      }
+
+      // Vérification RBAC - la ruche appartient-elle à l'utilisateur ?
+      const hive = await HiveService.findById(hiveId);
+      if (!hive || !hive.apiary_hives?.[0]?.apiary) {
+        return res.status(404).json({ error: "Ruche non trouvée" });
+      }
+
+      const currentApiary = hive.apiary_hives[0].apiary;
+      const fullCurrentApiary = await ApiaryService.findById(currentApiary.id);
+      if (!fullCurrentApiary || fullCurrentApiary.userId !== userId) {
+        return res.status(403).json({ 
+          error: "Accès interdit à cette ruche" 
+        });
+      }
+
+      // Effectuer la modification
+      const updatedHive = await HiveService.updateStatus(hiveId, newStatus, note);
+
+      res.status(200).json({
+        message: `Statut de la ruche modifié vers ${newStatus}`,
+        hive: updatedHive
+      });
+
+    } catch (error) {
+      console.error("Erreur modification statut ruche:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
 }
 export default HiveController;

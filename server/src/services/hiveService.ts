@@ -96,5 +96,30 @@ class HiveService {
       return newTranshumance;
     });
   }
+
+  // Modifier le statut d'une ruche
+  static async updateStatus(hiveId: number, newStatus: string, note?: string) {
+    try {
+      // Mettre à jour le statut de la ruche
+      const updatedHive = await prisma.hive.update({
+        where: { id: hiveId },
+        data: { 
+          status: newStatus as any, // Cast en HiveStatus enum
+          updatedAt: new Date()
+        },
+        include: {
+          apiary_hives: {
+            where: { endDate: null },
+            include: { apiary: true }
+          }
+        }
+      });
+
+      return updatedHive;
+    } catch (error) {
+      console.error("Erreur modification statut ruche:", error);
+      throw error;
+    }
+  }
 }
 export default HiveService;

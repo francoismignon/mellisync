@@ -9,6 +9,7 @@ import HiveController from './src/controllers/hiveConroller';
 import ActionController from './src/controllers/actionController';
 import VisitController from './src/controllers/visitController';
 import AuthController from './src/controllers/authController';
+import DashboardController from './src/controllers/dashboardController';
 import { authenticateToken } from './src/middleware/auth';
 
 dotenv.config()
@@ -40,6 +41,7 @@ app.get("/api/hives/:id", authenticateToken, HiveController.findById)
 app.get("/api/hives/:id/visits", authenticateToken, VisitController.findAllByHive);
 app.get("/api/hives/:id/transhumances", authenticateToken, HiveController.getTranshumanceHistory);
 app.post("/api/hives/:id/move", authenticateToken, HiveController.moveToApiary);
+app.put("/api/hives/:id/status", authenticateToken, HiveController.updateStatus);
 
 //Routes pour la définition des actions (protégées)
 // Route unique qui gère 2 cas :
@@ -56,6 +58,9 @@ app.post("/api/auth/register", AuthController.register);
 app.post("/api/auth/login", AuthController.login);
 app.post("/api/auth/logout", AuthController.logout);
 app.get("/api/auth/me", authenticateToken, AuthController.me);
+
+//Route pour le dashboard
+app.get("/api/dashboard", authenticateToken, DashboardController.getDashboardData);
 
 //route test
 app.get("/", (req: Request, res: Response)=>{
