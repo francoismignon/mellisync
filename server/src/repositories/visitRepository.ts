@@ -21,7 +21,7 @@ class VisitRepository {
         visitActions: {
           include: {
             action: {
-              select: { id: true, label: true, actionType: true, description: true }
+              select: { id: true, label: true, actionType: true }
             }
           }
         }

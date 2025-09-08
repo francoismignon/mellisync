@@ -8,8 +8,8 @@ class ActionRepository {
         action_options: {
           include: { option: true }
         },
-        action_periods: {
-          include: { period: true }
+        action_periodes: {
+          include: { periode: true }
         },
         action_weather_restrictions: {
           include: { weatherRestriction: true }
@@ -26,8 +26,8 @@ class ActionRepository {
         action_options: {
           include: { option: true }
         },
-        action_periods: {
-          include: { period: true }
+        action_periodes: {
+          include: { periode: true }
         },
         action_weather_restrictions: {
           include: { weatherRestriction: true }
@@ -37,8 +37,8 @@ class ActionRepository {
   }
 
   static async findAllPeriods() {
-    return await prisma.period.findMany({
-      orderBy: { startMonth: 'asc' }
+    return await prisma.periode.findMany({
+      orderBy: { id: 'asc' }
     });
   }
 
@@ -46,15 +46,15 @@ class ActionRepository {
     return await prisma.weatherRestriction.findMany();
   }
 
-  static async findPeriodByKey(key: string) {
-    return await prisma.period.findUnique({
-      where: { key }
+  static async findPeriodByLabel(label: string) {
+    return await prisma.periode.findFirst({
+      where: { label }
     });
   }
 
   static async findWeatherRestrictionByCondition(condition: string) {
     return await prisma.weatherRestriction.findFirst({
-      where: { condition: { contains: condition, mode: 'insensitive' } }
+      where: { label: { contains: condition, mode: 'insensitive' } }
     });
   }
 }

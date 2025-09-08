@@ -137,10 +137,11 @@ class HiveController {
       }
 
       // Effectuer le déplacement
-      const transhumance = await HiveService.moveToApiary(
+      const transhumance = await HiveService.moveHive(
         hiveId, 
         newApiaryId, 
         reason, 
+        req.user!.id,
         note
       );
 

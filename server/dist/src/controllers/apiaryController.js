@@ -6,27 +6,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const apiaryService_1 = __importDefault(require("../services/apiaryService"));
 class ApiaryController {
     static async create(req, res) {
-        const name = req.body.name;
-        const address = req.body.address;
-        const city = req.body.city;
-        //TODO:changer l'id
-        const apiary = await apiaryService_1.default.create(name, address, city, 1);
-        res.json({ apiary });
-    }
-    static async findAll(req, res) {
-        const apiaries = await apiaryService_1.default.findAll();
-        //console.log(apiaries);
-        res.json(apiaries);
-    }
-    static async delete(req, res) {
         try {
-            //console.log("DELETE appelé");
-            const id = parseInt(req.params.id); //bracket notation pour garder les bonne protique du guide zalando
-            const apiaryDeleted = await apiaryService_1.default.delete(id);
-            res.json(apiaryDeleted);
+            const name = req.body.name;
+            const address = req.body.address;
+            const city = req.body.city;
+            const userId = req.user.id; // Garanti par middleware auth
+            const apiary = await apiaryService_1.default.create(name, address, city, userId);
+            res.json({ apiary });
         }
         catch (error) {
-            console.log(error);
+            console.error('Erreur création rucher:', error);
+            res.status(500).json({ error: 'Erreur lors de la création du rucher' });
+        }
+    }
+    static async findAll(req, res) {
+        try {
+            const userId = req.user.id; // Garanti par middleware auth
+            const apiaries = await apiaryService_1.default.findAllByUser(userId);
+            res.json(apiaries);
+        }
+        catch (error) {
+            console.error('Erreur récupération ruchers:', error);
+            res.status(500).json({ error: 'Erreur lors de la récupération des ruchers' });
         }
     }
 }

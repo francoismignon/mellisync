@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma";
+import { HiveStatus, TranshumanceReason } from "@prisma/client";
 
 class HiveRepository {
 
@@ -85,7 +86,7 @@ class HiveRepository {
   static async updateStatus(id: number, status: string) {
     return await prisma.hive.update({
       where: { id },
-      data: { status }
+      data: { status: status as HiveStatus }
     });
   }
 
@@ -105,9 +106,14 @@ class HiveRepository {
         data: {
           hiveId,
           apiaryId: newApiaryId,
-          reason,
+          reason: reason as TranshumanceReason,
           note,
         },
+        include: {
+          apiary: {
+            select: { id: true, name: true, address: true, city: true }
+          }
+        }
       });
     });
   }
