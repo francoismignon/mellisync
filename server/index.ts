@@ -42,6 +42,7 @@ app.get("/api/hives/:id/visits", authenticateToken, VisitController.findAllByHiv
 app.get("/api/hives/:id/transhumances", authenticateToken, HiveController.getTranshumanceHistory);
 app.post("/api/hives/:id/move", authenticateToken, HiveController.moveToApiary);
 app.put("/api/hives/:id/status", authenticateToken, HiveController.updateStatus);
+app.post("/api/hives/:id/generate-qr", authenticateToken, HiveController.generateQRCode);
 
 //Routes pour la définition des actions (protégées)
 // Route unique qui gère 2 cas :

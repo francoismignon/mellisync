@@ -10,6 +10,8 @@ function NewHive() {
     const params = useParams();
     const apiaryId = params['apiary-id'];
     const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [createdHive, setCreatedHive] = useState<any>(null);
     const [formData, setFormData] = useState({
       name: "",
       type: "DADANT", //valeur par defaut pareille que pour les enum dans mon schéma prisma
@@ -31,12 +33,18 @@ function NewHive() {
         }
       );
       
+      setCreatedHive(response.data.hive);
       setToast({ message: "Ruche créée avec succès", type: "success", isVisible: true });
       
-      // Redirection après délai pour voir le toast
-      setTimeout(() => {
-        navigate(`/ruchers/${apiaryId}/ruches/${response.data.hive.id}`);
-      }, 1500);
+      // Afficher le modal QR code si disponible
+      if (response.data.hive.qrCodeDataUrl) {
+        setShowQRModal(true);
+      } else {
+        // Redirection immédiate si pas de QR code
+        setTimeout(() => {
+          navigate(`/ruchers/${apiaryId}/ruches/${response.data.hive.id}`);
+        }, 1500);
+      }
       
     } catch (error) {
         console.log(error);
@@ -54,6 +62,45 @@ function NewHive() {
             [name]: value
         }
     });
+  }
+
+  function handlePrintQR() {
+    const printWindow = window.open('', '_blank');
+    if (printWindow && createdHive?.qrCodeDataUrl) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>QR Code - ${createdHive.name}</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; font-family: Arial, sans-serif; }
+              .qr-container { page-break-inside: avoid; }
+              .qr-title { margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+              .qr-code { margin: 20px 0; }
+              .qr-info { margin-top: 10px; font-size: 14px; color: #666; }
+            </style>
+          </head>
+          <body>
+            <div class="qr-container">
+              <div class="qr-title">Ruche: ${createdHive.name}</div>
+              <div class="qr-code">
+                <img src="${createdHive.qrCodeDataUrl}" alt="QR Code ${createdHive.name}" />
+              </div>
+              <div class="qr-info">
+                Scanner pour accéder à la ruche<br/>
+                Type: ${createdHive.type} - Couleur: ${createdHive.color}
+              </div>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  }
+
+  function handleCloseQRModal() {
+    setShowQRModal(false);
+    navigate(`/ruchers/${apiaryId}/ruches/${createdHive.id}`);
   }
 
   return (
@@ -158,6 +205,44 @@ function NewHive() {
                 />
             </form>
         </div>
+
+        {/* Modal QR Code */}
+        {showQRModal && createdHive && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
+                QR Code généré pour {createdHive.name}
+              </h2>
+              
+              <div className="text-center mb-6">
+                <img 
+                  src={createdHive.qrCodeDataUrl} 
+                  alt={`QR Code pour ${createdHive.name}`}
+                  className="mx-auto mb-4"
+                />
+                <p className="text-gray-600 text-sm">
+                  Imprimez ce QR code et collez-le sur votre ruche.<br/>
+                  Scanner ce code vous amènera directement à cette ruche.
+                </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePrintQR}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  Imprimer
+                </button>
+                <button
+                  onClick={handleCloseQRModal}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  Continuer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 

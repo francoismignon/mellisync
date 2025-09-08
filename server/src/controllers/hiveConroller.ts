@@ -196,5 +196,39 @@ class HiveController {
       res.status(500).json({ error: "Erreur serveur" });
     }
   }
+
+  // Générer QR code pour une ruche existante
+  static async generateQRCode(req: Request, res: Response) {
+    try {
+      const hiveId = parseInt(req.params.id);
+      const userId = req.user!.id;
+
+      // Vérification RBAC - la ruche appartient-elle à l'utilisateur ?
+      const hive = await HiveService.findById(hiveId);
+      if (!hive || !hive.apiary_hives?.[0]?.apiary) {
+        return res.status(404).json({ error: "Ruche non trouvée" });
+      }
+
+      const currentApiary = hive.apiary_hives[0].apiary;
+      const fullCurrentApiary = await ApiaryService.findById(currentApiary.id);
+      if (!fullCurrentApiary || fullCurrentApiary.userId !== userId) {
+        return res.status(403).json({ 
+          error: "Accès interdit à cette ruche" 
+        });
+      }
+
+      // Générer le QR code
+      const updatedHive = await HiveService.generateQRCode(hiveId);
+
+      res.status(200).json({
+        message: "QR Code généré avec succès",
+        hive: updatedHive
+      });
+
+    } catch (error) {
+      console.error("Erreur génération QR code:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
 }
 export default HiveController;

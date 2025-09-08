@@ -18,6 +18,8 @@ function Hive(){
     const [selectedStatus, setSelectedStatus] = useState<string>("");
     const [statusNote, setStatusNote] = useState<string>("");
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [isGeneratingQR, setIsGeneratingQR] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const params = useParams();
     const navigate = useNavigate();
@@ -140,6 +142,61 @@ function Hive(){
         }
     }
 
+    function handlePrintQR() {
+        const printWindow = window.open('', '_blank');
+        if (printWindow && hive?.qrCodeDataUrl) {
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>QR Code - ${hive.name}</title>
+                        <style>
+                            body { margin: 0; padding: 20px; text-align: center; font-family: Arial, sans-serif; }
+                            .qr-container { page-break-inside: avoid; }
+                            .qr-title { margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+                            .qr-code { margin: 20px 0; }
+                            .qr-info { margin-top: 10px; font-size: 14px; color: #666; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="qr-container">
+                            <div class="qr-title">Ruche: ${hive.name}</div>
+                            <div class="qr-code">
+                                <img src="${hive.qrCodeDataUrl}" alt="QR Code ${hive.name}" />
+                            </div>
+                            <div class="qr-info">
+                                Scanner pour accéder à la ruche<br/>
+                                Type: ${hive.type} - Couleur: ${hive.color}
+                            </div>
+                        </div>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    }
+
+    async function handleGenerateQR() {
+        if (!hive) return;
+        
+        setIsGeneratingQR(true);
+        try {
+            const response = await axios.post(`/api/hives/${hive.id}/generate-qr`);
+            
+            // Mettre à jour les données de la ruche avec le nouveau QR code
+            setHive(response.data.hive);
+            setToast({ message: "QR Code généré avec succès", type: "success", isVisible: true });
+            
+            // Afficher automatiquement le modal QR
+            setShowQRModal(true);
+        } catch (error: any) {
+            console.error("Erreur génération QR:", error);
+            setToast({ message: "Erreur lors de la génération", type: "error", isVisible: true });
+        } finally {
+            setIsGeneratingQR(false);
+        }
+    }
+
     return(
         <div>
             <Toast 
@@ -148,23 +205,37 @@ function Hive(){
                 isVisible={toast.isVisible}
                 onClose={() => setToast({ ...toast, isVisible: false })}
             />
-            <h1>{hive.name}</h1>
-            <h1>{hive.color}</h1>
-            {/* On utilise une IIFE (Immediately Invoked Function Expression) pour exécuter du code inline.
-            On cherche le bon type avec .find() dans HIVE_TYPES, puis on affiche son label
-            (via opérateur ternaire ou short-circuit pour éviter une erreur si non trouvé). */}
-            <h1>
-                {
-                    (()=>{
-                        const objt = HIVE_TYPES.find(type => type.value === hive.type); 
-                        return objt && objt.label;
-                    })()
-                }
-            </h1>
-            {/* On utilise .find() pour récupérer l’objet correspondant, et ?. (optional chaining) pour afficher son label uniquement s’il existe. */}
-            <h1>{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</h1>
-            <h1>{HIVE_STATUS.find(status => status.value === hive.status)?.label}</h1>
-            <div className="flex gap-4 mb-6">
+            {/* Informations de la ruche */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Informations de la ruche</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Nom :</span>
+                        <span className="text-gray-800">{hive.name}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Type :</span>
+                        <span className="text-gray-800">{HIVE_TYPES.find(type => type.value === hive.type)?.label}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Cadres :</span>
+                        <span className="text-gray-800">{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Couleur :</span>
+                        <span className="text-gray-800">{hive.color}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Année :</span>
+                        <span className="text-gray-800">{hive.yearBuilt}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="font-medium text-gray-600">Statut :</span>
+                        <span className="text-gray-800">{HIVE_STATUS.find(status => status.value === hive.status)?.label}</span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <input 
                     type="button" 
                     value="Ajouter une visite"
@@ -185,6 +256,13 @@ function Hive(){
                     value="Modifier statut"
                     className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
                     onClick={() => setShowStatusModal(true)} 
+                />
+
+                <input 
+                    type="button" 
+                    value="QR Code"
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                    onClick={() => setShowQRModal(true)}
                 />
             </div>
 
@@ -449,6 +527,66 @@ function Hive(){
                                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                                 )}
                                 {isUpdatingStatus ? 'Modification...' : 'Modifier'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal QR Code */}
+            {showQRModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
+                            QR Code - {hive.name}
+                        </h2>
+                        
+                        <div className="text-center mb-6">
+                            {hive?.qrCodeDataUrl ? (
+                                <>
+                                    <img 
+                                        src={hive.qrCodeDataUrl} 
+                                        alt={`QR Code pour ${hive.name}`}
+                                        className="mx-auto mb-4"
+                                    />
+                                    <p className="text-gray-600 text-sm">
+                                        Scanner ce code QR pour accéder directement à cette ruche.<br/>
+                                        Vous pouvez le réimprimer si nécessaire.
+                                    </p>
+                                </>
+                            ) : (
+                                <div className="py-8">
+                                    <p className="text-gray-500 text-center">
+                                        Aucun QR code généré pour cette ruche.<br/>
+                                        Cliquez sur "Régénérer QR Code" pour en créer un.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="flex flex-col gap-3">
+                            {hive?.qrCodeDataUrl && (
+                                <button
+                                    onClick={handlePrintQR}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
+                                >
+                                    Imprimer QR Code
+                                </button>
+                            )}
+                            
+                            <button
+                                onClick={handleGenerateQR}
+                                disabled={isGeneratingQR}
+                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400"
+                            >
+                                {isGeneratingQR ? "Génération..." : (hive?.qrCodeDataUrl ? "Régénérer QR Code" : "Générer QR Code")}
+                            </button>
+                            
+                            <button
+                                onClick={() => setShowQRModal(false)}
+                                className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
+                            >
+                                Fermer
                             </button>
                         </div>
                     </div>
