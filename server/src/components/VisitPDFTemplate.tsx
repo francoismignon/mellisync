@@ -1,4 +1,4 @@
-// 📄 Template PDF pour génération fiche de visite côté serveur
+// Template PDF pour génération fiche de visite côté serveur
 import React from 'react';
 
 interface VisitPDFTemplateProps {
@@ -36,7 +36,7 @@ interface VisitPDFTemplateProps {
 }
 
 function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
-  // 📅 Formatage date française avec fuseau horaire local
+  // Formatage date française avec fuseau horaire local
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -222,13 +222,13 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
         `}</style>
       </head>
       <body>
-        {/* 📋 En-tête officiel */}
+        {/* En-tête officiel */}
         <div className="header">
           <h1>FICHE DE VISITE APICOLE</h1>
           <p>Mellisync - Gestion digitale de ruchers</p>
         </div>
 
-        {/* 🏷️ Informations générales */}
+        {/* Informations générales */}
         <div className="info-grid">
           {/* Identification */}
           <div>
@@ -288,7 +288,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
           )}
         </div>
 
-        {/* 📝 Zone observations */}
+        {/* Zone observations */}
         <div className="observations">
           <h3 className="section-title">OBSERVATIONS COMPLÉMENTAIRES</h3>
           <div className="observations-box">
@@ -304,7 +304,7 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
           </div>
         </div>
 
-        {/* 🔒 Pied de page */}
+        {/* Pied de page */}
         <div className="footer">
           <p>Document généré automatiquement par Mellisync</p>
           <p>Fiche de visite n°{visit.visitNumber || visit.id} - {new Date().toLocaleDateString('fr-FR')}</p>

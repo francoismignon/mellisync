@@ -139,7 +139,7 @@
 
       - name: Deploy notification
         run: |
-          echo "🚀 Deployment successful!"
+          echo "Deployment successful!"
           echo "Backend: ${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
           echo "Frontend: ${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}"
         # Affiche un message de succès avec les noms des images
@@ -152,14 +152,14 @@
           port: ${{ secrets.PROD_SSH_PORT }}
           script: |
             cd /home/docker/mellisync
-            echo "🔄 Pulling latest images..."
+            echo "Pulling latest images..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod pull
-            echo "🔧 Running Prisma migrations..."
+            echo "Running Prisma migrations..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm backend npx prisma migrate deploy
-            echo "🌱 Running database seed..."
+            echo "Running database seed..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm backend npm run seed
-            echo "🚀 Restarting services..."
+            echo "Restarting services..."
             docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
-            echo "🧹 Cleaning up old images..."
+            echo "Cleaning up old images..."
             docker system prune -f
-            echo "✅ Deployment completed!"
+            echo "Deployment completed!"

@@ -2,7 +2,7 @@ import prisma from "../src/lib/prisma";
 import AuthService from "../src/services/authService";
 
 async function main() {
-  console.log("🌱 Démarrage du seeding...");
+  console.log("Démarrage du seeding...");
   //Seeding des rôles
   const roles = [
     { id: 1, name: "ADMIN" },
@@ -16,7 +16,7 @@ async function main() {
       create: role,
     });
   }
-  console.log(`✅ ${roles.length} rôles seedés`);
+  console.log(`${roles.length} rôles seedés`);
 
   // Seeding de l'utilisateur admin avec mot de passe hashé
   const hashedAdminPassword = await AuthService.hashPassword("admin");
@@ -32,7 +32,7 @@ async function main() {
       roleId: 1,
     },
   });
-  console.log("✅ 1 utilisateur admin seedé (mot de passe hashé)");
+  console.log("1 utilisateur admin seedé (mot de passe hashé)");
 
   // Seeding de l'utilisateur beekeeper test
   const hashedBeekeeperPassword = await AuthService.hashPassword("francois");
@@ -48,7 +48,7 @@ async function main() {
       roleId: 2, // BEEKEEPER role
     },
   });
-  console.log("✅ 1 utilisateur beekeeper seedé (François)");
+  console.log("1 utilisateur beekeeper seedé (François)");
 
   // Seeding des options complètes (basées sur panel.html + user stories MUST HAVE)
   const options = [
@@ -99,7 +99,7 @@ async function main() {
       create: option,
     });
   }
-  console.log(`✅ ${options.length} options seedées`);
+  console.log(`${options.length} options seedées`);
 
   // Seeding des périodes
   const periodes = [
@@ -120,7 +120,7 @@ async function main() {
       create: periode,
     });
   }
-  console.log(`✅ ${periodes.length} périodes seedées`);
+  console.log(`${periodes.length} périodes seedées`);
 
   // Seeding des restrictions météo
   const weatherRestrictions = [
@@ -139,7 +139,7 @@ async function main() {
       create: weather,
     });
   }
-  console.log(`✅ ${weatherRestrictions.length} restrictions météo seedées`);
+  console.log(`${weatherRestrictions.length} restrictions météo seedées`);
 
   // Seeding des actions avec actionType, incrementStep et restrictions température selon REGLES_METIER_APICOLES.md
   const actions = [
@@ -173,7 +173,7 @@ async function main() {
       create: action,
     });
   }
-  console.log(`✅ ${actions.length} actions seedées`);
+  console.log(`${actions.length} actions seedées`);
 
   // Seeding des relations ActionOption complètes (18 actions MUST HAVE)
   const actionOptions = [
@@ -248,7 +248,7 @@ async function main() {
       create: actionOption,
     });
   }
-  console.log(`✅ ${actionOptions.length} relations action-options créées`);
+  console.log(`${actionOptions.length} relations action-options créées`);
 
   // Seeding des relations ActionPeriode selon REGLES_METIER_APICOLES.md
   const actionPeriodes = [
@@ -356,7 +356,7 @@ async function main() {
       create: actionPeriode,
     });
   }
-  console.log(`✅ ${actionPeriodes.length} relations action-périodes créées`);
+  console.log(`${actionPeriodes.length} relations action-périodes créées`);
 
   // Seeding des relations ActionWeatherRestriction selon REGLES_METIER_APICOLES.md
   const actionWeatherRestrictions = [
@@ -408,8 +408,8 @@ async function main() {
       create: actionWeatherRestriction,
     });
   }
-  console.log(`✅ ${actionWeatherRestrictions.length} relations action-météo créées`);
-  console.log("🌱 Seeding terminé");
+  console.log(`${actionWeatherRestrictions.length} relations action-météo créées`);
+  console.log("Seeding terminé");
 }
 
 main()

@@ -48,23 +48,23 @@ function Dashboard(){
                         {dashboardData?.statistics?.hivesByStatus && Object.keys(dashboardData.statistics.hivesByStatus).length > 0 && (
                             <div className="space-y-1">
                                 {Object.entries(dashboardData.statistics.hivesByStatus).map(([status, count]: [string, any]) => {
-                                    // Mapping des statuts avec icônes et traductions
-                                    const statusMapping: Record<string, {icon: string, label: string}> = {
-                                        'ACTIVE': { icon: '✅', label: 'actives' },
-                                        'WINTERING': { icon: '🥶', label: 'hivernage' },
-                                        'DEAD': { icon: '☠️', label: 'mortes' },
-                                        'INACTIVE': { icon: '🚫', label: 'inactives' },
-                                        'EMPTY': { icon: '📦', label: 'vides' },
-                                        'QUARANTINE': { icon: '🏥', label: 'quarantaine' },
-                                        'SWARMED': { icon: '🐝', label: 'essaimées' },
-                                        'MAINTENANCE': { icon: '🔧', label: 'maintenance' }
+                                    // Mapping des statuts avec traductions
+                                    const statusMapping: Record<string, {label: string}> = {
+                                        'ACTIVE': { label: 'actives' },
+                                        'WINTERING': { label: 'hivernage' },
+                                        'DEAD': { label: 'mortes' },
+                                        'INACTIVE': { label: 'inactives' },
+                                        'EMPTY': { label: 'vides' },
+                                        'QUARANTINE': { label: 'quarantaine' },
+                                        'SWARMED': { label: 'essaimées' },
+                                        'MAINTENANCE': { label: 'maintenance' }
                                     };
                                     
-                                    const statusInfo = statusMapping[status] || { icon: '❓', label: status.toLowerCase() };
+                                    const statusInfo = statusMapping[status] || { label: status.toLowerCase() };
                                     
                                     return (
                                         <div key={status} className="flex items-center justify-between text-xs text-green-700">
-                                            <span>{statusInfo.icon} {count} {statusInfo.label}</span>
+                                            <span>{count} {statusInfo.label}</span>
                                         </div>
                                     );
                                 })}
