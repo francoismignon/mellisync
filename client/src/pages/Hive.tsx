@@ -1,11 +1,20 @@
 import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
-import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
+import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, TRANSHUMANCE_REASONS} from "../constants/index";
 import { useNavigate, useParams } from "react-router";
+import Toast from "../components/Toast";
 
 function Hive(){
     const [hive, setHive] = useState<any>({});
     const [visits, setVisits] = useState<any[]>([]);
+    const [transhumances, setTranshumances] = useState<any[]>([]);
+    const [apiaries, setApiaries] = useState<any[]>([]);
+    const [showMoveModal, setShowMoveModal] = useState(false);
+    const [selectedApiaryId, setSelectedApiaryId] = useState<string>("");
+    const [reason, setReason] = useState<string>("");
+    const [note, setNote] = useState<string>("");
+    const [isMoving, setIsMoving] = useState(false);
+    const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const params = useParams();
     const navigate = useNavigate();
 
@@ -31,13 +40,77 @@ function Hive(){
         }
     }
 
+    //Fonction pour récupérer l'historique des transhumances
+    async function fetchTranshumances(){
+        try {
+            const hiveId = params['hive-id'];
+            const response = await axios.get(`/api/hives/${hiveId}/transhumances`);
+            setTranshumances(response.data);
+        } catch (error) {
+            console.log("Erreur récupération transhumances:", error);
+        }
+    }
+
+    //Fonction pour récupérer tous les ruchers de l'utilisateur
+    async function fetchApiaries(){
+        try {
+            const response = await axios.get('/api/apiaries');
+            setApiaries(response.data);
+        } catch (error) {
+            console.log("Erreur récupération ruchers:", error);
+        }
+    }
+
     useEffect(()=>{
         fetchHive();
         fetchVisits();
+        fetchTranshumances();
+        fetchApiaries();
     }, []);
+
+    //Fonction pour déplacer la ruche
+    async function moveHive() {
+        if (!selectedApiaryId || !reason) {
+            setToast({ message: "Veuillez sélectionner un rucher et une raison", type: "error", isVisible: true });
+            return;
+        }
+
+        setIsMoving(true);
+        try {
+            const hiveId = params['hive-id'];
+            const response = await axios.post(`/api/hives/${hiveId}/move`, {
+                newApiaryId: parseInt(selectedApiaryId),
+                reason: reason,
+                note: note || undefined
+            });
+
+            setToast({ message: "Ruche déplacée avec succès", type: "success", isVisible: true });
+            
+            // Fermer le modal et reset les états
+            setShowMoveModal(false);
+            setSelectedApiaryId("");
+            setReason("");
+            setNote("");
+            
+            // Recharger les données
+            fetchTranshumances();
+            
+        } catch (error: any) {
+            console.error("Erreur déplacement ruche:", error);
+            setToast({ message: "Erreur lors du déplacement", type: "error", isVisible: true });
+        } finally {
+            setIsMoving(false);
+        }
+    }
 
     return(
         <div>
+            <Toast 
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={() => setToast({ ...toast, isVisible: false })}
+            />
             <h1>{hive.name}</h1>
             <h1>{hive.color}</h1>
             {/* On utilise une IIFE (Immediately Invoked Function Expression) pour exécuter du code inline.
@@ -54,13 +127,22 @@ function Hive(){
             {/* On utilise .find() pour récupérer l’objet correspondant, et ?. (optional chaining) pour afficher son label uniquement s’il existe. */}
             <h1>{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</h1>
             <h1>{HIVE_STATUS.find(status => status.value === hive.status)?.label}</h1>
-            <input 
-                type="button" 
-                value="Ajouter une visite"
-                className="border"
-                onClick={()=> {
-                    navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
-                }} />
+            <div className="flex gap-4 mb-6">
+                <input 
+                    type="button" 
+                    value="Ajouter une visite"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                    onClick={()=> {
+                        navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
+                    }} />
+                
+                <input 
+                    type="button" 
+                    value="Déplacer ruche"
+                    className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
+                    onClick={() => setShowMoveModal(true)} 
+                />
+            </div>
 
             {/*Section Historique des visites */}
             <div className="mt-8">
@@ -109,6 +191,158 @@ function Hive(){
                     </div>
                 )}
             </div>
+
+            {/*Section Historique des transhumances */}
+            <div className="mt-8">
+                <h2 className="text-xl font-bold mb-4">Historique des transhumances</h2>
+                
+                {transhumances.length === 0 ? (
+                    <p className="text-gray-500 italic">Aucune transhumance enregistrée pour cette ruche</p>
+                ) : (
+                    <div className="space-y-2">
+                        {transhumances.map(transhumance => {
+                            //Fonction pour formater la date
+                            const formatDate = (dateString: string) => {
+                                const date = new Date(dateString);
+                                return date.toLocaleDateString('fr-FR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                });
+                            };
+
+                            // Trouver le label de la raison
+                            const reasonLabel = TRANSHUMANCE_REASONS.find(
+                                reason => reason.value === transhumance.reason
+                            )?.label || transhumance.reason;
+
+                            // Calculer durée si endDate existe
+                            const duration = transhumance.endDate 
+                                ? ` → ${formatDate(transhumance.endDate)}`
+                                : ' → Actuel';
+
+                            return (
+                                <div 
+                                    key={transhumance.id}
+                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-semibold text-gray-800">
+                                                {transhumance.apiary.name}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                {transhumance.apiary.address}, {transhumance.apiary.city}
+                                            </p>
+                                            <p className="text-sm text-blue-600 font-medium mt-1">
+                                                {reasonLabel}
+                                            </p>
+                                            {transhumance.note && (
+                                                <p className="text-sm text-gray-500 mt-1 italic">
+                                                    {transhumance.note}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="text-right text-sm text-gray-500">
+                                            <p>{formatDate(transhumance.startDate)}{duration}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Modal déplacement ruche */}
+            {showMoveModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-md w-full p-6">
+                        <h3 className="text-lg font-bold mb-4">Déplacer la ruche</h3>
+                        
+                        {/* Sélection rucher de destination */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Rucher de destination
+                            </label>
+                            <select 
+                                value={selectedApiaryId}
+                                onChange={(e) => setSelectedApiaryId(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Sélectionner un rucher...</option>
+                                {apiaries
+                                    .filter(apiary => apiary.id !== parseInt(params['apiary-id']!))
+                                    .map(apiary => (
+                                        <option key={apiary.id} value={apiary.id}>
+                                            {apiary.name} - {apiary.city}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+
+                        {/* Raison du déplacement */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Raison du déplacement
+                            </label>
+                            <select 
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Sélectionner une raison...</option>
+                                {TRANSHUMANCE_REASONS.map(reasonOption => (
+                                    <option key={reasonOption.value} value={reasonOption.value}>
+                                        {reasonOption.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Note optionnelle */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Note (optionnelle)
+                            </label>
+                            <textarea
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                placeholder="Ajoutez une note..."
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                rows={3}
+                            />
+                        </div>
+
+                        {/* Boutons */}
+                        <div className="flex gap-3 justify-end">
+                            <button 
+                                onClick={() => {
+                                    setShowMoveModal(false);
+                                    setSelectedApiaryId("");
+                                    setReason("");
+                                    setNote("");
+                                }}
+                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                disabled={isMoving}
+                            >
+                                Annuler
+                            </button>
+                            <button 
+                                onClick={moveHive}
+                                disabled={isMoving || !selectedApiaryId || !reason}
+                                className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:bg-gray-400 transition-colors flex items-center gap-2"
+                            >
+                                {isMoving && (
+                                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                )}
+                                {isMoving ? 'Déplacement...' : 'Déplacer'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

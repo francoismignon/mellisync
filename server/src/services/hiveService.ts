@@ -48,5 +48,53 @@ class HiveService {
 
     return hive;
   }
+
+  //Méthode pour récupérer l'historique des transhumances d'une ruche
+  static async getTranshumanceHistory(hiveId: number) {
+    return await prisma.apiaryHive.findMany({
+      where: { hiveId: hiveId },
+      include: {
+        apiary: {
+          select: { id: true, name: true, address: true, city: true }
+        }
+      },
+      orderBy: { startDate: 'desc' }  // Plus récentes en premier
+    });
+  }
+
+  //Méthode pour déplacer une ruche vers un autre rucher
+  static async moveToApiary(hiveId: number, newApiaryId: number, reason: string, note?: string) {
+    return await prisma.$transaction(async (tx) => {
+      // 1. Fermer la transhumance actuelle (endDate = maintenant)
+      await tx.apiaryHive.updateMany({
+        where: { 
+          hiveId: hiveId,
+          endDate: null  // Relation active actuelle
+        },
+        data: { 
+          endDate: new Date() 
+        }
+      });
+
+      // 2. Créer la nouvelle relation
+      const newTranshumance = await tx.apiaryHive.create({
+        data: {
+          hiveId: hiveId,
+          apiaryId: newApiaryId,
+          reason: reason as any, // Cast vers enum TranshumanceReason
+          note: note || null,
+          startDate: new Date(),
+          endDate: null  // Relation active
+        },
+        include: {
+          apiary: {
+            select: { id: true, name: true, address: true, city: true }
+          }
+        }
+      });
+
+      return newTranshumance;
+    });
+  }
 }
 export default HiveService;

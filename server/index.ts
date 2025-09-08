@@ -38,6 +38,8 @@ app.get("/api/hives", authenticateToken, HiveController.findAllByApiary);
 app.post("/api/hives", authenticateToken, HiveController.create);
 app.get("/api/hives/:id", authenticateToken, HiveController.findById)
 app.get("/api/hives/:id/visits", authenticateToken, VisitController.findAllByHive);
+app.get("/api/hives/:id/transhumances", authenticateToken, HiveController.getTranshumanceHistory);
+app.post("/api/hives/:id/move", authenticateToken, HiveController.moveToApiary);
 
 //Routes pour la définition des actions (protégées)
 // Route unique qui gère 2 cas :

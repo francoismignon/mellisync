@@ -2,12 +2,14 @@ import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
+import Toast from "../components/Toast";
 
 function NewVisit() {
   const { "hive-id": hiveId, "apiary-id": apiaryId } = useParams<{ "hive-id": string, "apiary-id": string }>(); //Récupération params depuis URL
   const navigate = useNavigate();
   const [actions, setActions] = useState<any[]>([]);
   const [visitActions, setVisitActions] = useState({});
+  const [toast, setToast] = useState({ message: "", type: "", isVisible: false });
   
   //États pour contexte apicole (maintenant fournis par backend)
   const [currentPeriod, setCurrentPeriod] = useState<string>("");
@@ -52,7 +54,7 @@ function NewVisit() {
   //Fonction de sauvegarde visite
   async function saveVisit() {
     if (!hiveId) {
-      alert("Erreur : ID de ruche manquant");
+      setToast({ message: "Erreur : ID de ruche manquant", type: "error", isVisible: true });
       return;
     }
 
@@ -68,17 +70,19 @@ function NewVisit() {
         }
       );
 
-      //Succès : Confirmation utilisateur + redirection
-      alert(`Visite enregistrée avec succès ! ID: ${response.data.id}`);
+      //Succès : Toast simple + redirection retardée
+      setToast({ message: "Visite enregistrée", type: "success", isVisible: true });
       console.log("Visite sauvée:", response.data);
       
-      //Redirection automatique vers la vue de la ruche
-      navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`);
+      //Redirection automatique vers la vue de la ruche après délai pour voir le toast
+      setTimeout(() => {
+        navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`);
+      }, 1500);
       
     } catch (error) {
-      //Erreur : Affichage message utilisateur
+      //Erreur : Toast d'erreur simple
       console.error("Erreur sauvegarde visite:", error);
-      alert("Erreur lors de l'enregistrement de la visite");
+      setToast({ message: "Erreur lors de l'enregistrement", type: "error", isVisible: true });
     } finally {
       setIsSaving(false);
     }
@@ -92,6 +96,12 @@ function NewVisit() {
 
   return (
     <div>
+      <Toast 
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
       <div className="mb-4 flex items-center gap-4">
         <h2 className="text-xl font-bold">Nouvelle visite</h2>
         
@@ -141,13 +151,25 @@ function NewVisit() {
       <button 
         onClick={saveVisit}
         disabled={isSaving}
-        className={`mt-4 px-4 py-2 rounded ${
+        className={`mt-4 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 ${
           isSaving 
             ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-            : 'bg-blue-500 text-white hover:bg-blue-600'
+            : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
         }`}
       >
-        {isSaving ? "Enregistrement..." : "Enregistrer visite"}
+        {isSaving ? (
+          <>
+            <div className="animate-spin w-4 h-4 border-2 border-gray-200 border-t-transparent rounded-full"></div>
+            Enregistrement...
+          </>
+        ) : (
+          <>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Enregistrer visite
+          </>
+        )}
       </button>
     </div>
   );

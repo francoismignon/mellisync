@@ -2,12 +2,14 @@ import axios from "../config/axiosConfig";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
+import Toast from "../components/Toast";
 
 function NewHive() {
     
     const navigate = useNavigate();
     const params = useParams();
     const apiaryId = params['apiary-id'];
+    const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const [formData, setFormData] = useState({
       name: "",
       type: "DADANT", //valeur par defaut pareille que pour les enum dans mon schéma prisma
@@ -28,10 +30,17 @@ function NewHive() {
             apiaryId: apiaryId
         }
       );
-      navigate(`/ruchers/${apiaryId}/ruches/${response.data.hive.id}`);//navigue uniquement si rponse coté back car await
-      alert(`Ruche ${response.data.hive.name} crée avec succes`);
+      
+      setToast({ message: "Ruche créée avec succès", type: "success", isVisible: true });
+      
+      // Redirection après délai pour voir le toast
+      setTimeout(() => {
+        navigate(`/ruchers/${apiaryId}/ruches/${response.data.hive.id}`);
+      }, 1500);
+      
     } catch (error) {
         console.log(error);
+        setToast({ message: "Erreur lors de la création", type: "error", isVisible: true });
     }
 
   }
@@ -49,6 +58,12 @@ function NewHive() {
 
   return (
     <div className="max-w-2xl mx-auto">
+        <Toast 
+            message={toast.message}
+            type={toast.type}
+            isVisible={toast.isVisible}
+            onClose={() => setToast({ ...toast, isVisible: false })}
+        />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Formulaire de création de ruche</h1>
         <div className="bg-white rounded-lg shadow-sm border p-8">
             <form onSubmit={handleSubmit} className="space-y-6">

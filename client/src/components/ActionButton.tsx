@@ -30,6 +30,7 @@ function ActionButton(props: ActionButtonProps) {
     }
   }, []); // Au mount du composant
 
+
   //Calcul valeur affichée selon type action (logique inchangée)
   function getCurrentValue() {
     if (props.action.actionType === "CYCLE") {
@@ -62,7 +63,9 @@ function ActionButton(props: ActionButtonProps) {
         onClick={handleClick}
     >
       <div className="font-bold mb-2">{props.action.label}</div>
-      <div className="text-sm text-blue-500">{getCurrentValue()}</div>
+      <div className="text-sm text-blue-500">
+        {getCurrentValue()}
+      </div>
     </button>
   );
 }

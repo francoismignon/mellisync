@@ -23,3 +23,13 @@ export const HIVE_STATUS = [
   { value: "QUARANTINE", label: "Quarantaine" },
   { value: "MAINTENANCE", label: "Maintenance" },
 ];
+
+export const TRANSHUMANCE_REASONS = [
+  { value: "ACQUISITION", label: "Acquisition/Achat" },
+  { value: "HONEY_FLOW", label: "Miellée" },
+  { value: "WINTERING", label: "Hivernage" },
+  { value: "POLLINATION", label: "Pollinisation" },
+  { value: "TREATMENT", label: "Traitement" },
+  { value: "MAINTENANCE", label: "Maintenance" },
+  { value: "OTHER", label: "Autre" },
+];
