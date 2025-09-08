@@ -1,11 +1,37 @@
 import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import QRScanner from "../components/QRScanner";
 
 function Dashboard(){
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showQRScanner, setShowQRScanner] = useState(false);
     const navigate = useNavigate();
+
+    const handleQRScanSuccess = (data: string) => {
+        try {
+            // Parser l'URL du QR code pour extraire le chemin
+            const url = new URL(data);
+            const path = url.pathname; // Ex: "/ruchers/123/ruches/456"
+            
+            // Fermer le scanner
+            setShowQRScanner(false);
+            
+            // Naviguer vers la ruche
+            navigate(path);
+        } catch (error) {
+            console.error('QR code invalide:', error);
+            alert('QR code invalide ou non reconnu');
+            setShowQRScanner(false);
+        }
+    };
+
+    const handleQRScanError = (error: string) => {
+        console.error('Erreur scan QR:', error);
+        alert(`Erreur scan QR: ${error}`);
+        setShowQRScanner(false);
+    };
 
     async function fetchDashboardData() {
         try {
@@ -127,6 +153,52 @@ function Dashboard(){
                     </div>
                 )}
             </div>
+
+            {/* FAB Scanner QR - Mobile uniquement */}
+            <div className="sm:hidden fixed bottom-6 right-6 z-50">
+                <button
+                    onClick={() => setShowQRScanner(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors duration-200"
+                    title="Scanner QR Code"
+                >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h4m12 4h2m-4 0V4M8 4H4v4" />
+                    </svg>
+                </button>
+            </div>
+
+            {/* Modal QR Scanner */}
+            {showQRScanner && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold">Scanner QR Code</h3>
+                            <button
+                                onClick={() => setShowQRScanner(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <QRScanner 
+                            onScanSuccess={handleQRScanSuccess}
+                            onScanError={handleQRScanError}
+                        />
+                        
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => setShowQRScanner(false)}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                            >
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 
