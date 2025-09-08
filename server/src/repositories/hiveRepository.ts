@@ -1,0 +1,144 @@
+import prisma from "../lib/prisma";
+
+class HiveRepository {
+
+  static async findById(id: number) {
+    return await prisma.hive.findUnique({
+      where: { id },
+      include: {
+        apiary_hives: {
+          where: { endDate: null }, // Rucher actuel
+          include: {
+            apiary: {
+              select: { id: true, name: true, address: true, city: true }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  static async findAllByApiary(apiaryId: number) {
+    return await prisma.hive.findMany({
+      where: {
+        apiary_hives: {
+          some: {
+            apiaryId: apiaryId,
+            endDate: null, // ruches actuellement dans ce rucher
+          },
+        },
+      },
+    });
+  }
+
+  static async findAllByUser(userId: number) {
+    return await prisma.hive.findMany({
+      where: {
+        apiary_hives: {
+          some: {
+            apiary: {
+              userId: userId,
+            },
+            endDate: null, // Ruches actuelles seulement
+          },
+        },
+      },
+      include: {
+        apiary_hives: {
+          where: { endDate: null },
+          include: {
+            apiary: {
+              select: { id: true, name: true, address: true, city: true }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  static async createWithApiary(apiaryId: number, hiveData: any) {
+    return await prisma.$transaction(async (tx) => {
+      // 1. Créer d'abord la ruche
+      const hive = await tx.hive.create({
+        data: hiveData,
+      });
+
+      // 2. Créer la relation apiary-hive
+      await tx.apiaryHive.create({
+        data: {
+          hiveId: hive.id,
+          apiaryId,
+        },
+      });
+
+      return hive;
+    });
+  }
+
+  static async updateQRCode(hiveId: number, qrCodeDataUrl: string) {
+    return await prisma.hive.update({
+      where: { id: hiveId },
+      data: { qrCodeDataUrl },
+    });
+  }
+
+  static async updateStatus(id: number, status: string) {
+    return await prisma.hive.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
+  static async moveToApiary(hiveId: number, newApiaryId: number, reason: string, note?: string) {
+    return await prisma.$transaction(async (tx) => {
+      // 1. Fermer la relation actuelle (fin de période dans ce rucher)
+      await tx.apiaryHive.updateMany({
+        where: {
+          hiveId,
+          endDate: null, // relation active actuelle
+        },
+        data: { endDate: new Date() },
+      });
+
+      // 2. Créer nouvelle relation dans le nouveau rucher
+      return await tx.apiaryHive.create({
+        data: {
+          hiveId,
+          apiaryId: newApiaryId,
+          reason,
+          note,
+        },
+      });
+    });
+  }
+
+  static async getTranshumanceHistory(hiveId: number) {
+    return await prisma.apiaryHive.findMany({
+      where: { hiveId },
+      include: {
+        apiary: {
+          select: { id: true, name: true, address: true, city: true }
+        }
+      },
+      orderBy: { startDate: 'desc' }
+    });
+  }
+
+  static async getVisitsHistory(hiveId: number) {
+    return await prisma.visit.findMany({
+      where: { hiveId },
+      include: {
+        visitActions: {
+          include: {
+            action: {
+              select: { id: true, label: true, actionType: true }
+            }
+          }
+        }
+      },
+      orderBy: { date: 'desc' }
+    });
+  }
+}
+
+export default HiveRepository;

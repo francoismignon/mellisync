@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
-import prisma from '../lib/prisma';
+import UserRepository from '../repositories/userRepository';
 
 interface UserPayload {
   id: number;
@@ -38,30 +38,33 @@ class AuthService {
   /**
    * Inscription nouvel utilisateur avec cookie sécurisé
    */
-  static async register(name: string, email: string, password: string, res: Response, roleId: number = 2): Promise<AuthResult['user']> {
+  static async register(name: string, email: string, password: string, res: Response, roleId?: number): Promise<AuthResult['user']> {
     // Vérifier si email existe déjà
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const existingUser = await UserRepository.findByEmail(email);
     
     if (existingUser) {
       throw new Error('Un utilisateur avec cet email existe déjà');
+    }
+
+    // Utiliser rôle BEEKEEPER par défaut si non spécifié
+    let finalRoleId = roleId;
+    if (!finalRoleId) {
+      const beekeeperRole = await UserRepository.findDefaultBeekeeperRole();
+      if (!beekeeperRole) {
+        throw new Error('Rôle BEEKEEPER non trouvé');
+      }
+      finalRoleId = beekeeperRole.id;
     }
 
     // Hash mot de passe
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
 
     // Créer utilisateur
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        roleId
-      },
-      include: {
-        role: true
-      }
+    const user = await UserRepository.create({
+      name,
+      email,
+      hashedPassword,
+      roleId: finalRoleId
     });
 
     // Générer JWT token
@@ -87,12 +90,7 @@ class AuthService {
    */
   static async login(email: string, password: string, res: Response): Promise<AuthResult['user']> {
     // Trouver utilisateur
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        role: true
-      }
-    });
+    const user = await UserRepository.findByEmail(email);
 
     if (!user) {
       throw new Error('Identifiants invalides');

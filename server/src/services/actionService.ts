@@ -1,4 +1,5 @@
-import prisma from "../lib/prisma";
+import ActionRepository from "../repositories/actionRepository";
+import ApiaryRepository from "../repositories/apiaryRepository";
 import WeatherService from "./weatherService";
 
 //Types TypeScript pour la structure des données
@@ -17,24 +18,7 @@ interface FilteredActionsResponse {
 class ActionService {
   //SERVICE CLASSIQUE : Retourne TOUTES les actions (mode expert)
   static async findAll() {
-    // Requête Prisma avec TOUTES les relations many-to-many
-    return await prisma.action.findMany({
-      include: {
-        // Inclut les options de chaque action (Oui/Non, etc.)
-        action_options: {
-          include: { option: true },
-        },
-        // Inclut les périodes autorisées pour chaque action
-        action_periodes: {
-          include: { periode: true },
-        },
-        // Inclut les restrictions météo de chaque action  
-        action_weather_restrictions: {
-          include: { weatherRestriction: true },
-        },
-      },
-      orderBy: { id: "asc" }, // Tri par ID croissant
-    });
+    return await ActionRepository.findAllWithRelations();
   }
 
   //SERVICE INTELLIGENT : Filtrage selon règles métier apicoles
@@ -108,10 +92,7 @@ class ActionService {
     //Si apiaryId fourni, récupérer les coordonnées du rucher
     if (apiaryId) {
       try {
-        const apiary = await prisma.apiary.findUnique({
-          where: { id: apiaryId },
-          select: { latitude: true, longitude: true }
-        });
+        const apiary = await ApiaryRepository.findById(apiaryId);
         
         if (apiary?.latitude && apiary?.longitude) {
           latitude = parseFloat(apiary.latitude.toString());
