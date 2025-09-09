@@ -77,13 +77,7 @@ function Dashboard(){
                                     // Mapping des statuts avec traductions
                                     const statusMapping: Record<string, {label: string}> = {
                                         'ACTIVE': { label: 'actives' },
-                                        'WINTERING': { label: 'hivernage' },
-                                        'DEAD': { label: 'mortes' },
-                                        'INACTIVE': { label: 'inactives' },
-                                        'EMPTY': { label: 'vides' },
-                                        'QUARANTINE': { label: 'quarantaine' },
-                                        'SWARMED': { label: 'essaimées' },
-                                        'MAINTENANCE': { label: 'maintenance' }
+                                        'INACTIVE': { label: 'inactives' }
                                     };
                                     
                                     const statusInfo = statusMapping[status] || { label: status.toLowerCase() };
@@ -124,12 +118,12 @@ function Dashboard(){
                             {dashboardData.alerts.hivesWithoutVisit.map((hive: any) => (
                                 <div 
                                     key={hive.id} 
-                                    onClick={() => navigate(`/ruchers/${hive.apiaryId}/ruches/${hive.id}`)}
+                                    onClick={() => navigate(`/ruchers/${hive.apiary_hives?.[0]?.apiary?.id}/ruches/${hive.id}`)}
                                     className="bg-white rounded p-3 border border-red-100 hover:bg-red-50 hover:border-red-200 cursor-pointer transition-colors"
                                 >
                                     <div className="font-medium text-red-900">{hive.name}</div>
                                     <div className="text-sm text-red-700">
-                                        {hive.apiary.name} ({hive.apiary.city}) • 
+                                        {hive.apiary_hives?.[0]?.apiary?.name} ({hive.apiary_hives?.[0]?.apiary?.city}) • 
                                         {hive.daysSinceLastVisit 
                                             ? ` ${hive.daysSinceLastVisit} jours depuis dernière visite`
                                             : ' Aucune visite enregistrée'

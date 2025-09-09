@@ -16,12 +16,6 @@ export const FRAME_COUNTS = [
 export const HIVE_STATUS = [
   { value: "ACTIVE", label: "Active" },
   { value: "INACTIVE", label: "Inactive" },
-  { value: "EMPTY", label: "Vide" },
-  { value: "WINTERING", label: "Hivernage" },
-  { value: "SWARMED", label: "Essaimée" },
-  { value: "DEAD", label: "Morte" },
-  { value: "QUARANTINE", label: "Quarantaine" },
-  { value: "MAINTENANCE", label: "Maintenance" },
 ];
 
 export const TRANSHUMANCE_REASONS = [

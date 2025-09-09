@@ -230,9 +230,21 @@ function Hive(){
                         <span className="font-medium text-gray-600">Année :</span>
                         <span className="text-gray-800">{hive.yearBuilt}</span>
                     </div>
-                    <div className="flex gap-2">
-                        <span className="font-medium text-gray-600">Statut :</span>
-                        <span className="text-gray-800">{HIVE_STATUS.find(status => status.value === hive.status)?.label}</span>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex gap-2">
+                            <span className="font-medium text-gray-600">Statut :</span>
+                            <span className="text-gray-800">{HIVE_STATUS.find(status => status.value === hive.status)?.label}</span>
+                        </div>
+                        {hive.statusReason && (
+                            <div className="ml-2 text-sm text-gray-500 italic">
+                                Raison : {hive.statusReason}
+                            </div>
+                        )}
+                        {hive.statusChangedAt && (
+                            <div className="ml-2 text-xs text-gray-400">
+                                Modifié le : {new Date(hive.statusChangedAt).toLocaleDateString('fr-FR')}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

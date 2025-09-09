@@ -83,10 +83,14 @@ class HiveRepository {
     });
   }
 
-  static async updateStatus(id: number, status: string) {
+  static async updateStatus(id: number, status: string, reason?: string) {
     return await prisma.hive.update({
       where: { id },
-      data: { status: status as HiveStatus }
+      data: { 
+        status: status as HiveStatus,
+        statusReason: reason,
+        statusChangedAt: new Date()
+      }
     });
   }
 

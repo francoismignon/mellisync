@@ -185,7 +185,7 @@ class HiveController {
       }
 
       // Effectuer la modification
-      const updatedHive = await HiveService.updateStatus(hiveId, newStatus, note);
+      const updatedHive = await HiveService.updateStatus(hiveId, newStatus, userId, note);
 
       res.status(200).json({
         message: `Statut de la ruche modifié vers ${newStatus}`,

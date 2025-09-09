@@ -51,14 +51,8 @@ enum TranshumanceReason {
 }
 
 enum HiveStatus {
-  ACTIVE // Ruche en production normale
-  INACTIVE // Ruche temporairement inactive
-  EMPTY // Ruche vide (pas de colonie)
-  WINTERING // Ruche en hivernage
-  SWARMED // Ruche qui a essaimé
-  DEAD // Colonie morte
-  QUARANTINE // Quarantaine (maladie, traitement)
-  MAINTENANCE // En réparation/maintenance
+  ACTIVE // Ruche active - génère des alertes si pas visitée
+  INACTIVE // Ruche inactive - pas d'alertes (morte, vendue, hivernage, etc.)
 }
 
 //Table users
@@ -105,12 +99,14 @@ model Hive {
   name          String
   type          HiveType   @default(DADANT)
   framecount    FrameCount @default(FRAME_10)
-  color         String
-  status        HiveStatus @default(ACTIVE)
-  yearBuilt     String
-  qrCodeDataUrl String?    // Data URL du QR code généré pour impression
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  color           String
+  status          HiveStatus @default(ACTIVE)
+  statusReason    String?    // Raison du dernier changement de statut
+  statusChangedAt DateTime?  // Date du dernier changement de statut
+  yearBuilt       String
+  qrCodeDataUrl   String?    // Data URL du QR code généré pour impression
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   //Relation
   apiary_hives ApiaryHive[]
