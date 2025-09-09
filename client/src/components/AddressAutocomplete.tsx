@@ -3,8 +3,7 @@ import axios from '../config/axiosConfig';
 
 interface AddressSuggestion {
   display_name: string;
-  address: string;
-  city: string;
+  clean_address: string;
   latitude: number;
   longitude: number;
 }
@@ -12,18 +11,24 @@ interface AddressSuggestion {
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
-  onCityChange: (city: string) => void;
+  onCoordinatesChange: (latitude: number, longitude: number) => void;
   placeholder?: string;
   className?: string;
 }
 
-function AddressAutocomplete({ value, onChange, onCityChange, placeholder = "Tapez votre adresse...", className = "" }: AddressAutocompleteProps) {
+function AddressAutocomplete({ value, onChange, onCoordinatesChange, placeholder = "Tapez votre adresse...", className = "" }: AddressAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSelectingSuggestion, setIsSelectingSuggestion] = useState(false);
 
   // Debounce pour éviter trop d'appels API
   useEffect(() => {
+    // Ne pas rechercher si on est en train de sélectionner une suggestion
+    if (isSelectingSuggestion) {
+      return;
+    }
+
     if (value.length < 3) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -45,13 +50,19 @@ function AddressAutocomplete({ value, onChange, onCityChange, placeholder = "Tap
     }, 300); // Attendre 300ms après la dernière saisie
 
     return () => clearTimeout(timeoutId);
-  }, [value]);
+  }, [value]); // Enlever isSelectingSuggestion des dépendances
 
   const handleSuggestionClick = (suggestion: AddressSuggestion) => {
-    onChange(suggestion.address);
-    onCityChange(suggestion.city);
+    setIsSelectingSuggestion(true); // Empêcher la recherche automatique
+    onChange(suggestion.clean_address);
+    onCoordinatesChange(suggestion.latitude, suggestion.longitude);
     setShowSuggestions(false);
     setSuggestions([]);
+    
+    // Réinitialiser le flag après un petit délai
+    setTimeout(() => {
+      setIsSelectingSuggestion(false);
+    }, 100);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,10 +103,7 @@ function AddressAutocomplete({ value, onChange, onCityChange, placeholder = "Tap
               className="px-4 py-3 cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
             >
               <div className="font-medium text-gray-900">
-                {suggestion.address}
-              </div>
-              <div className="text-sm text-gray-600">
-                {suggestion.city}
+                {suggestion.clean_address}
               </div>
             </div>
           ))}

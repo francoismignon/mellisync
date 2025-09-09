@@ -78,10 +78,14 @@ class HiveRepository {
             data: { qrCodeDataUrl },
         });
     }
-    static async updateStatus(id, status) {
+    static async updateStatus(id, status, reason) {
         return await prisma_1.default.hive.update({
             where: { id },
-            data: { status: status }
+            data: {
+                status: status,
+                statusReason: reason,
+                statusChangedAt: new Date()
+            }
         });
     }
     static async moveToApiary(hiveId, newApiaryId, reason, note) {

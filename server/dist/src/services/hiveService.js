@@ -64,7 +64,7 @@ class HiveService {
         // 3. Sauvegarder et retourner
         return await hiveRepository_1.default.updateQRCode(hiveId, qrCodeDataUrl);
     }
-    static async updateStatus(id, status, userId) {
+    static async updateStatus(id, status, userId, reason) {
         // Vérification RBAC : s'assurer que la ruche appartient à l'utilisateur
         const hive = await hiveRepository_1.default.findById(id);
         if (!hive || !hive.apiary_hives?.[0]) {
@@ -75,7 +75,7 @@ class HiveService {
         if (!apiary) {
             throw new Error('Accès non autorisé à cette ruche');
         }
-        return await hiveRepository_1.default.updateStatus(id, status);
+        return await hiveRepository_1.default.updateStatus(id, status, reason);
     }
     static async moveHive(hiveId, newApiaryId, reason, userId, note) {
         // Vérification RBAC : vérifier ownership des deux ruchers

@@ -1,34 +1,7 @@
 "use strict";
-//Service pour intégration APIs Open-Meteo (géocodage + météo)
+//Service pour intégration API Open-Meteo (météo uniquement)
 Object.defineProperty(exports, "__esModule", { value: true });
 class WeatherService {
-    //Géocodage d'une ville via Open-Meteo Geocoding API
-    static async geocodeAddress(_address, city) {
-        try {
-            //Utiliser uniquement la ville pour plus de fiabilité
-            const query = encodeURIComponent(city);
-            const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=1&language=fr&format=json`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                console.error(`Geocoding API error: ${response.status}`);
-                return null;
-            }
-            const data = await response.json();
-            if (!data.results || data.results.length === 0) {
-                console.warn(`No geocoding results for city: ${city}`);
-                return null;
-            }
-            const result = data.results[0];
-            return {
-                latitude: result.latitude,
-                longitude: result.longitude
-            };
-        }
-        catch (error) {
-            console.error('Error in geocodeAddress:', error);
-            return null;
-        }
-    }
     //Récupération météo actuelle via Open-Meteo Weather API
     static async getCurrentWeather(latitude, longitude) {
         try {

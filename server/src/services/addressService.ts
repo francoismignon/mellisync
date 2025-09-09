@@ -27,8 +27,7 @@ interface NominatimSearchResponse {
 //Interface pour suggestion d'adresse
 interface AddressSuggestion {
   display_name: string;
-  address: string;
-  city: string;
+  clean_address: string;
   latitude: number;
   longitude: number;
 }
@@ -67,28 +66,12 @@ class AddressService {
       // Transformer réponse Nominatim en suggestions utilisables
       return data
         .filter(result => result.lat && result.lon && result.display_name)
-        .map(result => {
-          // Extraire ville depuis address ou display_name
-          const city = result.address?.city || 
-                      result.address?.town || 
-                      result.address?.village || 
-                      result.address?.municipality || 
-                      this.extractCityFromDisplayName(result.display_name!);
-          
-          // Construire adresse propre
-          const addressParts = [];
-          if (result.address?.house_number) addressParts.push(result.address.house_number);
-          if (result.address?.road) addressParts.push(result.address.road);
-          const address = addressParts.join(' ') || result.display_name!.split(',')[0];
-          
-          return {
-            display_name: result.display_name!,
-            address: address,
-            city: city,
-            latitude: parseFloat(result.lat!),
-            longitude: parseFloat(result.lon!)
-          };
-        });
+        .map(result => ({
+          display_name: result.display_name!,
+          clean_address: this.buildCleanAddress(result),
+          latitude: parseFloat(result.lat!),
+          longitude: parseFloat(result.lon!)
+        }));
       
     } catch (error) {
       console.error('Error in searchAddresses:', error);
@@ -96,25 +79,46 @@ class AddressService {
     }
   }
   
-  //Extraire ville depuis display_name si address incomplet
-  private static extractCityFromDisplayName(displayName: string): string {
-    // Format typique: "Rue Example, 1000 Bruxelles, Belgique"
-    const parts = displayName.split(',').map(p => p.trim());
+  //Construire une adresse propre et lisible
+  private static buildCleanAddress(result: NominatimSearchResponse): string {
+    const address = result.address;
+    const addressParts = [];
     
-    // Chercher partie avec code postal + ville
-    for (const part of parts) {
-      const match = part.match(/^\d{4}\s+(.+)$/);
-      if (match) {
-        return match[1]; // Ville après code postal
-      }
+    // 1. Numéro + rue
+    if (address?.house_number && address?.road) {
+      addressParts.push(`${address.house_number} ${address.road}`);
+    } else if (address?.road) {
+      addressParts.push(address.road);
     }
     
-    // Fallback: avant-dernière partie (avant pays)
-    if (parts.length >= 2) {
-      return parts[parts.length - 2];
+    // 2. Code postal + ville
+    const cityParts = [];
+    if (address?.postcode) {
+      cityParts.push(address.postcode);
     }
     
-    return parts[0] || 'Ville inconnue';
+    // Priorité ville : city > town > village > municipality
+    const city = address?.city || address?.town || address?.village || address?.municipality;
+    if (city) {
+      cityParts.push(city);
+    }
+    
+    if (cityParts.length > 0) {
+      addressParts.push(cityParts.join(' '));
+    }
+    
+    // 3. Code pays simple
+    if (address?.country_code) {
+      addressParts.push(address.country_code.toUpperCase());
+    }
+    
+    // Fallback si pas d'adresse structurée : prendre les 3 premiers éléments du display_name
+    if (addressParts.length === 0 && result.display_name) {
+      const parts = result.display_name.split(',').map(p => p.trim());
+      return parts.slice(0, 3).join(', ');
+    }
+    
+    return addressParts.join(', ').replace(/,$/, ''); // Supprimer virgule finale
   }
 }
 

@@ -5,12 +5,14 @@ import ApiaryService from '../services/apiaryService';
 class ApiaryController {
   static async create(req: Request, res: Response) {
     try {
-      const name: string = req.body.name;
-      const address: string = req.body.address;
-      const city: string = req.body.city;
+      const { name, address, latitude, longitude } = req.body;
       const userId = req.user!.id; // Garanti par middleware auth
 
-      const apiary = await ApiaryService.create(name, address, city, userId);
+      if (!name || !address || !latitude || !longitude) {
+        return res.status(400).json({ error: 'Nom, adresse et coordonnées GPS sont requis' });
+      }
+
+      const apiary = await ApiaryService.create(name, address, latitude, longitude, userId);
       res.json({apiary});
     } catch (error) {
       console.error('Erreur création rucher:', error);

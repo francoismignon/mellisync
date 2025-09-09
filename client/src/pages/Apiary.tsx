@@ -41,7 +41,7 @@ function Apiary() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {apiary?.name || 'Rucher'}
             </h1>
-            <p className="text-gray-600">📍 {apiary?.address}, {apiary?.city}</p>
+            <p className="text-gray-600">{apiary?.address}</p>
           </div>
           
           {/* Météo locale */}

@@ -15,6 +15,7 @@ const actionController_1 = __importDefault(require("./src/controllers/actionCont
 const visitController_1 = __importDefault(require("./src/controllers/visitController"));
 const authController_1 = __importDefault(require("./src/controllers/authController"));
 const dashboardController_1 = __importDefault(require("./src/controllers/dashboardController"));
+const addressController_1 = __importDefault(require("./src/controllers/addressController"));
 const auth_1 = require("./src/middleware/auth");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -33,6 +34,7 @@ app.use(express_1.default.json());
 //Routes Rucher (protégées)
 app.post("/api/apiaries", auth_1.authenticateToken, apiaryController_1.default.create);
 app.get("/api/apiaries", auth_1.authenticateToken, apiaryController_1.default.findAll);
+app.get("/api/apiaries/:id", auth_1.authenticateToken, apiaryController_1.default.findById);
 //Routes Ruche (protégées)
 app.get("/api/hives", auth_1.authenticateToken, hiveConroller_1.default.findAllByApiary);
 app.post("/api/hives", auth_1.authenticateToken, hiveConroller_1.default.create);
@@ -57,8 +59,10 @@ app.post("/api/auth/logout", authController_1.default.logout);
 app.get("/api/auth/me", auth_1.authenticateToken, authController_1.default.me);
 //Route pour le dashboard
 app.get("/api/dashboard", auth_1.authenticateToken, dashboardController_1.default.getDashboardData);
+//Routes pour les adresses (autocomplétion)
+app.get("/api/addresses/suggestions", auth_1.authenticateToken, addressController_1.default.getAddressSuggestions);
 //route test
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
     res.json({ message: 'API Mellisync - Gestion de ruches' });
 });
 app.listen(PORT, () => {

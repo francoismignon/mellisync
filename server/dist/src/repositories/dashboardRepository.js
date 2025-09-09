@@ -69,9 +69,7 @@ class DashboardRepository {
                         endDate: null
                     }
                 },
-                status: {
-                    in: ['ACTIVE', 'WINTERING'] // Exclure ruches mortes/inactives/vides
-                },
+                status: 'ACTIVE', // Seules les ruches actives génèrent des alertes
                 OR: [
                     {
                         visits: {

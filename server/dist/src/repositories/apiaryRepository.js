@@ -8,7 +8,24 @@ class ApiaryRepository {
     static async findAllByUser(userId) {
         return await prisma_1.default.apiary.findMany({
             where: { userId },
-            orderBy: { name: 'asc' }
+            orderBy: { name: 'asc' },
+            include: {
+                _count: {
+                    select: {
+                        apiary_hives: {
+                            where: { endDate: null } // Ruches actuellement dans ce rucher
+                        }
+                    }
+                },
+                apiary_hives: {
+                    where: { endDate: null },
+                    include: {
+                        hive: {
+                            select: { status: true }
+                        }
+                    }
+                }
+            }
         });
     }
     static async findById(id) {

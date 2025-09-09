@@ -26,9 +26,9 @@ export const HIVE_COLORS = [
   // Ligne 3 - tons naturels
   "#8B7355", "#A0522D", "#CD853F", "#DEB887", "#F5DEB3", "#D2B48C", "#BC9A6A",
   // Ligne 4 - tons vifs
-  "#FF7675", "#FD79A8", "#FDCB6E", "#6C5CE7", "#A29BFE", "#DDA0DD", "#E17055",
+  "#FF7675", "#FD79A8", "#FDCB6E", "#E84393", "#A29BFE", "#DDA0DD", "#E17055",
   // Ligne 5 - neutres  
-  "#636E72", "#2D3436", "#FFFFFF", "#F8F8FF", "#DCDDE1", "#B2BEC3", "#74B9FF"
+  "#636E72", "#2D3436", "#FFFFFF", "#F8F8FF", "#DCDDE1", "#B2BEC3", "#95A5A6"
 ];
 
 // Générer les années de 1990 à 2030
