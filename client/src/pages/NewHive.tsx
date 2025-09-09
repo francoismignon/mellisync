@@ -20,6 +20,7 @@ function NewHive() {
       color: "#8B7355", // Couleur par défaut : Naturel
       yearBuilt: "2025", // Année par défaut : année courante
     });
+    
 
 
   async function handleSubmit(event: React.FormEvent){
