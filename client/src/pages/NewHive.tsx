@@ -4,6 +4,14 @@ import { useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, HIVE_COLORS, HIVE_YEARS, FLOWER_NAMES} from "../constants/index";
 import Toast from "../components/Toast";
 
+interface CreatedHive {
+    id: number;
+    name: string;
+    type: string;
+    color: string;
+    qrCodeDataUrl?: string;
+}
+
 function NewHive() {
     
     const navigate = useNavigate();
@@ -11,7 +19,7 @@ function NewHive() {
     const apiaryId = params['apiary-id'];
     const [toast, setToast] = useState({ message: "", type: "success" as "success" | "error", isVisible: false });
     const [showQRModal, setShowQRModal] = useState(false);
-    const [createdHive, setCreatedHive] = useState<any>(null);
+    const [createdHive, setCreatedHive] = useState<CreatedHive | null>(null);
     const [formData, setFormData] = useState({
       name: "",
       type: "DADANT", //valeur par defaut pareille que pour les enum dans mon schéma prisma
@@ -101,7 +109,7 @@ function NewHive() {
 
   function handleCloseQRModal() {
     setShowQRModal(false);
-    navigate(`/ruchers/${apiaryId}/ruches/${createdHive.id}`);
+    navigate(`/ruchers/${apiaryId}/ruches/${createdHive?.id}`);
   }
 
   function generateRandomName() {
