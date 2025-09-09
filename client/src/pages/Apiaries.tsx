@@ -40,7 +40,35 @@ function Apiaries() {
             onClick={()=> navigate(`/ruchers/${apiary.id}`)}>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{apiary.name}</h3>
-              <p className="text-gray-600">{apiary.address}, {apiary.city}</p>
+              <p className="text-gray-600 mb-3">{apiary.address}, {apiary.city}</p>
+              
+              {/* Statistiques des ruches */}
+              <div className="flex gap-4 text-sm">
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-700">Total:</span>
+                  <span className="bg-gray-100 px-2 py-1 rounded text-gray-800">
+                    {apiary.hiveStats?.total || 0} ruches
+                  </span>
+                </div>
+                
+                {apiary.hiveStats?.active > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-green-700">Actives:</span>
+                    <span className="bg-green-100 px-2 py-1 rounded text-green-800">
+                      {apiary.hiveStats.active}
+                    </span>
+                  </div>
+                )}
+                
+                {apiary.hiveStats?.inactive > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-gray-700">Inactives:</span>
+                    <span className="bg-gray-100 px-2 py-1 rounded text-gray-800">
+                      {apiary.hiveStats.inactive}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}

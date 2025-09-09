@@ -28,5 +28,23 @@ class ApiaryController {
       res.status(500).json({ error: 'Erreur lors de la récupération des ruchers' });
     }
   }
+
+  static async findById(req: Request, res: Response) {
+    try {
+      const apiaryId = parseInt(req.params.id);
+      const userId = req.user!.id; // Garanti par middleware auth
+      
+      const apiary = await ApiaryService.findByIdWithWeather(apiaryId, userId);
+      
+      if (!apiary) {
+        return res.status(404).json({ error: 'Rucher non trouvé' });
+      }
+      
+      res.json(apiary);
+    } catch (error) {
+      console.error('Erreur récupération rucher:', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération du rucher' });
+    }
+  }
 }
 export default ApiaryController;

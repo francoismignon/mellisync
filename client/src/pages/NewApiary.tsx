@@ -1,7 +1,8 @@
 import axios from "../config/axiosConfig";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { BELGIAN_CITIES } from "../constants/belgianCities";
+import { APIARY_NAMES } from "../constants/index";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 
 function NewApiary() {
   const [formData, setFormData] = useState({
@@ -32,6 +33,16 @@ function NewApiary() {
       };
     });
   }
+
+  function generateRandomApiaryName() {
+    const randomIndex = Math.floor(Math.random() * APIARY_NAMES.length);
+    const randomName = APIARY_NAMES[randomIndex];
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      name: randomName
+    }));
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Formulaire de création de rucher</h1>
@@ -39,41 +50,49 @@ function NewApiary() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Nom du rucher</label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              name="name"
-              placeholder="ex: Rucher des Lilas"
-              onChange={handleChange}
-              value={formData.name}
-            />
+            <div className="flex gap-2">
+              <input
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                name="name"
+                placeholder="ex: Les Coteaux, Val Fleuri..."
+                onChange={handleChange}
+                value={formData.name}
+              />
+              <button
+                type="button"
+                onClick={generateRandomApiaryName}
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                title="Générer un nom aléatoire"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              type="text"
-              name="address"
-              placeholder="ex: Rue de Melli"
-              onChange={handleChange}
+            <label className="block text-sm font-medium text-gray-700 mb-2">Adresse complète</label>
+            <AddressAutocomplete
               value={formData.address}
+              onChange={(address) => setFormData(prev => ({ ...prev, address }))}
+              onCityChange={(city) => setFormData(prev => ({ ...prev, city }))}
+              placeholder="ex: Rue Désirée Maroilles, Boussubois..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <input
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              type="text"
               name="city"
-              onChange={handleChange}
               value={formData.city}
-              required
-            >
-              <option value="">Sélectionner une ville...</option>
-              {BELGIAN_CITIES.map(city => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+              placeholder="Sélectionnée automatiquement depuis l'adresse..."
+              readOnly
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              La ville se remplit automatiquement quand vous sélectionnez une adresse
+            </p>
           </div>
           <input 
             type="submit" 

@@ -10,6 +10,7 @@ import ActionController from './src/controllers/actionController';
 import VisitController from './src/controllers/visitController';
 import AuthController from './src/controllers/authController';
 import DashboardController from './src/controllers/dashboardController';
+import AddressController from './src/controllers/addressController';
 import { authenticateToken } from './src/middleware/auth';
 
 dotenv.config()
@@ -33,6 +34,7 @@ app.use(express.json());
 //Routes Rucher (protégées)
 app.post("/api/apiaries", authenticateToken, ApiaryController.create);
 app.get("/api/apiaries", authenticateToken, ApiaryController.findAll);
+app.get("/api/apiaries/:id", authenticateToken, ApiaryController.findById);
 
 //Routes Ruche (protégées)
 app.get("/api/hives", authenticateToken, HiveController.findAllByApiary);
@@ -63,8 +65,11 @@ app.get("/api/auth/me", authenticateToken, AuthController.me);
 //Route pour le dashboard
 app.get("/api/dashboard", authenticateToken, DashboardController.getDashboardData);
 
+//Routes pour les adresses (autocomplétion)
+app.get("/api/addresses/suggestions", authenticateToken, AddressController.getAddressSuggestions);
+
 //route test
-app.get("/", (req: Request, res: Response)=>{
+app.get("/", (_req: Request, res: Response)=>{
   res.json({message: 'API Mellisync - Gestion de ruches'});
 });
 

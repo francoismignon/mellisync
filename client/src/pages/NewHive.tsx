@@ -1,7 +1,7 @@
 import axios from "../config/axiosConfig";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS} from "../constants/index";
+import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, HIVE_COLORS, HIVE_YEARS, FLOWER_NAMES} from "../constants/index";
 import Toast from "../components/Toast";
 
 function NewHive() {
@@ -17,8 +17,8 @@ function NewHive() {
       type: "DADANT", //valeur par defaut pareille que pour les enum dans mon schéma prisma
       framecount: "FRAME_10",
       status: "ACTIVE",
-      color: "",
-      yearBuilt: "",
+      color: "#8B7355", // Couleur par défaut : Naturel
+      yearBuilt: "2025", // Année par défaut : année courante
     });
 
 
@@ -103,6 +103,15 @@ function NewHive() {
     navigate(`/ruchers/${apiaryId}/ruches/${createdHive.id}`);
   }
 
+  function generateRandomName() {
+    const randomIndex = Math.floor(Math.random() * FLOWER_NAMES.length);
+    const randomName = FLOWER_NAMES[randomIndex];
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      name: randomName
+    }));
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
         <Toast 
@@ -116,14 +125,26 @@ function NewHive() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nom de la ruche</label>
-                    <input 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        placeholder="ex: Margueritte"
-                        onChange={handleChange} 
-                    />
+                    <div className="flex gap-2">
+                        <input 
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            placeholder="ex: Marguerite, Lavande..."
+                            onChange={handleChange} 
+                        />
+                        <button
+                            type="button"
+                            onClick={generateRandomName}
+                            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                            title="Générer un nom aléatoire"
+                        >
+                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Type de ruche</label>
@@ -177,26 +198,58 @@ function NewHive() {
                     </select>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Couleur</label>
-                    <input 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        type="text"
-                        name="color"
-                        value={formData.color}
-                        placeholder="ex: Bleue, Rouge, Naturelle"
-                        onChange={handleChange} 
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                        Couleur de la ruche
+                    </label>
+                    <div className="grid grid-cols-7 gap-2 max-w-md mx-auto">
+                        {HIVE_COLORS.map((color) => (
+                            <div
+                                key={color}
+                                onClick={() => setFormData(prev => ({ ...prev, color: color }))}
+                                className={`cursor-pointer transition-all duration-200 hover:scale-110 ${
+                                    formData.color === color 
+                                        ? 'ring-4 ring-blue-500 ring-opacity-50' 
+                                        : 'hover:ring-2 hover:ring-gray-300'
+                                }`}
+                                style={{
+                                    backgroundColor: color,
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    border: '2px solid #fff',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                }}
+                                title={color}
+                            >
+                            </div>
+                        ))}
+                    </div>
+                    <div className="text-center mt-3">
+                        <div 
+                            className="inline-block w-6 h-6 rounded-full border-2 border-gray-300 mr-2"
+                            style={{ backgroundColor: formData.color }}
+                        ></div>
+                        <span className="text-sm text-gray-600">
+                            Couleur sélectionnée: {formData.color}
+                        </span>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Année de fabrication</label>
-                    <input 
+                    <select
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        type="text"
                         name="yearBuilt"
                         value={formData.yearBuilt}
-                        placeholder="ex: 2024"
-                        onChange={handleChange} 
-                    />
+                        onChange={handleChange}
+                    > 
+                    {HIVE_YEARS.map(year =>(
+                        <option 
+                            key={year.value}
+                            value={year.value}>
+                            {year.label}
+                        </option>
+                    ))}
+                    </select>
                 </div>
                 <input 
                     type="submit" 

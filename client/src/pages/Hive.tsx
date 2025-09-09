@@ -222,9 +222,15 @@ function Hive(){
                         <span className="font-medium text-gray-600">Cadres :</span>
                         <span className="text-gray-800">{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                         <span className="font-medium text-gray-600">Couleur :</span>
-                        <span className="text-gray-800">{hive.color}</span>
+                        {hive.color && (
+                            <div 
+                                className="w-6 h-6 rounded-full border border-gray-300"
+                                style={{ backgroundColor: hive.color }}
+                                title={hive.color}
+                            ></div>
+                        )}
                     </div>
                     <div className="flex gap-2">
                         <span className="font-medium text-gray-600">Année :</span>
