@@ -93,9 +93,11 @@ model Hive {
   name          String
   type          HiveType   @default(DADANT)
   framecount    FrameCount @default(FRAME_10)
-  color         String
-  status        HiveStatus @default(ACTIVE)
-  yearBuilt     String
+  color           String
+  status          HiveStatus @default(ACTIVE)
+  statusReason    String?    // Raison du dernier changement de statut
+  statusChangedAt DateTime?  // Date du dernier changement de statut
+  yearBuilt       String
   qrCodeDataUrl String?    // Data URL du QR code généré pour impression
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
