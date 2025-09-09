@@ -41,12 +41,6 @@ enum TranshumanceReason {
 enum HiveStatus {
   ACTIVE // Ruche en production normale
   INACTIVE // Ruche temporairement inactive
-  EMPTY // Ruche vide (pas de colonie)
-  WINTERING // Ruche en hivernage
-  SWARMED // Ruche qui a essaimé
-  DEAD // Colonie morte
-  QUARANTINE // Quarantaine (maladie, traitement)
-  MAINTENANCE // En réparation/maintenance
 }
 
 //Table users
