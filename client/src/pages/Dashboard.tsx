@@ -112,7 +112,7 @@ function Dashboard(){
 
             {/* Alertes */}
             <div className="mb-6">
-                <h2 className="text-xl font-bold mb-4">Alertes</h2>
+                <h2 className="text-xl font-bold mb-4">🚨 Alertes</h2>
                 {dashboardData?.alerts?.hivesWithoutVisit?.length > 0 ? (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                         <div className="flex items-center mb-2">
