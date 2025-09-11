@@ -13,7 +13,6 @@ interface VisitPDFTemplateProps {
         apiary: {
           name: string;
           address: string;
-          city: string;
         };
       }>;
     };
@@ -234,9 +233,8 @@ function VisitPDFTemplate({ visit, weather, period }: VisitPDFTemplateProps) {
           <div>
             <h3 className="section-title">IDENTIFICATION</h3>
             <p><strong>Rucher :</strong> {visit.hive.apiary_hives?.[0]?.apiary.name || 'Non spécifié'}</p>
-            <p><strong>Localisation :</strong> {visit.hive.apiary_hives?.[0]?.apiary.address && visit.hive.apiary_hives?.[0]?.apiary.city 
-              ? `${visit.hive.apiary_hives[0].apiary.address}, ${visit.hive.apiary_hives[0].apiary.city}` 
-              : 'Non spécifiée'}</p>
+            <p><strong>Localisation :</strong> {visit.hive.apiary_hives?.[0]?.apiary.address 
+              || 'Non spécifiée'}</p>
             <p><strong>Ruche :</strong> {visit.hive.name}</p>
             <p><strong>N° Visite :</strong> {visit.visitNumber || 'N/A'}</p>
           </div>

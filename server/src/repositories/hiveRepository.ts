@@ -11,7 +11,7 @@ class HiveRepository {
           where: { endDate: null }, // Rucher actuel
           include: {
             apiary: {
-              select: { id: true, name: true, address: true, city: true }
+              select: { id: true, name: true, address: true }
             }
           }
         }
@@ -49,7 +49,7 @@ class HiveRepository {
           where: { endDate: null },
           include: {
             apiary: {
-              select: { id: true, name: true, address: true, city: true }
+              select: { id: true, name: true, address: true }
             }
           }
         }
@@ -115,7 +115,7 @@ class HiveRepository {
         },
         include: {
           apiary: {
-            select: { id: true, name: true, address: true, city: true }
+            select: { id: true, name: true, address: true }
           }
         }
       });
@@ -127,7 +127,7 @@ class HiveRepository {
       where: { hiveId },
       include: {
         apiary: {
-          select: { id: true, name: true, address: true, city: true }
+          select: { id: true, name: true, address: true }
         }
       },
       orderBy: { startDate: 'desc' }

@@ -44,7 +44,6 @@ class ApiaryRepository {
   static async create(data: { 
     name: string; 
     address: string; 
-    city: string; 
     userId: number;
     latitude?: number | null;
     longitude?: number | null;

@@ -16,7 +16,7 @@
     "postinstall": "prisma generate --schema=prisma/schema.runtime.prisma"
   },
   "prisma": {
-    "seed": "node dist/prisma/seed.js"
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

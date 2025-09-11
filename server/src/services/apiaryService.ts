@@ -47,7 +47,6 @@ class ApiaryService {
     return await ApiaryRepository.create({
       name,
       address,
-      city: '', // Plus utilisé, on garde le display_name complet dans address
       userId,
       latitude,
       longitude,
@@ -72,7 +71,6 @@ class ApiaryService {
         id: apiary.id,
         name: apiary.name,
         address: apiary.address,
-        city: apiary.city,
         latitude: apiary.latitude,
         longitude: apiary.longitude,
         createdAt: apiary.createdAt,

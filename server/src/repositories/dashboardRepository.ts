@@ -96,7 +96,7 @@ class DashboardRepository {
           where: { endDate: null },
           include: {
             apiary: {
-              select: { id: true, name: true, city: true }
+              select: { id: true, name: true }
             }
           }
         },
