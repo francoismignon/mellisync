@@ -8,6 +8,7 @@
     "dev": "tsx --watch index.ts",
     "build": "tsc",
     "seed": "tsx prisma/seed.ts",
+    "seed:dev": "tsx prisma/seed.ts",
     "prisma:generate": "prisma generate --schema=prisma/schema.runtime.prisma",
     "prisma:dev:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:erd": "prisma generate --schema=prisma/schema.prisma",
@@ -16,7 +17,7 @@
     "postinstall": "prisma generate --schema=prisma/schema.runtime.prisma"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "node dist/prisma/seed.js"
   },
   "keywords": [],
   "author": "",
