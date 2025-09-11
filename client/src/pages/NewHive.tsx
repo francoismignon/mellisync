@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, HIVE_COLORS, HIVE_YEARS, FLOWER_NAMES} from "../constants/index";
 import Toast from "../components/Toast";
+import { Hive, Shuffle, Save, Cancel, ArrowBack, Print, Close } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
 interface CreatedHive {
     id: number;
@@ -129,36 +131,48 @@ function NewHive() {
             isVisible={toast.isVisible}
             onClose={() => setToast({ ...toast, isVisible: false })}
         />
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Formulaire de création de ruche</h1>
-        <div className="bg-white rounded-lg shadow-sm border p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex items-center gap-3 mb-6">
+            <IconButton
+                onClick={() => navigate(`/ruchers/${apiaryId}`)}
+                className="text-gray-600 hover:text-blue-600"
+                size="small"
+            >
+                <ArrowBack />
+            </IconButton>
+            <Hive className="text-blue-600" fontSize="large" />
+            <h1 className="text-2xl font-semibold text-gray-800">Nouvelle ruche</h1>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom de la ruche</label>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <Hive fontSize="small" className="text-blue-600" />
+                        Nom de la ruche
+                    </label>
                     <div className="flex gap-2">
                         <input 
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             type="text"
                             name="name"
                             value={formData.name}
                             placeholder="ex: Marguerite, Lavande..."
                             onChange={handleChange} 
                         />
-                        <button
+                        <IconButton
                             type="button"
                             onClick={generateRandomName}
-                            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                            className="border border-gray-300 hover:border-blue-500 hover:bg-blue-50"
                             title="Générer un nom aléatoire"
+                            size="medium"
                         >
-                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                        </button>
+                            <Shuffle className="text-gray-600 hover:text-blue-600" />
+                        </IconButton>
                     </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Type de ruche</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         name="type"
                         value={formData.type}
                         onChange={handleChange}
@@ -175,7 +189,7 @@ function NewHive() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de cadres</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         name="framecount"
                         value={formData.framecount}
                         onChange={handleChange}
@@ -192,7 +206,7 @@ function NewHive() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Statut</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
@@ -210,43 +224,44 @@ function NewHive() {
                     <label className="block text-sm font-medium text-gray-700 mb-4">
                         Couleur de la ruche
                     </label>
-                    <div className="grid grid-cols-7 gap-2 max-w-md mx-auto">
-                        {HIVE_COLORS.map((color) => (
-                            <div
-                                key={color}
-                                onClick={() => setFormData(prev => ({ ...prev, color: color }))}
-                                className={`cursor-pointer transition-all duration-200 hover:scale-110 ${
-                                    formData.color === color 
-                                        ? 'ring-4 ring-blue-500 ring-opacity-50' 
-                                        : 'hover:ring-2 hover:ring-gray-300'
-                                }`}
-                                style={{
-                                    backgroundColor: color,
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '50%',
-                                    border: '2px solid #fff',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                                title={color}
-                            >
-                            </div>
-                        ))}
-                    </div>
-                    <div className="text-center mt-3">
-                        <div 
-                            className="inline-block w-6 h-6 rounded-full border-2 border-gray-300 mr-2"
-                            style={{ backgroundColor: formData.color }}
-                        ></div>
-                        <span className="text-sm text-gray-600">
-                            Couleur sélectionnée: {formData.color}
-                        </span>
+                    {/* Section avec fond cohérent avec l'application */}
+                    <div className="bg-slate-200 rounded-lg p-6 max-w-md mx-auto">
+                        <div className="grid grid-cols-7 gap-3 justify-items-center">
+                            {HIVE_COLORS.map((color) => (
+                                <div
+                                    key={color}
+                                    className="relative flex items-center justify-center"
+                                    style={{
+                                        width: '40px',
+                                        height: '36px'
+                                    }}
+                                >
+                                    <div
+                                        onClick={() => setFormData(prev => ({ ...prev, color: color }))}
+                                        className={`cursor-pointer transition-all duration-200 absolute ${
+                                            formData.color === color 
+                                                ? 'ring-4 ring-blue-600 ring-opacity-50 z-10' 
+                                                : 'hover:ring-2 hover:ring-gray-400'
+                                        }`}
+                                        style={{
+                                            backgroundColor: color,
+                                            width: formData.color === color ? '44px' : '26px',
+                                            height: formData.color === color ? '40px' : '23px',
+                                            clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                        }}
+                                        title={color}
+                                    >
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Année de fabrication</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         name="yearBuilt"
                         value={formData.yearBuilt}
                         onChange={handleChange}
@@ -260,17 +275,29 @@ function NewHive() {
                     ))}
                     </select>
                 </div>
-                <input 
-                    type="submit" 
-                    value="Ajouter ruche"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 cursor-pointer font-medium"
-                />
+                <div className="flex gap-3">
+                    <button
+                        type="button"
+                        onClick={() => navigate(`/ruchers/${apiaryId}`)}
+                        className="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-2.5 px-4 rounded-lg font-medium flex-1"
+                    >
+                        <Cancel fontSize="small" />
+                        Annuler
+                    </button>
+                    <button
+                        type="submit"
+                        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium flex-1"
+                    >
+                        <Save fontSize="small" />
+                        Créer la ruche
+                    </button>
+                </div>
             </form>
         </div>
 
         {/* Modal QR Code */}
         {showQRModal && createdHive && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
               <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
                 QR Code généré pour {createdHive.name}
@@ -291,14 +318,16 @@ function NewHive() {
               <div className="flex gap-3">
                 <button
                   onClick={handlePrintQR}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
+                  className="flex items-center justify-center gap-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
                 >
+                  <Print fontSize="small" />
                   Imprimer
                 </button>
                 <button
                   onClick={handleCloseQRModal}
-                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
+                  className="flex items-center justify-center gap-2 flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"
                 >
+                  <Close fontSize="small" />
                   Continuer
                 </button>
               </div>

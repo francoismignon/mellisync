@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
 import Toast from "../components/Toast";
+import { Assignment, ArrowBack, Save, Cancel, WbSunny, Settings, AutoAwesome } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
 function NewVisit() {
   const { "hive-id": hiveId, "apiary-id": apiaryId } = useParams<{ "hive-id": string, "apiary-id": string }>(); //Récupération params depuis URL
@@ -95,82 +97,117 @@ function NewVisit() {
 
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       <Toast 
         message={toast.message}
         type={toast.type}
         isVisible={toast.isVisible}
         onClose={() => setToast({ ...toast, isVisible: false })}
       />
-      <div className="mb-4 flex items-center gap-4">
-        <h2 className="text-xl font-bold">Nouvelle visite</h2>
-        
-        {/*Affichage contexte apicole en mode normal */}
-        {!expertMode && currentPeriod && (
-          <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
-            {currentPeriod} • {currentTemperature}°C • {currentWeather}
+      
+      {/* Header avec retour */}
+      <div className="flex items-center gap-3 mb-6">
+        <IconButton
+          onClick={() => navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`)}
+          className="text-gray-600 hover:text-blue-600"
+          size="small"
+        >
+          <ArrowBack />
+        </IconButton>
+        <Assignment className="text-blue-600" fontSize="large" />
+        <h1 className="text-2xl font-semibold text-gray-800">Nouvelle visite</h1>
+      </div>
+      
+      {/* Contexte et mode */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {/* Contexte météo */}
+            {!expertMode && currentPeriod && (
+              <div className="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                <WbSunny fontSize="small" className="text-blue-600" />
+                <span className="text-sm">{currentPeriod} • {currentTemperature}°C • {currentWeather}</span>
+              </div>
+            )}
           </div>
-        )}
-        
-        <div className="ml-auto flex gap-1">
-          <button
-            onClick={() => setExpertMode(false)}
-            className={`px-3 py-1 rounded-l ${!expertMode 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Mode Saison
-          </button>
-          <button
-            onClick={() => setExpertMode(true)}
-            className={`px-3 py-1 rounded-r ${expertMode 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Mode Expert
-          </button>
+          
+          {/* Sélecteur de mode */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-300">
+            <button
+              onClick={() => setExpertMode(false)}
+              className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
+                !expertMode 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <AutoAwesome fontSize="small" />
+              Mode Saison
+            </button>
+            <button
+              onClick={() => setExpertMode(true)}
+              className={`flex items-center gap-2 px-3 py-2 text-sm border-l border-gray-300 transition-colors ${
+                expertMode 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Settings fontSize="small" />
+              Mode Expert
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {actions.map(action =>
-          <ActionButton
-            key={action.id}
-            action={action}
-            onValueChange={(value) =>{
-              setVisitActions(prevActions => ({
-                ...prevActions,
-                [action.id]: value
-              }));
-            }} />
-        )}
+      {/* Actions de visite */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {actions.map(action =>
+            <ActionButton
+              key={action.id}
+              action={action}
+              onValueChange={(value) =>{
+                setVisitActions(prevActions => ({
+                  ...prevActions,
+                  [action.id]: value
+                }));
+              }} />
+          )}
+        </div>
       </div>
 
-      <button 
-        onClick={saveVisit}
-        disabled={isSaving}
-        className={`mt-4 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 ${
-          isSaving 
-            ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-            : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
-        }`}
-      >
-        {isSaving ? (
-          <>
-            <div className="animate-spin w-4 h-4 border-2 border-gray-200 border-t-transparent rounded-full"></div>
-            Enregistrement...
-          </>
-        ) : (
-          <>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Enregistrer visite
-          </>
-        )}
-      </button>
+      {/* Boutons d'action */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`)}
+          className="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-2.5 px-4 rounded-lg font-medium flex-1"
+        >
+          <Cancel fontSize="small" />
+          Annuler
+        </button>
+        
+        <button 
+          onClick={saveVisit}
+          disabled={isSaving}
+          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium flex-1 ${
+            isSaving 
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}
+        >
+          {isSaving ? (
+            <>
+              <div className="animate-spin w-4 h-4 border-2 border-gray-200 border-t-transparent rounded-full"></div>
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save fontSize="small" />
+              Enregistrer visite
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

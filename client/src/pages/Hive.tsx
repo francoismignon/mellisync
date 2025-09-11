@@ -3,12 +3,56 @@ import { useEffect, useState } from "react";
 import{ HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, TRANSHUMANCE_REASONS} from "../constants/index";
 import { useNavigate, useParams } from "react-router";
 import Toast from "../components/Toast";
+import { Hive as HiveIcon, ArrowBack, Add, SwapHoriz, Edit, QrCodeScanner, Print, Close, Circle, PictureAsPdf, LocationOn, Cancel, Save } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+
+// Types TypeScript
+interface HiveType {
+    id: number;
+    name: string;
+    type: string;
+    framecount: string;
+    status: string;
+    color: string;
+    yearBuilt: string;
+    qrCodeDataUrl?: string;
+    statusReason?: string;
+    statusChangedAt?: string;
+}
+
+interface VisitType {
+    id: number;
+    createdAt: string;
+    date: string;
+    visitActions: Record<string, unknown>;
+}
+
+interface TranshumanceType {
+    id: number;
+    fromApiaryId: number;
+    toApiaryId: number;
+    reason: string;
+    note: string;
+    createdAt: string;
+    startDate: string;
+    endDate: string;
+    fromApiary: ApiaryType;
+    toApiary: ApiaryType;
+    apiary?: ApiaryType;
+}
+
+interface ApiaryType {
+    id: number;
+    name: string;
+    address: string;
+    city: string;
+}
 
 function Hive(){
-    const [hive, setHive] = useState<any>({});
-    const [visits, setVisits] = useState<any[]>([]);
-    const [transhumances, setTranshumances] = useState<any[]>([]);
-    const [apiaries, setApiaries] = useState<any[]>([]);
+    const [hive, setHive] = useState<HiveType>({} as HiveType);
+    const [visits, setVisits] = useState<VisitType[]>([]);
+    const [transhumances, setTranshumances] = useState<TranshumanceType[]>([]);
+    const [apiaries, setApiaries] = useState<ApiaryType[]>([]);
     const [showMoveModal, setShowMoveModal] = useState(false);
     const [selectedApiaryId, setSelectedApiaryId] = useState<string>("");
     const [reason, setReason] = useState<string>("");
@@ -95,14 +139,17 @@ function Hive(){
             
             // Fermer le modal et reset les états
             setShowMoveModal(false);
+            const newApiaryId = selectedApiaryId;
             setSelectedApiaryId("");
             setReason("");
             setNote("");
             
-            // Recharger les données
-            fetchTranshumances();
+            // Rediriger vers le nouveau rucher après délai pour voir le toast
+            setTimeout(() => {
+                navigate(`/ruchers/${newApiaryId}/ruches/${hiveId}`);
+            }, 1500);
             
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erreur déplacement ruche:", error);
             setToast({ message: "Erreur lors du déplacement", type: "error", isVisible: true });
         } finally {
@@ -135,7 +182,7 @@ function Hive(){
             // Recharger les données de la ruche
             fetchHive();
             
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erreur modification statut:", error);
             setToast({ message: "Erreur lors de la modification", type: "error", isVisible: true });
         } finally {
@@ -190,7 +237,7 @@ function Hive(){
             
             // Afficher automatiquement le modal QR
             setShowQRModal(true);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erreur génération QR:", error);
             setToast({ message: "Erreur lors de la génération", type: "error", isVisible: true });
         } finally {
@@ -199,102 +246,131 @@ function Hive(){
     }
 
     return(
-        <div>
+        <div className="max-w-4xl mx-auto">
             <Toast 
                 message={toast.message}
                 type={toast.type}
                 isVisible={toast.isVisible}
                 onClose={() => setToast({ ...toast, isVisible: false })}
             />
+            
+            {/* Header avec retour */}
+            <div className="flex items-center gap-3 mb-6">
+                <IconButton
+                    onClick={() => navigate(`/ruchers/${params['apiary-id']}`)}
+                    className="text-gray-600 hover:text-blue-600"
+                    size="small"
+                >
+                    <ArrowBack />
+                </IconButton>
+                <HiveIcon className="text-blue-600" fontSize="large" />
+                <h1 className="text-2xl font-semibold text-gray-800">{hive.name || 'Ruche'}</h1>
+            </div>
+            
             {/* Informations de la ruche */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Informations de la ruche</h2>
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <HiveIcon className="text-blue-600" fontSize="small" />
+                    Informations
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex gap-2">
-                        <span className="font-medium text-gray-600">Nom :</span>
-                        <span className="text-gray-800">{hive.name}</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-gray-600">Type :</span>
+                        <span className="text-gray-800 font-medium">{HIVE_TYPES.find(type => type.value === hive.type)?.label}</span>
                     </div>
-                    <div className="flex gap-2">
-                        <span className="font-medium text-gray-600">Type :</span>
-                        <span className="text-gray-800">{HIVE_TYPES.find(type => type.value === hive.type)?.label}</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-gray-600">Cadres :</span>
+                        <span className="text-gray-800 font-medium">{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</span>
                     </div>
-                    <div className="flex gap-2">
-                        <span className="font-medium text-gray-600">Cadres :</span>
-                        <span className="text-gray-800">{FRAME_COUNTS.find(frame => frame.value === hive.framecount)?.label}</span>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                        <span className="font-medium text-gray-600">Couleur :</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-gray-600">Couleur :</span>
                         {hive.color && (
                             <div 
-                                className="w-6 h-6 rounded-full border border-gray-300"
+                                className="w-5 h-5 rounded-full border border-gray-300"
                                 style={{ backgroundColor: hive.color }}
                                 title={hive.color}
                             ></div>
                         )}
                     </div>
-                    <div className="flex gap-2">
-                        <span className="font-medium text-gray-600">Année :</span>
-                        <span className="text-gray-800">{hive.yearBuilt}</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-gray-600">Année :</span>
+                        <span className="text-gray-800 font-medium">{hive.yearBuilt}</span>
                     </div>
-                    <div className="flex flex-col gap-1">
-                        <div className="flex gap-2">
-                            <span className="font-medium text-gray-600">Statut :</span>
-                            <span className="text-gray-800">{HIVE_STATUS.find(status => status.value === hive.status)?.label}</span>
+                    <div className="col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="text-gray-600">Statut :</span>
+                            <span className={`flex items-center gap-2 font-medium ${
+                                hive.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'
+                            }`}>
+                                <Circle fontSize="small" />
+                                {HIVE_STATUS.find(status => status.value === hive.status)?.label}
+                            </span>
                         </div>
                         {hive.statusReason && (
-                            <div className="ml-2 text-sm text-gray-500 italic">
+                            <div className="text-sm text-gray-500 ml-6">
                                 Raison : {hive.statusReason}
                             </div>
                         )}
                         {hive.statusChangedAt && (
-                            <div className="ml-2 text-xs text-gray-400">
-                                Modifié le : {new Date(hive.statusChangedAt).toLocaleDateString('fr-FR')}
+                            <div className="text-xs text-gray-400 ml-6">
+                                Modifié le {new Date(hive.statusChangedAt).toLocaleDateString('fr-FR')}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+            {/* Boutons d'action desktop */}
             <div className="hidden sm:flex sm:flex-row gap-3 mb-6">
-                <input 
-                    type="button" 
-                    value="Ajouter une visite"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                <button 
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
                     onClick={()=> {
                         navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
-                    }} />
+                    }}
+                >
+                    <Add fontSize="small" />
+                    Ajouter une visite
+                </button>
                 
-                <input 
-                    type="button" 
-                    value="Déplacer ruche"
-                    className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
+                <button 
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
                     onClick={() => setShowMoveModal(true)} 
-                />
+                >
+                    <SwapHoriz fontSize="small" />
+                    Déplacer ruche
+                </button>
 
-                <input 
-                    type="button" 
-                    value="Modifier statut"
-                    className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                <button 
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
                     onClick={() => setShowStatusModal(true)} 
-                />
+                >
+                    <Edit fontSize="small" />
+                    Modifier statut
+                </button>
 
-                <input 
-                    type="button" 
-                    value="QR Code"
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                <button 
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
                     onClick={() => setShowQRModal(true)}
-                />
+                >
+                    <QrCodeScanner fontSize="small" />
+                    QR Code
+                </button>
             </div>
 
-            {/*Section Historique des visites */}
-            <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4">Historique des visites</h2>
+            {/* Historique des visites */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <PictureAsPdf className="text-blue-600" fontSize="small" />
+                    Historique des visites ({visits.length})
+                </h2>
                 
                 {visits.length === 0 ? (
-                    <p className="text-gray-500 italic">Aucune visite enregistrée pour cette ruche</p>
+                    <div className="text-center py-8">
+                        <PictureAsPdf className="text-gray-400 mb-2" fontSize="large" />
+                        <p className="text-gray-500">Aucune visite enregistrée</p>
+                    </div>
                 ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         {visits.map(visit => {
-                            //Fonction pour formater la date
                             const formatDate = (dateString: string) => {
                                 const date = new Date(dateString);
                                 return date.toLocaleDateString('fr-FR', {
@@ -310,21 +386,21 @@ function Hive(){
                                 <div 
                                     key={visit.id}
                                     onClick={() => {
-                                        //Téléchargement PDF fiche de visite
                                         window.open(`${import.meta.env.VITE_API_BASE_URL}/api/visits/${visit.id}/pdf`, '_blank');
                                     }}
-                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all"
+                                    className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
                                 >
                                     <div className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-semibold text-gray-800">{formatDate(visit.date)}</p>
-                                            <p className="text-sm text-gray-600">
-                                                {visit.visitActions?.length || 0} action(s) effectuée(s)
-                                            </p>
+                                        <div className="flex items-center gap-3">
+                                            <PictureAsPdf className="text-blue-600" fontSize="small" />
+                                            <div>
+                                                <p className="font-semibold text-gray-800">{formatDate(visit.date)}</p>
+                                                <p className="text-sm text-gray-600">
+                                                    {Object.keys(visit.visitActions || {}).length} action(s) effectuée(s)
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="text-blue-500 font-bold">
-                                            PDF
-                                        </div>
+                                        <span className="text-blue-600 text-sm font-medium">Télécharger PDF</span>
                                     </div>
                                 </div>
                             );
@@ -333,16 +409,21 @@ function Hive(){
                 )}
             </div>
 
-            {/*Section Historique des transhumances */}
-            <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4">Historique des transhumances</h2>
+            {/* Historique des transhumances */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <SwapHoriz className="text-blue-600" fontSize="small" />
+                    Historique des transhumances ({transhumances.length})
+                </h2>
                 
                 {transhumances.length === 0 ? (
-                    <p className="text-gray-500 italic">Aucune transhumance enregistrée pour cette ruche</p>
+                    <div className="text-center py-8">
+                        <SwapHoriz className="text-gray-400 mb-2" fontSize="large" />
+                        <p className="text-gray-500">Aucune transhumance enregistrée</p>
+                    </div>
                 ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         {transhumances.map(transhumance => {
-                            //Fonction pour formater la date
                             const formatDate = (dateString: string) => {
                                 const date = new Date(dateString);
                                 return date.toLocaleDateString('fr-FR', {
@@ -352,40 +433,48 @@ function Hive(){
                                 });
                             };
 
-                            // Trouver le label de la raison
                             const reasonLabel = TRANSHUMANCE_REASONS.find(
                                 reason => reason.value === transhumance.reason
                             )?.label || transhumance.reason;
 
-                            // Calculer durée si endDate existe
-                            const duration = transhumance.endDate 
-                                ? ` → ${formatDate(transhumance.endDate)}`
-                                : ' → Actuel';
 
                             return (
                                 <div 
                                     key={transhumance.id}
-                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                                    className="border border-gray-200 rounded-lg p-4"
                                 >
                                     <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-semibold text-gray-800">
-                                                {transhumance.apiary.name}
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                                {transhumance.apiary.address}, {transhumance.apiary.city}
-                                            </p>
-                                            <p className="text-sm text-blue-600 font-medium mt-1">
-                                                {reasonLabel}
-                                            </p>
-                                            {transhumance.note && (
-                                                <p className="text-sm text-gray-500 mt-1 italic">
-                                                    {transhumance.note}
+                                        <div className="flex items-start gap-3 flex-1">
+                                            <LocationOn className="text-blue-600 mt-0.5" fontSize="small" />
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-800">
+                                                    {transhumance.apiary?.name || 'Rucher inconnu'}
                                                 </p>
-                                            )}
+                                                <p className="text-sm text-gray-600">
+                                                    {transhumance.apiary?.address || 'Adresse inconnue'}, {transhumance.apiary?.city || 'Ville inconnue'}
+                                                </p>
+                                                <p className="text-sm text-blue-600 font-medium mt-1">
+                                                    {reasonLabel}
+                                                </p>
+                                                {transhumance.note && (
+                                                    <p className="text-sm text-gray-500 mt-1">
+                                                        {transhumance.note}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="text-right text-sm text-gray-500">
-                                            <p>{formatDate(transhumance.startDate)}{duration}</p>
+                                        <div className="text-right text-sm text-gray-500 ml-4">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-gray-800 font-medium">{formatDate(transhumance.startDate)}</span>
+                                                <span className="text-gray-400">→</span>
+                                                <span className={
+                                                    transhumance.endDate 
+                                                        ? "text-gray-800 font-medium" 
+                                                        : "text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded text-xs"
+                                                }>
+                                                    {transhumance.endDate ? formatDate(transhumance.endDate) : 'Actuel'}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -397,9 +486,12 @@ function Hive(){
 
             {/* Modal déplacement ruche */}
             {showMoveModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg max-w-md w-full p-6">
-                        <h3 className="text-lg font-bold mb-4">Déplacer la ruche</h3>
+                <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-white border border-gray-200 rounded-lg max-w-md w-full p-6 shadow-lg">
+                        <div className="flex items-center gap-3 mb-6">
+                            <SwapHoriz className="text-blue-600" />
+                            <h3 className="text-lg font-semibold text-gray-800">Déplacer la ruche</h3>
+                        </div>
                         
                         {/* Sélection rucher de destination */}
                         <div className="mb-4">
@@ -457,7 +549,7 @@ function Hive(){
                         </div>
 
                         {/* Boutons */}
-                        <div className="flex gap-3 justify-end">
+                        <div className="flex gap-3">
                             <button 
                                 onClick={() => {
                                     setShowMoveModal(false);
@@ -465,20 +557,28 @@ function Hive(){
                                     setReason("");
                                     setNote("");
                                 }}
-                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                className="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex-1"
                                 disabled={isMoving}
                             >
+                                <Cancel fontSize="small" />
                                 Annuler
                             </button>
                             <button 
                                 onClick={moveHive}
                                 disabled={isMoving || !selectedApiaryId || !reason}
-                                className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:bg-gray-400 transition-colors flex items-center gap-2"
+                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg disabled:bg-gray-400 flex-1"
                             >
-                                {isMoving && (
-                                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                {isMoving ? (
+                                    <>
+                                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                        Déplacement...
+                                    </>
+                                ) : (
+                                    <>
+                                        <SwapHoriz fontSize="small" />
+                                        Déplacer
+                                    </>
                                 )}
-                                {isMoving ? 'Déplacement...' : 'Déplacer'}
                             </button>
                         </div>
                     </div>
@@ -487,9 +587,12 @@ function Hive(){
 
             {/* Modal modification statut */}
             {showStatusModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg max-w-md w-full p-6">
-                        <h3 className="text-lg font-bold mb-4">Modifier le statut de la ruche</h3>
+                <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-white border border-gray-200 rounded-lg max-w-md w-full p-6 shadow-lg">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Edit className="text-blue-600" />
+                            <h3 className="text-lg font-semibold text-gray-800">Modifier le statut</h3>
+                        </div>
                         
                         {/* Sélection du nouveau statut */}
                         <div className="mb-4">
@@ -499,7 +602,7 @@ function Hive(){
                             <select 
                                 value={selectedStatus}
                                 onChange={(e) => setSelectedStatus(e.target.value)}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Sélectionner un statut...</option>
                                 {HIVE_STATUS.map(status => (
@@ -519,33 +622,41 @@ function Hive(){
                                 value={statusNote}
                                 onChange={(e) => setStatusNote(e.target.value)}
                                 placeholder="Raison du changement de statut..."
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 rows={3}
                             />
                         </div>
 
                         {/* Boutons */}
-                        <div className="flex gap-3 justify-end">
+                        <div className="flex gap-3">
                             <button 
                                 onClick={() => {
                                     setShowStatusModal(false);
                                     setSelectedStatus("");
                                     setStatusNote("");
                                 }}
-                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                className="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex-1"
                                 disabled={isUpdatingStatus}
                             >
+                                <Cancel fontSize="small" />
                                 Annuler
                             </button>
                             <button 
                                 onClick={updateHiveStatus}
                                 disabled={isUpdatingStatus || !selectedStatus}
-                                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:bg-gray-400 transition-colors flex items-center gap-2"
+                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg disabled:bg-gray-400 flex-1"
                             >
-                                {isUpdatingStatus && (
-                                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                {isUpdatingStatus ? (
+                                    <>
+                                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                        Modification...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save fontSize="small" />
+                                        Modifier
+                                    </>
                                 )}
-                                {isUpdatingStatus ? 'Modification...' : 'Modifier'}
                             </button>
                         </div>
                     </div>
@@ -554,11 +665,14 @@ function Hive(){
 
             {/* Modal QR Code */}
             {showQRModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                            QR Code - {hive.name}
-                        </h2>
+                <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-md w-full shadow-lg">
+                        <div className="flex items-center justify-center gap-3 mb-6">
+                            <QrCodeScanner className="text-blue-600" />
+                            <h2 className="text-lg font-semibold text-gray-800">
+                                QR Code - {hive.name}
+                            </h2>
+                        </div>
                         
                         <div className="text-center mb-6">
                             {hive?.qrCodeDataUrl ? (
@@ -587,8 +701,9 @@ function Hive(){
                             {hive?.qrCodeDataUrl && (
                                 <button
                                     onClick={handlePrintQR}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
+                                    className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
                                 >
+                                    <Print fontSize="small" />
                                     Imprimer QR Code
                                 </button>
                             )}
@@ -596,15 +711,17 @@ function Hive(){
                             <button
                                 onClick={handleGenerateQR}
                                 disabled={isGeneratingQR}
-                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400"
+                                className="flex items-center justify-center gap-2 w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg disabled:bg-gray-400"
                             >
+                                <QrCodeScanner fontSize="small" />
                                 {isGeneratingQR ? "Génération..." : (hive?.qrCodeDataUrl ? "Régénérer QR Code" : "Générer QR Code")}
                             </button>
                             
                             <button
                                 onClick={() => setShowQRModal(false)}
-                                className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
+                                className="flex items-center justify-center gap-2 w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"
                             >
+                                <Close fontSize="small" />
                                 Fermer
                             </button>
                         </div>
@@ -612,8 +729,9 @@ function Hive(){
                 </div>
             )}
 
-            {/* FAB Mobile uniquement */}
-            <div className="sm:hidden fixed bottom-6 right-6 z-50">
+            {/* FAB Mobile uniquement - caché si modale ouverte */}
+            {!showMoveModal && !showStatusModal && !showQRModal && (
+                <div className="sm:hidden fixed bottom-6 right-6 z-50">
                 {/* Menu FAB (affiché si ouvert) */}
                 {showFABMenu && (
                     <div className="absolute bottom-16 right-0 flex flex-col gap-3 mb-2">
@@ -627,11 +745,9 @@ function Hive(){
                                     setShowFABMenu(false);
                                     navigate(`/ruchers/${params['apiary-id']}/ruches/${params['hive-id']}/visites/nouvelle`);
                                 }}
-                                className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                                className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
+                                <Add className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -645,11 +761,9 @@ function Hive(){
                                     setShowFABMenu(false);
                                     setShowMoveModal(true);
                                 }}
-                                className="w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                                className="w-12 h-12 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                </svg>
+                                <SwapHoriz className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -663,11 +777,9 @@ function Hive(){
                                     setShowFABMenu(false);
                                     setShowStatusModal(true);
                                 }}
-                                className="w-12 h-12 bg-purple-500 hover:bg-purple-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                                className="w-12 h-12 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
+                                <Edit className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -681,11 +793,9 @@ function Hive(){
                                     setShowFABMenu(false);
                                     setShowQRModal(true);
                                 }}
-                                className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+                                className="w-12 h-12 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                                </svg>
+                                <QrCodeScanner className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
@@ -694,13 +804,12 @@ function Hive(){
                 {/* Bouton FAB principal */}
                 <button
                     onClick={() => setShowFABMenu(!showFABMenu)}
-                    className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center ${showFABMenu ? 'rotate-45' : ''}`}
+                    className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center ${showFABMenu ? 'rotate-45' : ''}`}
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                    <Add className="w-6 h-6" />
                 </button>
-            </div>
+                </div>
+            )}
         </div>
     );
 }

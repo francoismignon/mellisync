@@ -38,7 +38,7 @@ function App() {
   if (!isAuthenticated) {
     return (
       <BrowserRouter>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-200">
           <main className="container mx-auto px-4 py-8">
             <Routes>
               <Route path="/register" element={<Register />} />
@@ -52,7 +52,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-200">
         <NavBar />
         <main className="container mx-auto px-4 py-8">
           <Routes>

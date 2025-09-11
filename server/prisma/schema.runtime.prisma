@@ -67,7 +67,6 @@ model Apiary {
   id        Int      @id @default(autoincrement())
   name      String
   address   String
-  city      String
   latitude  Decimal? // Coordonnées GPS pour API météo Open-Meteo
   longitude Decimal? // Générées automatiquement via géocodage
   createdAt DateTime @default(now())

@@ -67,7 +67,7 @@ class DashboardRepository {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysSince);
 
-    return await prisma.hive.findMany({
+    const hives = await prisma.hive.findMany({
       where: {
         apiary_hives: {
           some: {
@@ -106,6 +106,23 @@ class DashboardRepository {
           take: 1
         }
       }
+    });
+
+    // Calculer daysSinceLastVisit pour chaque ruche
+    const today = new Date();
+    return hives.map(hive => {
+      let daysSinceLastVisit: number | null = null;
+      
+      if (hive.visits.length > 0) {
+        const lastVisitDate = new Date(hive.visits[0].date);
+        const diffTime = today.getTime() - lastVisitDate.getTime();
+        daysSinceLastVisit = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      }
+
+      return {
+        ...hive,
+        daysSinceLastVisit
+      };
     });
   }
 }

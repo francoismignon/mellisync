@@ -2,6 +2,7 @@ import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import QRScanner from "../components/QRScanner";
+import { Home, Hive, CalendarToday, QrCodeScanner } from "@mui/icons-material";
 
 function Dashboard(){
     const [dashboardData, setDashboardData] = useState<any>(null);
@@ -58,23 +59,28 @@ function Dashboard(){
             
             {/* Compteurs de base */}
             <div className="mb-6">
-                <h2 className="text-xl font-bold mb-4">Statistiques</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Statistiques</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Carte Ruchers */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="text-2xl font-bold text-blue-600">{dashboardData?.statistics?.apiaryCount || 0}</div>
-                        <div className="text-sm text-blue-800">Ruchers</div>
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Home className="text-blue-600" fontSize="small" />
+                            <div className="text-lg font-semibold text-gray-800">{dashboardData?.statistics?.apiaryCount || 0}</div>
+                        </div>
+                        <div className="text-sm text-gray-600">Ruchers</div>
                     </div>
 
-                    {/* Carte Ruches enrichie avec répartition */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div className="text-2xl font-bold text-green-600 mb-2">{dashboardData?.statistics?.totalHives || 0}</div>
-                        <div className="text-sm text-green-800 mb-3">Ruches totales</div>
+                    {/* Carte Ruches */}
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Hive className="text-blue-600" fontSize="small" />
+                            <div className="text-lg font-semibold text-gray-800">{dashboardData?.statistics?.totalHives || 0}</div>
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">Ruches totales</div>
                         
                         {dashboardData?.statistics?.hivesByStatus && Object.keys(dashboardData.statistics.hivesByStatus).length > 0 && (
-                            <div className="space-y-1">
+                            <div className="space-y-1 border-t border-gray-100 pt-2">
                                 {Object.entries(dashboardData.statistics.hivesByStatus).map(([status, count]: [string, any]) => {
-                                    // Mapping des statuts avec traductions
                                     const statusMapping: Record<string, {label: string}> = {
                                         'ACTIVE': { label: 'actives' },
                                         'INACTIVE': { label: 'inactives' }
@@ -83,8 +89,8 @@ function Dashboard(){
                                     const statusInfo = statusMapping[status] || { label: status.toLowerCase() };
                                     
                                     return (
-                                        <div key={status} className="flex items-center justify-between text-xs text-green-700">
-                                            <span>{count} {statusInfo.label}</span>
+                                        <div key={status} className="text-xs text-gray-500">
+                                            {count} {statusInfo.label}
                                         </div>
                                     );
                                 })}
@@ -93,9 +99,12 @@ function Dashboard(){
                     </div>
 
                     {/* Carte Visites */}
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <div className="text-2xl font-bold text-purple-600">{dashboardData?.statistics?.visitsThisMonth || 0}</div>
-                        <div className="text-sm text-purple-800">Visites ce mois</div>
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow">
+                        <div className="flex items-center gap-2 mb-1">
+                            <CalendarToday className="text-blue-600" fontSize="small" />
+                            <div className="text-lg font-semibold text-gray-800">{dashboardData?.statistics?.visitsThisMonth || 0}</div>
+                        </div>
+                        <div className="text-sm text-gray-600">Visites ce mois</div>
                     </div>
                 </div>
             </div>
@@ -123,10 +132,10 @@ function Dashboard(){
                                 >
                                     <div className="font-medium text-red-900">{hive.name}</div>
                                     <div className="text-sm text-red-700">
-                                        {hive.apiary_hives?.[0]?.apiary?.name} ({hive.apiary_hives?.[0]?.apiary?.city}) • 
-                                        {hive.daysSinceLastVisit 
-                                            ? ` ${hive.daysSinceLastVisit} jours depuis dernière visite`
-                                            : ' Aucune visite enregistrée'
+                                        {hive.apiary_hives?.[0]?.apiary?.name}
+                                        {typeof hive.daysSinceLastVisit === 'number' && hive.daysSinceLastVisit > 0
+                                            ? ` - ${hive.daysSinceLastVisit} jours depuis dernière visite`
+                                            : ' - Aucune visite enregistrée'
                                         }
                                     </div>
                                     <div className="text-xs text-red-600 mt-1 opacity-75">
@@ -137,12 +146,31 @@ function Dashboard(){
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className={`rounded-lg p-4 ${
+                        (dashboardData?.statistics?.totalHives || 0) === 0
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'bg-green-50 border border-green-200'
+                    }`}>
                         <div className="flex items-center">
-                            <svg className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-green-800">Toutes vos ruches ont été visitées récemment</span>
+                            {(dashboardData?.statistics?.totalHives || 0) === 0 ? (
+                                <svg className="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            ) : (
+                                <svg className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            )}
+                            <span className={
+                                (dashboardData?.statistics?.totalHives || 0) === 0
+                                    ? 'text-blue-800'
+                                    : 'text-green-800'
+                            }>
+                                {(dashboardData?.statistics?.totalHives || 0) === 0
+                                    ? 'Vous n\'avez pas de ruche pour le moment'
+                                    : 'Toutes vos ruches ont été visitées récemment'
+                                }
+                            </span>
                         </div>
                     </div>
                 )}
@@ -152,12 +180,10 @@ function Dashboard(){
             <div className="sm:hidden fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => setShowQRScanner(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors duration-200"
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg"
                     title="Scanner QR Code"
                 >
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h4m12 4h2m-4 0V4M8 4H4v4" />
-                    </svg>
+                    <QrCodeScanner className="h-6 w-6" />
                 </button>
             </div>
 
@@ -185,7 +211,7 @@ function Dashboard(){
                         <div className="flex justify-end">
                             <button
                                 onClick={() => setShowQRScanner(false)}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                             >
                                 Fermer
                             </button>
