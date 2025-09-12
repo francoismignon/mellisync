@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../config/axiosConfig";
 import { Link, useNavigate } from "react-router";
-import { Home, LocationOn, Hive, Add } from "@mui/icons-material";
+import { Home, LocationOn, Hive as HiveIcon, Add } from "@mui/icons-material";
 
 function Apiaries() {
   const [apiaries, setApiaries] = useState<any[]>([]);
@@ -53,7 +53,7 @@ function Apiaries() {
                 {/* Statistiques des ruches */}
                 <div className="flex gap-3 text-sm">
                   <div className="flex items-center gap-1">
-                    <Hive fontSize="small" className="text-blue-600" />
+                    <HiveIcon fontSize="small" className="text-blue-600" />
                     <span className="text-gray-600">{apiary.hiveStats?.total || 0} ruches</span>
                   </div>
                   

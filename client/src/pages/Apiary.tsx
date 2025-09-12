@@ -2,7 +2,7 @@ import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, HIVE_STATUS } from "../constants/index";
-import { Home, LocationOn, Hive, Add, ArrowBack, WbSunny, Circle, ChevronRight } from "@mui/icons-material";
+import { Home, LocationOn, Hive as HiveIcon, Add, ArrowBack, WbSunny, Circle, ChevronRight } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
 function Apiary() {
@@ -73,7 +73,7 @@ function Apiary() {
       
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          <Hive className="text-blue-600" fontSize="small" />
+          <HiveIcon className="text-blue-600" fontSize="small" />
           Ruches ({hives.length})
         </h2>
         <Link to={`/ruchers/${apiaryId}/ruches/nouvelle`} className="hidden sm:block">
@@ -95,7 +95,7 @@ function Apiary() {
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Hive className="text-blue-600" fontSize="small" />
+                  <HiveIcon className="text-blue-600" fontSize="small" />
                   <div>
                     <h3 className="font-semibold text-gray-800">{hive.name}</h3>
                     <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
@@ -136,7 +136,7 @@ function Apiary() {
         </div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-          <Hive className="text-gray-400 mb-2" fontSize="large" />
+          <HiveIcon className="text-gray-400 mb-2" fontSize="large" />
           <p className="text-gray-500">Aucune ruche trouvée</p>
         </div>
       )}

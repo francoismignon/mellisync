@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, HIVE_COLORS, HIVE_YEARS, FLOWER_NAMES} from "../constants/index";
 import Toast from "../components/Toast";
-import { Hive, Shuffle, Save, Cancel, ArrowBack, Print, Close } from "@mui/icons-material";
+import { Hive as HiveIcon, Shuffle, Save, Cancel, ArrowBack, Print, Close } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import type { CreatedHive } from "../types";
 
@@ -132,14 +132,14 @@ function NewHive() {
             >
                 <ArrowBack />
             </IconButton>
-            <Hive className="text-blue-600" fontSize="large" />
+            <HiveIcon className="text-blue-600" fontSize="large" />
             <h1 className="text-2xl font-semibold text-gray-800">Nouvelle ruche</h1>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                        <Hive fontSize="small" className="text-blue-600" />
+                        <HiveIcon fontSize="small" className="text-blue-600" />
                         Nom de la ruche
                     </label>
                     <div className="flex gap-2">

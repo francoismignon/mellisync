@@ -2,7 +2,7 @@ import axios from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import QRScanner from "../components/QRScanner";
-import { Home, Hive, CalendarToday, QrCodeScanner } from "@mui/icons-material";
+import { Home, Hive as HiveIcon, CalendarToday, QrCodeScanner } from "@mui/icons-material";
 import type { HiveAlert } from "../types";
 
 // Types spécifiques au Dashboard
@@ -87,7 +87,7 @@ function Dashboard(){
                     {/* Carte Ruches */}
                     <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow">
                         <div className="flex items-center gap-2 mb-1">
-                            <Hive className="text-blue-600" fontSize="small" />
+                            <HiveIcon className="text-blue-600" fontSize="small" />
                             <div className="text-lg font-semibold text-gray-800">{dashboardData?.statistics?.totalHives || 0}</div>
                         </div>
                         <div className="text-sm text-gray-600 mb-2">Ruches totales</div>
