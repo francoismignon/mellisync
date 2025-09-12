@@ -7,7 +7,7 @@ import { Hive as HiveIcon, ArrowBack, Add, SwapHoriz, Edit, QrCodeScanner, Print
 import { IconButton } from "@mui/material";
 import type { Hive, Visit, Transhumance, Apiary } from "../types";
 
-function Hive(){
+function HiveDetails(){
     const [hive, setHive] = useState<Hive>({} as Hive);
     const [visits, setVisits] = useState<Visit[]>([]);
     const [transhumances, setTranshumances] = useState<Transhumance[]>([]);
@@ -818,4 +818,4 @@ function Hive(){
         </div>
     );
 }
-export default Hive;
+export default HiveDetails;
