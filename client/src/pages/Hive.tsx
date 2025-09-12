@@ -5,54 +5,14 @@ import { useNavigate, useParams } from "react-router";
 import Toast from "../components/Toast";
 import { Hive as HiveIcon, ArrowBack, Add, SwapHoriz, Edit, QrCodeScanner, Print, Close, Circle, PictureAsPdf, LocationOn, Cancel, Save } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-
-// Types TypeScript
-interface HiveType {
-    id: number;
-    name: string;
-    type: string;
-    framecount: string;
-    status: string;
-    color: string;
-    yearBuilt: string;
-    qrCodeDataUrl?: string;
-    statusReason?: string;
-    statusChangedAt?: string;
-}
-
-interface VisitType {
-    id: number;
-    createdAt: string;
-    date: string;
-    visitActions: Record<string, unknown>;
-}
-
-interface TranshumanceType {
-    id: number;
-    fromApiaryId: number;
-    toApiaryId: number;
-    reason: string;
-    note: string;
-    createdAt: string;
-    startDate: string;
-    endDate: string;
-    fromApiary: ApiaryType;
-    toApiary: ApiaryType;
-    apiary?: ApiaryType;
-}
-
-interface ApiaryType {
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-}
+import type { Hive, Visit, Transhumance, Apiary } from "../types";
 
 function Hive(){
-    const [hive, setHive] = useState<HiveType>({} as HiveType);
-    const [visits, setVisits] = useState<VisitType[]>([]);
-    const [transhumances, setTranshumances] = useState<TranshumanceType[]>([]);
-    const [apiaries, setApiaries] = useState<ApiaryType[]>([]);
+    const [hive, setHive] = useState<Hive>({} as Hive);
+    const [visits, setVisits] = useState<Visit[]>([]);
+    const [transhumances, setTranshumances] = useState<Transhumance[]>([]);
+    const [apiaries, setApiaries] = useState<Apiary[]>([]);
+    const [loading, setLoading] = useState(true);
     const [showMoveModal, setShowMoveModal] = useState(false);
     const [selectedApiaryId, setSelectedApiaryId] = useState<string>("");
     const [reason, setReason] = useState<string>("");
@@ -74,9 +34,40 @@ function Hive(){
             const hiveId = params['hive-id'];
             const response = await axios.get(`/api/hives/${hiveId}`);
             setHive(response.data);
+            setLoading(false);
 
-        } catch (error) {
+        } catch (error: unknown) {
             console.log(error);
+            
+            // Gérer spécifiquement les erreurs d'accès
+            const axiosError = error as { response?: { status: number } };
+            if (axiosError.response?.status === 403) {
+                setToast({ 
+                    message: "Vous n'avez pas accès à cette ruche", 
+                    type: "error", 
+                    isVisible: true 
+                });
+                // Rediriger vers le dashboard après 1.5 secondes
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500);
+            } else if (axiosError.response?.status === 404) {
+                setToast({ 
+                    message: "Ruche non trouvée", 
+                    type: "error", 
+                    isVisible: true 
+                });
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500);
+            } else {
+                setToast({ 
+                    message: "Erreur lors du chargement de la ruche", 
+                    type: "error", 
+                    isVisible: true 
+                });
+                setLoading(false);
+            }
         }
     }
 
@@ -243,6 +234,20 @@ function Hive(){
         } finally {
             setIsGeneratingQR(false);
         }
+    }
+
+    if (loading) {
+        return (
+            <div className="max-w-4xl mx-auto">
+                <Toast 
+                    message={toast.message}
+                    type={toast.type}
+                    isVisible={toast.isVisible}
+                    onClose={() => setToast({ ...toast, isVisible: false })}
+                />
+                <div className="text-center p-8">Chargement de la ruche...</div>
+            </div>
+        );
     }
 
     return(

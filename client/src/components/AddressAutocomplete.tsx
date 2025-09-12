@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../config/axiosConfig';
-
-interface AddressSuggestion {
-  display_name: string;
-  clean_address: string;
-  latitude: number;
-  longitude: number;
-}
+import type { AddressSuggestion } from "../types";
 
 interface AddressAutocompleteProps {
   value: string;

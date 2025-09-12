@@ -7,10 +7,29 @@ class HiveController {
   static async findById(req: Request, res: Response){
     try {
       const hiveId = parseInt(req.params.id);
+      const userId = req.user!.id; // Garanti par middleware auth
+
+      // Vérification RBAC - s'assurer que l'utilisateur possède cette ruche
       const hive = await HiveService.findById(hiveId);
-      res.status(201).json(hive);
+      if (!hive) {
+        return res.status(404).json({ error: "Ruche non trouvée" });
+      }
+
+      if (!hive.apiary_hives?.[0]?.apiary) {
+        return res.status(404).json({ error: "Ruche sans rucher associé" });
+      }
+      
+      // Vérifier que l'utilisateur possède le rucher courant
+      const currentApiary = hive.apiary_hives[0].apiary;
+      const fullApiary = await ApiaryService.findById(currentApiary.id);
+      if (!fullApiary || fullApiary.userId !== userId) {
+        return res.status(403).json({ error: "Accès interdit à cette ruche" });
+      }
+
+      res.status(200).json(hive);
     } catch (error) {
-      console.log(error);
+      console.error("Erreur récupération ruche:", error);
+      res.status(500).json({ error: "Erreur serveur" });
     }
   }
 

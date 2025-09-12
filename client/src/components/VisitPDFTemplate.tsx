@@ -1,26 +1,7 @@
+import type { VisitWithDetails } from "../types";
+
 interface VisitPDFTemplateProps {
-  visit: {
-    id: number;
-    date: string;
-    hive: {
-      id: number;
-      name: string;
-      apiary?: {
-        name: string;
-        location: string;
-      };
-    };
-    visitActions: Array<{
-      id: number;
-      value: string;
-      action: {
-        id: number;
-        name: string;
-        actionType: 'CYCLE' | 'INCREMENT';
-        description?: string;
-      };
-    }>;
-  };
+  visit: VisitWithDetails;
   weather?: {
     temperature: number;
     condition: string;

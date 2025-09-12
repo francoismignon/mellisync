@@ -3,9 +3,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import QRScanner from "../components/QRScanner";
 import { Home, Hive, CalendarToday, QrCodeScanner } from "@mui/icons-material";
+import type { HiveAlert } from "../types";
+
+// Types spécifiques au Dashboard
+interface DashboardData {
+    statistics?: {
+        apiaryCount?: number;
+        totalHives?: number;
+        visitsThisMonth?: number;
+        hivesByStatus?: Record<string, number>;
+    };
+    alerts?: {
+        hivesWithoutVisit?: HiveAlert[];
+    };
+}
 
 function Dashboard(){
-    const [dashboardData, setDashboardData] = useState<any>(null);
+    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [showQRScanner, setShowQRScanner] = useState(false);
     const navigate = useNavigate();
@@ -80,7 +94,7 @@ function Dashboard(){
                         
                         {dashboardData?.statistics?.hivesByStatus && Object.keys(dashboardData.statistics.hivesByStatus).length > 0 && (
                             <div className="space-y-1 border-t border-gray-100 pt-2">
-                                {Object.entries(dashboardData.statistics.hivesByStatus).map(([status, count]: [string, any]) => {
+                                {Object.entries(dashboardData.statistics.hivesByStatus).map(([status, count]: [string, number]) => {
                                     const statusMapping: Record<string, {label: string}> = {
                                         'ACTIVE': { label: 'actives' },
                                         'INACTIVE': { label: 'inactives' }
@@ -113,18 +127,18 @@ function Dashboard(){
             {/* Alertes */}
             <div className="mb-6">
                 <h2 className="text-xl font-bold mb-4">Alertes</h2>
-                {dashboardData?.alerts?.hivesWithoutVisit?.length > 0 ? (
+                {dashboardData?.alerts?.hivesWithoutVisit && dashboardData.alerts.hivesWithoutVisit.length > 0 ? (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                         <div className="flex items-center mb-2">
                             <svg className="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                             <span className="font-semibold text-red-800">
-                                {dashboardData.alerts.hivesWithoutVisit.length} ruche(s) sans visite récente
+                                {dashboardData?.alerts?.hivesWithoutVisit?.length} ruche(s) sans visite récente
                             </span>
                         </div>
                         <div className="space-y-2">
-                            {dashboardData.alerts.hivesWithoutVisit.map((hive: any) => (
+                            {dashboardData?.alerts?.hivesWithoutVisit?.map((hive: HiveAlert) => (
                                 <div 
                                     key={hive.id} 
                                     onClick={() => navigate(`/ruchers/${hive.apiary_hives?.[0]?.apiary?.id}/ruches/${hive.id}`)}

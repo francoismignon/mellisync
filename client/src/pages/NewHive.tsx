@@ -5,14 +5,7 @@ import { HIVE_TYPES, FRAME_COUNTS, HIVE_STATUS, HIVE_COLORS, HIVE_YEARS, FLOWER_
 import Toast from "../components/Toast";
 import { Hive, Shuffle, Save, Cancel, ArrowBack, Print, Close } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-
-interface CreatedHive {
-    id: number;
-    name: string;
-    type: string;
-    color: string;
-    qrCodeDataUrl?: string;
-}
+import type { CreatedHive } from "../types";
 
 function NewHive() {
     
