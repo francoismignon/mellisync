@@ -9,13 +9,13 @@ const swaggerDefinition: SwaggerDefinition = {
     version: '1.0.0',
     description: 'API REST pour la gestion de ruches apicoles - Mellisync TFE 2025',
     contact: {
-      name: 'François Demol',
-      email: 'francois@mellisync.com',
+      name: 'François Mignon',
+      email: 'mignon.francois@gmail.com',
     },
   },
   servers: [
     {
-      url: process.env.API_URL || 'http://localhost:3001',
+      url: process.env.API_URL || 'http://localhost:3000',
       description: 'Serveur de développement',
     },
     {
@@ -38,7 +38,7 @@ const swaggerDefinition: SwaggerDefinition = {
         type: 'object',
         properties: {
           id: { type: 'integer', example: 1 },
-          name: { type: 'string', example: 'François Demol' },
+          name: { type: 'string', example: 'François Mignon' },
           email: { type: 'string', format: 'email', example: 'francois@mellisync.com' },
           roleId: { type: 'integer', example: 2 },
           role: { type: 'string', example: 'BEEKEEPER' },
@@ -105,7 +105,7 @@ const swaggerDefinition: SwaggerDefinition = {
         type: 'object',
         required: ['name', 'email', 'password'],
         properties: {
-          name: { type: 'string', example: 'François Demol' },
+          name: { type: 'string', example: 'François Mignon' },
           email: { type: 'string', format: 'email', example: 'francois@mellisync.com' },
           password: { type: 'string', format: 'password', example: 'motdepasse123' },
           roleId: { type: 'integer', example: 2, default: 2 },
