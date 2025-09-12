@@ -135,6 +135,9 @@ function HiveDetails(){
             setReason("");
             setNote("");
             
+            // Rafraîchir l'historique des transhumances immédiatement
+            await fetchTranshumances();
+            
             // Rediriger vers le nouveau rucher après délai pour voir le toast
             setTimeout(() => {
                 navigate(`/ruchers/${newApiaryId}/ruches/${hiveId}`);

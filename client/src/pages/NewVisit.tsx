@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
 import Toast from "../components/Toast";
-import { Assignment, ArrowBack, Save, Cancel, WbSunny, Settings, AutoAwesome } from "@mui/icons-material";
+import { Assignment, ArrowBack, Save, WbSunny, Settings, AutoAwesome } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
 function NewVisit() {
@@ -176,20 +176,12 @@ function NewVisit() {
         </div>
       </div>
 
-      {/* Boutons d'action */}
-      <div className="flex gap-3">
-        <button
-          onClick={() => navigate(`/ruchers/${apiaryId}/ruches/${hiveId}`)}
-          className="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-2.5 px-4 rounded-lg font-medium flex-1"
-        >
-          <Cancel fontSize="small" />
-          Annuler
-        </button>
-        
+      {/* Bouton d'action */}
+      <div className="flex justify-center">
         <button 
           onClick={saveVisit}
           disabled={isSaving}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium flex-1 ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-6 rounded-lg font-medium ${
             isSaving 
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
               : 'bg-blue-600 hover:bg-blue-700 text-white'
