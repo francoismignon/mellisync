@@ -7,7 +7,7 @@ import Apiaries from "./pages/Apiaries";
 import NewApiary from "./pages/NewApiary";
 import Apiary from "./pages/Apiary";
 import NewHive from "./pages/NewHive";
-import Hive from "./pages/Hive";
+import HiveDetails from "./pages/HiveDetails";
 import NewVisit from "./pages/NewVisit";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -61,7 +61,7 @@ function App() {
             <Route path="/ruchers/nouveau" element={<NewApiary />} />
             <Route path="/ruchers/:apiary-id" element={<Apiary />} />
             <Route path="/ruchers/:apiary-id/ruches/nouvelle" element={<NewHive />} />
-            <Route path="/ruchers/:apiary-id/ruches/:hive-id" element={<Hive />} />
+            <Route path="/ruchers/:apiary-id/ruches/:hive-id" element={<HiveDetails />} />
             <Route path="/ruchers/:apiary-id/ruches/:hive-id/visites/nouvelle" element={<NewVisit />} />
           </Routes>
         </main>
