@@ -35,41 +35,48 @@ function Apiaries() {
         </Link>
       </div>
       
-      <div className="grid gap-4">
-        {apiaries.map(apiary => (
-          <div 
-            key={apiary.id}
-            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm hover:border-blue-300 transition-all duration-200 cursor-pointer"
-            onClick={()=> navigate(`/ruchers/${apiary.id}`)}>
-            <div className="flex items-start gap-3">
-              <Home className="text-blue-600 mt-0.5" fontSize="small" />
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">{apiary.name}</h3>
-                <div className="flex items-center gap-1 text-gray-600 mb-3">
-                  <LocationOn fontSize="small" className="text-gray-400" />
-                  <span className="text-sm">{apiary.address}, {apiary.city}</span>
-                </div>
-                
-                {/* Statistiques des ruches */}
-                <div className="flex gap-3 text-sm">
-                  <div className="flex items-center gap-1">
-                    <HiveIcon fontSize="small" className="text-blue-600" />
-                    <span className="text-gray-600">{apiary.hiveStats?.total || 0} ruches</span>
+      {apiaries.length > 0 ? (
+        <div className="grid gap-4">
+          {apiaries.map(apiary => (
+            <div 
+              key={apiary.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm hover:border-blue-300 transition-all duration-200 cursor-pointer"
+              onClick={()=> navigate(`/ruchers/${apiary.id}`)}>
+              <div className="flex items-start gap-3">
+                <Home className="text-blue-600 mt-0.5" fontSize="small" />
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">{apiary.name}</h3>
+                  <div className="flex items-center gap-1 text-gray-600 mb-3">
+                    <LocationOn fontSize="small" className="text-gray-400" />
+                    <span className="text-sm">{apiary.address}, {apiary.city}</span>
                   </div>
                   
-                  {apiary.hiveStats?.active > 0 && (
-                    <span className="text-gray-500">• {apiary.hiveStats.active} actives</span>
-                  )}
-                  
-                  {apiary.hiveStats?.inactive > 0 && (
-                    <span className="text-gray-500">• {apiary.hiveStats.inactive} inactives</span>
-                  )}
+                  {/* Statistiques des ruches */}
+                  <div className="flex gap-3 text-sm">
+                    <div className="flex items-center gap-1">
+                      <HiveIcon fontSize="small" className="text-blue-600" />
+                      <span className="text-gray-600">{apiary.hiveStats?.total || 0} ruches</span>
+                    </div>
+                    
+                    {apiary.hiveStats?.active > 0 && (
+                      <span className="text-gray-500">• {apiary.hiveStats.active} actives</span>
+                    )}
+                    
+                    {apiary.hiveStats?.inactive > 0 && (
+                      <span className="text-gray-500">• {apiary.hiveStats.inactive} inactives</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+          <Home className="text-gray-400 mb-2" fontSize="large" />
+          <p className="text-gray-500">Aucun rucher trouvé</p>
+        </div>
+      )}
 
       {/* FAB Mobile uniquement */}
       <div className="sm:hidden fixed bottom-6 right-6 z-50">
