@@ -1,24 +1,19 @@
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import ApiaryController from './src/controllers/apiaryController';
-import HiveController from './src/controllers/hiveConroller';
-import ActionController from './src/controllers/actionController';
-import VisitController from './src/controllers/visitController';
-import AuthController from './src/controllers/authController';
-import DashboardController from './src/controllers/dashboardController';
-import AddressController from './src/controllers/addressController';
-import { authenticateToken } from './src/middleware/auth';
 
-dotenv.config()
+// Import des routes modulaires
+import apiRoutes from './src/routes';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
 
-//middleware
+// Middlewares globaux
 app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
@@ -30,47 +25,17 @@ app.use(morgan('combined'));
 app.use(cookieParser()); // Middleware pour parser les cookies
 app.use(express.json());
 
+// Routes API modulaires
+app.use('/api', apiRoutes);
 
-//Routes Rucher (protégées)
-app.post("/api/apiaries", authenticateToken, ApiaryController.create);
-app.get("/api/apiaries", authenticateToken, ApiaryController.findAll);
-app.get("/api/apiaries/:id", authenticateToken, ApiaryController.findById);
-
-//Routes Ruche (protégées)
-app.get("/api/hives", authenticateToken, HiveController.findAllByApiary);
-app.post("/api/hives", authenticateToken, HiveController.create);
-app.get("/api/hives/:id", authenticateToken, HiveController.findById)
-app.get("/api/hives/:id/visits", authenticateToken, VisitController.findAllByHive);
-app.get("/api/hives/:id/transhumances", authenticateToken, HiveController.getTranshumanceHistory);
-app.post("/api/hives/:id/move", authenticateToken, HiveController.moveToApiary);
-app.put("/api/hives/:id/status", authenticateToken, HiveController.updateStatus);
-app.post("/api/hives/:id/generate-qr", authenticateToken, HiveController.generateQRCode);
-
-//Routes pour la définition des actions (protégées)
-// Route unique qui gère 2 cas :
-// - GET /api/actions → Toutes les actions (mode expert)  
-// - GET /api/actions?filter=current → Actions filtrées selon période/météo/température (mode normal)
-app.get("/api/actions", authenticateToken, ActionController.findAll);
-
-//Routes pour les visites (protégées)
-app.post("/api/visits", authenticateToken, VisitController.create);
-app.get("/api/visits/:id/pdf", authenticateToken, VisitController.generatePDF);
-
-//Routes pour l'authentification
-app.post("/api/auth/register", AuthController.register);
-app.post("/api/auth/login", AuthController.login);
-app.post("/api/auth/logout", AuthController.logout);
-app.get("/api/auth/me", authenticateToken, AuthController.me);
-
-//Route pour le dashboard
-app.get("/api/dashboard", authenticateToken, DashboardController.getDashboardData);
-
-//Routes pour les adresses (autocomplétion)
-app.get("/api/addresses/suggestions", authenticateToken, AddressController.getAddressSuggestions);
-
-//route test
-app.get("/", (_req: Request, res: Response)=>{
-  res.json({message: 'API Mellisync - Gestion de ruches'});
+// Route racine de santé
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    message: 'API Mellisync - Gestion de ruches',
+    version: '1.0.0',
+    status: 'OK',
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.listen(PORT, () => {
