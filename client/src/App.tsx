@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,9 +23,11 @@ function App() {
 
   const checkAuth = async () => {
     try {
-      await axios.get('/api/auth/me');
+      const response = await axios.get('/api/auth/me');
+      setUser(response.data.user);
       setIsAuthenticated(true);
     } catch {
+      setUser(null);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);
@@ -53,7 +56,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-200">
-        <NavBar />
+        <NavBar user={user} />
         <main className="container mx-auto px-4 py-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />

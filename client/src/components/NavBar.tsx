@@ -6,11 +6,23 @@ import {
   Home, 
   Menu, 
   Close,
-  ExitToApp 
+  ExitToApp,
+  Person
 } from "@mui/icons-material"
 import { useState } from "react"
 
-function NavBar(){
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  roleId: number;
+}
+
+interface NavBarProps {
+  user: User | null;
+}
+
+function NavBar({ user }: NavBarProps){
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     const handleLogout = async () => {
@@ -42,6 +54,12 @@ function NavBar(){
                             <Home fontSize="small" />
                             Ruchers
                         </Link>
+                        {user && (
+                            <div className="flex items-center gap-2 text-gray-700 bg-gray-100 px-3 py-2 rounded-lg">
+                                <Person fontSize="small" />
+                                <span className="text-sm font-medium">{user.name}</span>
+                            </div>
+                        )}
                         <Button 
                             onClick={handleLogout} 
                             variant="outlined" 
@@ -53,13 +71,21 @@ function NavBar(){
                         </Button>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <button 
-                        className="md:hidden p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    >
-                        {mobileMenuOpen ? <Close /> : <Menu />}
-                    </button>
+                    {/* Mobile User & Menu */}
+                    <div className="md:hidden flex items-center gap-3">
+                        {user && (
+                            <div className="flex items-center gap-2 text-gray-700 bg-gray-100 px-2 py-1 rounded-lg">
+                                <Person fontSize="small" />
+                                <span className="text-sm font-medium">{user.name}</span>
+                            </div>
+                        )}
+                        <button 
+                            className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        >
+                            {mobileMenuOpen ? <Close /> : <Menu />}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
