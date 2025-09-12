@@ -4,9 +4,11 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
 
 // Import des routes modulaires
 import apiRoutes from './src/routes';
+import { swaggerSpec } from './src/config/swagger';
 
 dotenv.config();
 
@@ -25,6 +27,22 @@ app.use(morgan('combined'));
 app.use(cookieParser()); // Middleware pour parser les cookies
 app.use(express.json());
 
+// Documentation OpenAPI/Swagger
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Mellisync API Documentation',
+  customfavIcon: '/assets/favicon.ico',
+  swaggerOptions: {
+    persistAuthorization: true,
+  }
+}));
+
+// Route pour servir le spec OpenAPI JSON
+app.get('/api/openapi.json', (_req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // Routes API modulaires
 app.use('/api', apiRoutes);
 
@@ -34,7 +52,9 @@ app.get('/', (_req: Request, res: Response) => {
     message: 'API Mellisync - Gestion de ruches',
     version: '1.0.0',
     status: 'OK',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    documentation: '/swagger',
+    openapi: '/api/openapi.json'
   });
 });
 
