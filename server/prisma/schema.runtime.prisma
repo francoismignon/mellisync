@@ -39,8 +39,8 @@ enum TranshumanceReason {
 }
 
 enum HiveStatus {
-  ACTIVE // Ruche en production normale
-  INACTIVE // Ruche temporairement inactive
+  ACTIVE // Ruche active - génère des alertes si pas visitée
+  INACTIVE // Ruche inactive - pas d'alertes (morte, vendue, hivernage, etc.)
 }
 
 //Table users
@@ -91,9 +91,9 @@ model Hive {
   statusReason    String?    // Raison du dernier changement de statut
   statusChangedAt DateTime?  // Date du dernier changement de statut
   yearBuilt       String
-  qrCodeDataUrl String?    // Data URL du QR code généré pour impression
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  qrCodeDataUrl   String?    // Data URL du QR code généré pour impression
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   //Relation
   apiary_hives ApiaryHive[]
@@ -183,8 +183,10 @@ model Option {
 }
 
 model Periode {
-  id    Int    @id @default(autoincrement())
-  label String
+  id         Int    @id @default(autoincrement())
+  code       String @unique  // Code technique : "traitement_ete", "miellée_printemps"
+  label_fr   String          // Label français : "Traitement d'été", "Miellée de printemps"
+  label_en   String          // Label anglais : "Summer treatment", "Spring honey flow"
 
   // Relations
   action_periodes ActionPeriode[]
@@ -192,14 +194,16 @@ model Periode {
   @@map("periodes")
 }
 
-model WeatherRestriction {
-  id    Int    @id @default(autoincrement())
-  label String
+model WeatherCondition {
+  id       Int    @id @default(autoincrement())
+  wmo_code Int    @unique  // Code WMO standardisé : 0, 1, 61, 63, 95...
+  label_fr String          // Label français : "Ciel dégagé", "Pluie modérée"
+  label_en String          // Label anglais : "Clear sky", "Moderate rain"
 
   // Relations
   action_weather_restrictions ActionWeatherRestriction[]
 
-  @@map("weather_restrictions")
+  @@map("weather_conditions")
 }
 
 // Tables de jointure many-to-many
@@ -229,12 +233,12 @@ model ActionPeriode {
 
 model ActionWeatherRestriction {
   actionId             Int
-  weatherRestrictionId Int
+  weatherConditionId   Int
 
   // Relations
-  action             Action             @relation(fields: [actionId], references: [id], onDelete: Cascade)
-  weatherRestriction WeatherRestriction @relation(fields: [weatherRestrictionId], references: [id], onDelete: Cascade)
+  action             Action           @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  weatherCondition   WeatherCondition @relation(fields: [weatherConditionId], references: [id], onDelete: Cascade)
 
-  @@id([actionId, weatherRestrictionId])
+  @@id([actionId, weatherConditionId])
   @@map("action_weather_restriction")
 }

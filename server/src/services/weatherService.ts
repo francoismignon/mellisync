@@ -13,6 +13,7 @@ interface WeatherResponse {
 interface WeatherData {
   temperature: number;
   condition: string;
+  wmoCode: number;  // Code WMO standardisé pour filtrage
 }
 
 class WeatherService {
@@ -37,7 +38,8 @@ class WeatherService {
       
       return {
         temperature: Math.round(data.current.temperature_2m),
-        condition: this.mapWeatherCode(data.current.weathercode)
+        condition: this.mapWeatherCode(data.current.weathercode),
+        wmoCode: data.current.weathercode
       };
       
     } catch (error) {
@@ -78,7 +80,8 @@ class WeatherService {
   private static getFallbackWeather(): WeatherData {
     return {
       temperature: -5,
-      condition: "Neige légère"
+      condition: "Neige légère",
+      wmoCode: 71  // Code WMO pour neige légère
     };
   }
 }

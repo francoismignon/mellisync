@@ -101,16 +101,16 @@ async function main() {
   }
   console.log(`${options.length} options seedées`);
 
-  // Seeding des périodes
+  // Seeding des périodes avec traductions
   const periodes = [
-    { id: 1, label: "hiver" },
-    { id: 2, label: "fin_hiver" },
-    { id: 3, label: "miellée_printemps" },
-    { id: 4, label: "inter_miellée" },
-    { id: 5, label: "pré_traitement" },
-    { id: 6, label: "traitement_été" },
-    { id: 7, label: "préparation_hiver" },
-    { id: 8, label: "traitement_hiver" },
+    { id: 1, code: "hiver", label_fr: "Hiver", label_en: "Winter" },
+    { id: 2, code: "fin_hiver", label_fr: "Fin d'hiver", label_en: "Late winter" },
+    { id: 3, code: "miellée_printemps", label_fr: "Miellée de printemps", label_en: "Spring honey flow" },
+    { id: 4, code: "inter_miellée", label_fr: "Inter-miellée", label_en: "Between honey flows" },
+    { id: 5, code: "pré_traitement", label_fr: "Pré-traitement", label_en: "Pre-treatment" },
+    { id: 6, code: "traitement_été", label_fr: "Traitement d'été", label_en: "Summer treatment" },
+    { id: 7, code: "préparation_hiver", label_fr: "Préparation d'hiver", label_en: "Winter preparation" },
+    { id: 8, code: "traitement_hiver", label_fr: "Traitement d'hiver", label_en: "Winter treatment" },
   ];
 
   for (const periode of periodes) {
@@ -122,24 +122,37 @@ async function main() {
   }
   console.log(`${periodes.length} périodes seedées`);
 
-  // Seeding des restrictions météo
-  const weatherRestrictions = [
-    { id: 1, label: "Ensoleillé" },
-    { id: 2, label: "Partiellement nuageux" },
-    { id: 3, label: "Pluie" },
-    { id: 4, label: "Averses" },
-    { id: 5, label: "Orage" },
-    { id: 6, label: "Vent fort" },
+  // Seeding des conditions météo avec codes WMO standardisés
+  const weatherConditions = [
+    { id: 1, wmo_code: 0, label_fr: "Ciel dégagé", label_en: "Clear sky" },
+    { id: 2, wmo_code: 1, label_fr: "Principalement dégagé", label_en: "Mainly clear" },
+    { id: 3, wmo_code: 2, label_fr: "Partiellement nuageux", label_en: "Partly cloudy" },
+    { id: 4, wmo_code: 3, label_fr: "Couvert", label_en: "Overcast" },
+    { id: 5, wmo_code: 45, label_fr: "Brouillard", label_en: "Fog" },
+    { id: 6, wmo_code: 48, label_fr: "Brouillard givrant", label_en: "Depositing rime fog" },
+    { id: 7, wmo_code: 51, label_fr: "Bruine légère", label_en: "Light drizzle" },
+    { id: 8, wmo_code: 53, label_fr: "Bruine modérée", label_en: "Moderate drizzle" },
+    { id: 9, wmo_code: 55, label_fr: "Bruine forte", label_en: "Dense drizzle" },
+    { id: 10, wmo_code: 61, label_fr: "Pluie légère", label_en: "Slight rain" },
+    { id: 11, wmo_code: 63, label_fr: "Pluie modérée", label_en: "Moderate rain" },
+    { id: 12, wmo_code: 65, label_fr: "Pluie forte", label_en: "Heavy rain" },
+    { id: 13, wmo_code: 71, label_fr: "Neige légère", label_en: "Slight snow fall" },
+    { id: 14, wmo_code: 73, label_fr: "Neige modérée", label_en: "Moderate snow fall" },
+    { id: 15, wmo_code: 75, label_fr: "Neige forte", label_en: "Heavy snow fall" },
+    { id: 16, wmo_code: 80, label_fr: "Averses légères", label_en: "Slight rain showers" },
+    { id: 17, wmo_code: 81, label_fr: "Averses modérées", label_en: "Moderate rain showers" },
+    { id: 18, wmo_code: 82, label_fr: "Averses fortes", label_en: "Violent rain showers" },
+    { id: 19, wmo_code: 95, label_fr: "Orage", label_en: "Thunderstorm" },
   ];
 
-  for (const weather of weatherRestrictions) {
-    await prisma.weatherRestriction.upsert({
+  for (const weather of weatherConditions) {
+    await prisma.weatherCondition.upsert({
       where: { id: weather.id },
       update: {},
       create: weather,
     });
   }
-  console.log(`${weatherRestrictions.length} restrictions météo seedées`);
+  console.log(`${weatherConditions.length} conditions météo seedées`);
 
   // Seeding des actions avec actionType, incrementStep et restrictions température selon REGLES_METIER_APICOLES.md
   const actions = [
@@ -361,37 +374,53 @@ async function main() {
   // Seeding des relations ActionWeatherRestriction selon REGLES_METIER_APICOLES.md
   const actionWeatherRestrictions = [
     // Actions nécessitant ouverture ruche = interdites par mauvais temps
-    // Restrictions: Pluie (3), Averses (4), Orage (5), Vent fort (6)
+    // Restrictions basées sur codes WMO: Pluie légère (61), Pluie modérée (63), Pluie forte (65),
+    // Averses légères (80), Averses modérées (81), Averses fortes (82), Orage (95)
     
     // Action 1: Confirmer présence reine (ouverture ruche)
-    { actionId: 1, weatherRestrictionId: 3 }, // Pluie
-    { actionId: 1, weatherRestrictionId: 4 }, // Averses
-    { actionId: 1, weatherRestrictionId: 5 }, // Orage
-    { actionId: 1, weatherRestrictionId: 6 }, // Vent fort
+    { actionId: 1, weatherConditionId: 10 }, // Pluie légère (WMO 61)
+    { actionId: 1, weatherConditionId: 11 }, // Pluie modérée (WMO 63)
+    { actionId: 1, weatherConditionId: 12 }, // Pluie forte (WMO 65)
+    { actionId: 1, weatherConditionId: 16 }, // Averses légères (WMO 80)
+    { actionId: 1, weatherConditionId: 17 }, // Averses modérées (WMO 81)
+    { actionId: 1, weatherConditionId: 18 }, // Averses fortes (WMO 82)
+    { actionId: 1, weatherConditionId: 19 }, // Orage (WMO 95)
     
     // Action 2: Observer couvain (ouverture prolongée)
-    { actionId: 2, weatherRestrictionId: 3 }, // Pluie
-    { actionId: 2, weatherRestrictionId: 4 }, // Averses
-    { actionId: 2, weatherRestrictionId: 5 }, // Orage
-    { actionId: 2, weatherRestrictionId: 6 }, // Vent fort
+    { actionId: 2, weatherConditionId: 10 }, // Pluie légère (WMO 61)
+    { actionId: 2, weatherConditionId: 11 }, // Pluie modérée (WMO 63)
+    { actionId: 2, weatherConditionId: 12 }, // Pluie forte (WMO 65)
+    { actionId: 2, weatherConditionId: 16 }, // Averses légères (WMO 80)
+    { actionId: 2, weatherConditionId: 17 }, // Averses modérées (WMO 81)
+    { actionId: 2, weatherConditionId: 18 }, // Averses fortes (WMO 82)
+    { actionId: 2, weatherConditionId: 19 }, // Orage (WMO 95)
     
     // Action 3: Évaluer vitalité reine (ouverture ruche)
-    { actionId: 3, weatherRestrictionId: 3 }, // Pluie
-    { actionId: 3, weatherRestrictionId: 4 }, // Averses
-    { actionId: 3, weatherRestrictionId: 5 }, // Orage
-    { actionId: 3, weatherRestrictionId: 6 }, // Vent fort
+    { actionId: 3, weatherConditionId: 10 }, // Pluie légère (WMO 61)
+    { actionId: 3, weatherConditionId: 11 }, // Pluie modérée (WMO 63)
+    { actionId: 3, weatherConditionId: 12 }, // Pluie forte (WMO 65)
+    { actionId: 3, weatherConditionId: 16 }, // Averses légères (WMO 80)
+    { actionId: 3, weatherConditionId: 17 }, // Averses modérées (WMO 81)
+    { actionId: 3, weatherConditionId: 18 }, // Averses fortes (WMO 82)
+    { actionId: 3, weatherConditionId: 19 }, // Orage (WMO 95)
     
     // Action 5: Surface couvain (inspection cadres)
-    { actionId: 5, weatherRestrictionId: 3 }, // Pluie
-    { actionId: 5, weatherRestrictionId: 4 }, // Averses
-    { actionId: 5, weatherRestrictionId: 5 }, // Orage
-    { actionId: 5, weatherRestrictionId: 6 }, // Vent fort
+    { actionId: 5, weatherConditionId: 10 }, // Pluie légère (WMO 61)
+    { actionId: 5, weatherConditionId: 11 }, // Pluie modérée (WMO 63)
+    { actionId: 5, weatherConditionId: 12 }, // Pluie forte (WMO 65)
+    { actionId: 5, weatherConditionId: 16 }, // Averses légères (WMO 80)
+    { actionId: 5, weatherConditionId: 17 }, // Averses modérées (WMO 81)
+    { actionId: 5, weatherConditionId: 18 }, // Averses fortes (WMO 82)
+    { actionId: 5, weatherConditionId: 19 }, // Orage (WMO 95)
     
     // Action 18: Contrôle visuel réserves (ouverture ruche)
-    { actionId: 18, weatherRestrictionId: 3 }, // Pluie
-    { actionId: 18, weatherRestrictionId: 4 }, // Averses
-    { actionId: 18, weatherRestrictionId: 5 }, // Orage
-    { actionId: 18, weatherRestrictionId: 6 }, // Vent fort
+    { actionId: 18, weatherConditionId: 10 }, // Pluie légère (WMO 61)
+    { actionId: 18, weatherConditionId: 11 }, // Pluie modérée (WMO 63)
+    { actionId: 18, weatherConditionId: 12 }, // Pluie forte (WMO 65)
+    { actionId: 18, weatherConditionId: 16 }, // Averses légères (WMO 80)
+    { actionId: 18, weatherConditionId: 17 }, // Averses modérées (WMO 81)
+    { actionId: 18, weatherConditionId: 18 }, // Averses fortes (WMO 82)
+    { actionId: 18, weatherConditionId: 19 }, // Orage (WMO 95)
     
     // Note: Actions 4,6,7,8,9,10,11,12,13,14,15,16,17 = interventions externes/rapides = pas de restrictions météo
   ];
@@ -399,9 +428,9 @@ async function main() {
   for (const actionWeatherRestriction of actionWeatherRestrictions) {
     await prisma.actionWeatherRestriction.upsert({
       where: { 
-        actionId_weatherRestrictionId: { 
+        actionId_weatherConditionId: { 
           actionId: actionWeatherRestriction.actionId, 
-          weatherRestrictionId: actionWeatherRestriction.weatherRestrictionId 
+          weatherConditionId: actionWeatherRestriction.weatherConditionId 
         } 
       },
       update: {},

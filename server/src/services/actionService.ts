@@ -6,6 +6,7 @@ import WeatherService from "./weatherService";
 interface WeatherData {
   temperature: number;  // Température en °C
   condition: string;    // Condition météo mappée (ex: "Ensoleillé", "Pluie")
+  wmoCode: number;      // Code WMO standardisé pour filtrage actions
 }
 
 interface FilteredActionsResponse {
@@ -29,58 +30,59 @@ class ActionService {
     const allActions = await this.findAll(); // Récupère toutes actions + relations (déjà optimisé)
 
     // 2️ ÉTAPE CONTEXTE : Calculer situation actuelle apicole
-    const currentPeriod = this.getCurrentPeriod();    // Période selon date (hiver, printemps...)
+    const currentPeriodId = this.getCurrentPeriod();    // ID période selon date (1-8)
+    const currentPeriodData = await ActionRepository.findPeriodById(currentPeriodId); // Récupère label depuis DB
     const weatherData = await this.getCurrentWeather(apiaryId); // Température + météo spécifiques au rucher
 
     // 3️ ÉTAPE FILTRAGE : Appliquer règles métier pour chaque action
     const filteredActions = this.filterActionsByRules(
       allActions,     // Toutes les actions de la DB
-      currentPeriod,  // Ex: "traitement_été" 
+      currentPeriodId,  // ID période (1-8)
       weatherData     // Ex: { temperature: 18, condition: "Ensoleillé" }
     );
 
     // 4️ ÉTAPE RESPONSE : Structurer réponse avec contexte + actions filtrées
     return {
-      currentPeriod,                           // Période calculée pour info frontend
+      currentPeriod: currentPeriodData?.label_fr || "Période inconnue", // Libellé français depuis DB
       currentTemperature: weatherData.temperature, // Température pour info frontend  
       currentWeather: weatherData.condition,       // Météo pour info frontend
       actions: filteredActions                     // SEULEMENT les actions autorisées maintenant
     };
   }
 
-  //MÉTHODE 1: Calcul période apicole selon date actuelle (retourne label utilisateur)
-  static getCurrentPeriod(): string {
+  //MÉTHODE 1: Calcul période apicole selon date actuelle (retourne ID période 1-8)
+  static getCurrentPeriod(): number {
     const now = new Date();
     const month = now.getMonth() + 1; // JavaScript months: 0-indexed → +1 pour mois réel
     const day = now.getDate();
 
     //Périodes selon Guide officiel apicole Wallonie (8 périodes annuelles)
     if (month === 1 || (month === 2 && day <= 15)) {
-      return "hiver";                    // Jan - 15 fév : Repos hivernal, minimal interventions
+      return 1;                    // Jan - 15 fév : Hiver
     }
     if ((month === 2 && day > 15) || month === 3) {
-      return "fin_hiver";               // 16 fév - Mars : Préparation réveil, premiers contrôles  
+      return 2;                    // 16 fév - Mars : Fin d'hiver
     }
     if (month >= 4 && month <= 6) {
-      return "miellée_printemps";         // Avr-Juin : Période productive, surveillance reine/couvain
+      return 3;                    // Avr-Juin : Miellée de printemps
     }
     if (month === 7) {
-      return "inter_miellée";                // Juillet : Entre 2 miellées, récolte miel
+      return 4;                    // Juillet : Inter-miellée
     }
     if ((month === 8 && day <= 15)) {
-      return "pré_traitement";               // 1-15 août : Préparation traitements varroa
+      return 5;                    // 1-15 août : Pré-traitement
     }
     if ((month === 8 && day > 15) || month === 9) {
-      return "traitement_été";             // 16 août-Sept : Traitement varroa obligatoire
+      return 6;                    // 16 août-Sept : Traitement d'été
     }
     if (month >= 10 && month <= 11) {
-      return "préparation_hiver";        // Oct-Nov : Préparation hivernage, nourrissement
+      return 7;                    // Oct-Nov : Préparation d'hiver
     }
     if (month === 12) {
-      return "traitement_hiver";          // Décembre : Traitement hiver (acide oxalique)
+      return 8;                    // Décembre : Traitement d'hiver
     }
     
-    return "hiver"; // Fallback sécurité
+    return 1; // Fallback sécurité → Hiver
   }
 
   //MÉTHODE 2: Récupération météo actuelle avec API Open-Meteo
@@ -108,15 +110,15 @@ class ActionService {
   }
 
   //MÉTHODE 3: Filtrage actions selon 4 règles métier apicoles
-  static filterActionsByRules(actions: any[], currentPeriod: string, weather: WeatherData): any[] {
+  static filterActionsByRules(actions: any[], currentPeriodId: number, weather: WeatherData): any[] {
     return actions.filter(action => {
       
       //FILTRE 1: Vérification période saisonnière
       if (action.action_periodes.length > 0) {
-        // Extrait les périodes autorisées pour cette action (ex: ["miellée_printemps", "traitement_été"])
-        const allowedPeriods = action.action_periodes.map((ap: any) => ap.periode.label);
-        if (!allowedPeriods.includes(currentPeriod)) {
-          return false; //Action interdite pour période actuelle (ex: traitement hiver en été)
+        // Extrait les IDs périodes autorisées pour cette action (ex: [3, 6] pour printemps et été)
+        const allowedPeriodIds = action.action_periodes.map((ap: any) => ap.periodeId);
+        if (!allowedPeriodIds.includes(currentPeriodId)) {
+          return false; //Action interdite pour période actuelle (ex: ID 8=traitement hiver en ID 6=été)
         }
       }
       // Si action.action_periodes vide = action autorisée toute l'année
@@ -131,12 +133,12 @@ class ActionService {
         return false; //Trop chaud (ex: traitement acide oxalique si > 8°C)
       }
 
-      //FILTRE 4: Vérification restrictions météorologiques
+      //FILTRE 4: Vérification restrictions météorologiques (codes WMO standardisés)
       if (action.action_weather_restrictions.length > 0) {
-        // Extrait restrictions météo pour cette action (ex: ["Pluie", "Vent fort"])
-        const weatherRestrictions = action.action_weather_restrictions.map((wr: any) => wr.weatherRestriction.label);
-        if (weatherRestrictions.includes(weather.condition)) {
-          return false; //Météo défavorable (ex: ouverture ruche sous la pluie)
+        // Extrait codes WMO interdits pour cette action (ex: [61, 63, 65, 95] pour pluie/orage)
+        const restrictedWmoCodes = action.action_weather_restrictions.map((wr: any) => wr.weatherCondition.wmo_code);
+        if (restrictedWmoCodes.includes(weather.wmoCode)) {
+          return false; //Météo défavorable selon code WMO (ex: ouverture ruche code 61=pluie légère)
         }
       }
 

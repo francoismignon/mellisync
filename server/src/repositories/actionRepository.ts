@@ -12,7 +12,7 @@ class ActionRepository {
           include: { periode: true }
         },
         action_weather_restrictions: {
-          include: { weatherRestriction: true }
+          include: { weatherCondition: true }
         }
       },
       orderBy: { id: 'asc' }
@@ -30,7 +30,7 @@ class ActionRepository {
           include: { periode: true }
         },
         action_weather_restrictions: {
-          include: { weatherRestriction: true }
+          include: { weatherCondition: true }
         }
       }
     });
@@ -42,19 +42,19 @@ class ActionRepository {
     });
   }
 
-  static async findAllWeatherRestrictions() {
-    return await prisma.weatherRestriction.findMany();
+  static async findAllWeatherConditions() {
+    return await prisma.weatherCondition.findMany();
   }
 
-  static async findPeriodByLabel(label: string) {
-    return await prisma.periode.findFirst({
-      where: { label }
+  static async findPeriodById(id: number) {
+    return await prisma.periode.findUnique({
+      where: { id }
     });
   }
 
-  static async findWeatherRestrictionByCondition(condition: string) {
-    return await prisma.weatherRestriction.findFirst({
-      where: { label: { contains: condition, mode: 'insensitive' } }
+  static async findWeatherConditionByWmoCode(wmoCode: number) {
+    return await prisma.weatherCondition.findFirst({
+      where: { wmo_code: wmoCode }
     });
   }
 }
