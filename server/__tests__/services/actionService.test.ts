@@ -6,13 +6,13 @@ jest.mock('../../src/services/weatherService')
 
 describe('ActionService', () => {
   describe('getCurrentPeriod', () => {
-    it('devrait retourner "hiver" pour janvier', () => {
+    it('devrait retourner ID 1 (hiver) pour janvier', () => {
       // Mock de la date pour janvier
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2025-01-15'))
 
       const period = ActionService.getCurrentPeriod()
-      expect(period).toBe('hiver')
+      expect(period).toBe(1) // ID 1 = hiver
 
       // Restaurer les timers
       jest.useRealTimers()
