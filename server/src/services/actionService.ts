@@ -85,6 +85,12 @@ class ActionService {
     return 1; // Fallback sécurité → Hiver
   }
 
+  //MÉTHODE HELPER: Récupération libellé français d'une période par son ID
+  static async getPeriodLabelById(id: number): Promise<string> {
+    const periodData = await ActionRepository.findPeriodById(id);
+    return periodData?.label_fr || "Période inconnue";
+  }
+
   //MÉTHODE 2: Récupération météo actuelle avec API Open-Meteo
   static async getCurrentWeather(apiaryId?: number): Promise<WeatherData> {
     // Si aucun apiaryId fourni, utiliser coordonnées par défaut (Bruxelles)

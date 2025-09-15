@@ -80,13 +80,15 @@ class VisitController{
             );
             const visitNumber = sortedVisits.findIndex(v => v.id === visitId) + 1;
 
-            //Utilisation météo historique stockée dans la visite
+            //Utilisation météo historique stockée dans la visite + période traduite
+            const currentPeriodId = ActionService.getCurrentPeriod();  // ID période selon date visite
+            
             const contextData = {
                 weather: {
                     temperature: visit.temperature || 0,
                     condition: visit.weather || "Non disponible"
                 },
-                period: ActionService.getCurrentPeriod()  // Période selon date visite
+                period: await ActionService.getPeriodLabelById(currentPeriodId)  // Label français depuis DB
             };
 
             //Génération HTML depuis composant React

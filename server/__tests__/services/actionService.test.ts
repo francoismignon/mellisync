@@ -29,13 +29,13 @@ describe('ActionService', () => {
       jest.useRealTimers()
     })
 
-    it('devrait retourner "traitement_été" pour septembre', () => {
+    it('devrait retourner ID 6 (traitement_été) pour septembre', () => {
       // Mock de la date pour septembre (période actuelle)
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2025-09-15'))
 
       const period = ActionService.getCurrentPeriod()
-      expect(period).toBe('traitement_été')
+      expect(period).toBe(6) // ID 6 = traitement_été
 
       jest.useRealTimers()
     })
@@ -49,7 +49,7 @@ describe('ActionService', () => {
         temperatureMin: 15,
         temperatureMax: null,
         action_periodes: [
-          { periode: { label: 'miellée_printemps' } }
+          { periodeId: 3 } // miellée_printemps
         ],
         action_weather_restrictions: []
       },
@@ -59,7 +59,7 @@ describe('ActionService', () => {
         temperatureMin: null,
         temperatureMax: 8,
         action_periodes: [
-          { periode: { label: 'traitement_hiver' } }
+          { periodeId: 8 } // traitement_hiver
         ],
         action_weather_restrictions: []
       },
@@ -69,19 +69,19 @@ describe('ActionService', () => {
         temperatureMin: null,
         temperatureMax: null,
         action_periodes: [
-          { periode: { label: 'miellée_printemps' } }
+          { periodeId: 3 } // miellée_printemps
         ],
         action_weather_restrictions: [
-          { weatherRestriction: { label: 'Pluie' } }
+          { weatherCondition: { wmo_code: 61 } } // Pluie légère
         ]
       }
     ]
 
     it('devrait filtrer les actions selon la période', () => {
-      const weatherData = { temperature: 18, condition: 'Ensoleillé' }
+      const weatherData = { temperature: 18, condition: 'Ensoleillé', wmoCode: 0 }
       const filtered = ActionService.filterActionsByRules(
         mockActions, 
-        'miellée_printemps', 
+        3, // ID pour miellée_printemps
         weatherData
       )
 
@@ -92,10 +92,10 @@ describe('ActionService', () => {
     })
 
     it('devrait filtrer les actions selon la température minimum', () => {
-      const weatherData = { temperature: 10, condition: 'Ensoleillé' }
+      const weatherData = { temperature: 10, condition: 'Ensoleillé', wmoCode: 0 }
       const filtered = ActionService.filterActionsByRules(
         mockActions, 
-        'miellée_printemps', 
+        3, // ID pour miellée_printemps
         weatherData
       )
 
@@ -105,10 +105,10 @@ describe('ActionService', () => {
     })
 
     it('devrait filtrer les actions selon les restrictions météo', () => {
-      const weatherData = { temperature: 18, condition: 'Pluie' }
+      const weatherData = { temperature: 18, condition: 'Pluie légère', wmoCode: 61 }
       const filtered = ActionService.filterActionsByRules(
         mockActions, 
-        'miellée_printemps', 
+        3, // ID pour miellée_printemps
         weatherData
       )
 
