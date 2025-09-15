@@ -18,13 +18,13 @@ describe('ActionService', () => {
       jest.useRealTimers()
     })
 
-    it('devrait retourner "fin_hiver" pour mars', () => {
+    it('devrait retourner ID 2 (fin_hiver) pour mars', () => {
       // Mock de la date pour mars
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2025-03-15'))
 
       const period = ActionService.getCurrentPeriod()
-      expect(period).toBe('fin_hiver')
+      expect(period).toBe(2) // ID 2 = fin_hiver
 
       jest.useRealTimers()
     })
