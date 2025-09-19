@@ -14,9 +14,10 @@ datasource db {
 }
 
 generator erd {
-  provider = "prisma-erd-generator"
-  output   = "../../docs/technique/diagrammes/erd.svg"
-  theme    = "neutral"
+  provider    = "prisma-erd-generator"
+  output      = "../../docs/technique/diagrammes/erd.svg"
+  theme       = "neutral"
+  ignoreEnums = true
 }
 
 generator dbml {
