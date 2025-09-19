@@ -43,7 +43,7 @@ class AddressService {
 
       // Encoder la requête pour URL
       const encodedQuery = encodeURIComponent(query.trim());
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&countrycodes=BE,NO&limit=5&addressdetails=1`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&countrycodes=BE&limit=5&addressdetails=1`;
       
       const response = await fetch(url, {
         headers: {
