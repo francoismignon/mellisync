@@ -459,7 +459,7 @@ function HiveDetails(){
                                                     {transhumance.apiary?.name || 'Rucher inconnu'}
                                                 </p>
                                                 <p className="text-sm text-gray-600">
-                                                    {transhumance.apiary?.address || 'Adresse inconnue'}, {transhumance.apiary?.city || 'Ville inconnue'}
+                                                    {transhumance.apiary?.address || 'Adresse inconnue'}
                                                 </p>
                                                 <p className="text-sm text-blue-600 font-medium mt-1">
                                                     {reasonLabel}
