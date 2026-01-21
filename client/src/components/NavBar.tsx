@@ -41,7 +41,7 @@ function NavBar({ user }: NavBarProps){
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <span className="text-2xl">🐝</span>
-                        <h1 className="text-xl font-semibold text-gray-800">François</h1>
+                        <h1 className="text-xl font-semibold text-gray-800">Mellisync</h1>
                     </div>
                     
                     {/* Desktop Menu */}

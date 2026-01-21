@@ -50,6 +50,22 @@ async function main() {
   });
   console.log("1 utilisateur beekeeper seedé (François)");
 
+  // Seeding de l'utilisateur invité pour démo recruteurs
+  const hashedGuestPassword = await AuthService.hashPassword("demo2025");
+  await prisma.user.upsert({
+    where: { email: "invite@mellisync.demo" },
+    update: {
+      password: hashedGuestPassword
+    },
+    create: {
+      name: "Invité Démo",
+      email: "invite@mellisync.demo",
+      password: hashedGuestPassword,
+      roleId: 2, // BEEKEEPER role
+    },
+  });
+  console.log("1 utilisateur invité démo seedé");
+
   // Seeding des options complètes (basées sur panel.html + user stories MUST HAVE)
   const options = [
     // Options générales toggle
