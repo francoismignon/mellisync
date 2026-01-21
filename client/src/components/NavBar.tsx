@@ -47,8 +47,7 @@ function NavBar({ user }: NavBarProps){
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-6">
                         <Link to="/" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                            <Dashboard fontSize="smal
-                            l" />
+                            <Dashboard fontSize="small" />
                             Tableau de bord
                         </Link>
                         <Link to="/ruchers" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
