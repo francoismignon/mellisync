@@ -41,13 +41,14 @@ function NavBar({ user }: NavBarProps){
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <span className="text-2xl">🐝</span>
-                        <h1 className="text-xl font-semibold text-gray-800">Mellisync</h1>
+                        <h1 className="text-xl font-semibold text-gray-800">François</h1>
                     </div>
                     
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-6">
                         <Link to="/" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                            <Dashboard fontSize="small" />
+                            <Dashboard fontSize="smal
+                            l" />
                             Tableau de bord
                         </Link>
                         <Link to="/ruchers" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
