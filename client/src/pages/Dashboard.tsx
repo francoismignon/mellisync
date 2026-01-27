@@ -18,7 +18,14 @@ interface DashboardData {
     };
 }
 
-function Dashboard(){
+interface DashboardProps {
+    user?: {
+        email: string;
+        [key: string]: any;
+    };
+}
+
+function Dashboard({ user }: DashboardProps){
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [showQRScanner, setShowQRScanner] = useState(false);
@@ -67,10 +74,41 @@ function Dashboard(){
         return <div className="text-center p-8">Chargement du tableau de bord...</div>;
     }
 
+    // Vérifier si c'est un utilisateur invité (démo)
+    const isGuestUser = user?.email === 'invite@mellisync.demo';
+
     return(
         <div>
             <h1>Tableau de bord</h1>
-            
+
+            {/* Card d'aide pour la navigation - uniquement pour session invitée */}
+            {isGuestUser && (
+            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-blue-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-blue-900 mb-1">Découvrez l'application</h3>
+                        <p className="text-sm text-blue-800 mb-3">
+                            Consultez vos ruchers pour voir vos ruches et effectuer des visites
+                        </p>
+                        <button
+                            onClick={() => navigate('/ruchers')}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+                        >
+                            Voir mes ruchers
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            )}
+
             {/* Compteurs de base */}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4 text-gray-800">Statistiques</h2>
