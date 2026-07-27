@@ -141,6 +141,65 @@ mellisync/
 
 ---
 
+## 💻 Lancement local
+
+### Prérequis
+
+- Node.js 22+
+- PostgreSQL 15+
+
+### Backend
+
+```bash
+cd server
+npm install
+```
+
+Créer un fichier `server/.env` :
+
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mellisync
+PORT=3000
+JWT_SECRET=change-me
+FRONTEND_URL=http://localhost:5173
+API_URL=http://localhost:3000
+```
+
+Puis initialiser la base et lancer l'API :
+
+```bash
+npx prisma migrate dev --schema=prisma/schema.prisma
+npm run seed:dev
+npm run dev
+```
+
+- API : `http://localhost:3000`
+- Documentation Swagger : `http://localhost:3000/swagger`
+- Tests backend : `npm test`
+
+### Frontend
+
+```bash
+cd client
+npm install
+```
+
+Créer un fichier `client/.env` :
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Puis lancer l'interface :
+
+```bash
+npm run dev
+```
+
+Application locale : `http://localhost:5173`
+
+---
+
 ## 🚢 CI/CD Pipeline
 
 Chaque push sur `master` déclenche automatiquement :
@@ -156,7 +215,7 @@ Chaque push sur `master` déclenche automatiquement :
 ## 👨‍💻 Contact
 
 **François Mignon**
-- 🌐 mignon.francois@gmail.com
+- ✉️ mignon.francois@gmail.com
 ---
 
 **⭐ Si ce projet vous intéresse, n'hésitez pas à lui donner une étoile !**
